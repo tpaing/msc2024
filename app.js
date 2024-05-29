@@ -1395,26 +1395,26 @@ app.get("/draft", (req, res) => {
 
     //pics
     responseData.player1Pic =
-      `${formData.banHeroPath}${a[0].player_list[0].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[0].player_list[0].roleid}.png` || "";
     responseData.player2Pic =
-      `${formData.banHeroPath}${a[0].player_list[1].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[0].player_list[1].roleid}.png` || "";
     responseData.player3Pic =
-      `${formData.banHeroPath}${a[0].player_list[2].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[0].player_list[2].roleid}.png` || "";
     responseData.player4Pic =
-      `${formData.banHeroPath}${a[0].player_list[3].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[0].player_list[3].roleid}.png` || "";
     responseData.player5Pic =
-      `${formData.banHeroPath}${a[0].player_list[4].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[0].player_list[4].roleid}.png` || "";
 
     responseData.player6Pic =
-      `${formData.banHeroPath}${a[1].player_list[0].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[1].player_list[0].roleid}.png` || "";
     responseData.player7Pic =
-      `${formData.banHeroPath}${a[1].player_list[1].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[1].player_list[1].roleid}.png` || "";
     responseData.player8Pic =
-      `${formData.banHeroPath}${a[1].player_list[2].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[1].player_list[2].roleid}.png` || "";
     responseData.player9Pic =
-      `${formData.banHeroPath}${a[1].player_list[3].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[1].player_list[3].roleid}.png` || "";
     responseData.player10Pic =
-      `${formData.banHeroPath}${a[1].player_list[4].roleid}.png` || "";
+      `${formData.draft_player_pic}${a[1].player_list[4].roleid}.png` || "";
 
     //ledPlayers
     for (let i = 0; i < 5; i++) {
