@@ -1489,8 +1489,10 @@ app.get("/draft", (req, res) => {
     //picked1
     responseData.picking1 = 0
     responseData.picked1 = 0
+    responseData.border1 = "C://data/draft/border/0.png"
     if (a[0].player_list[0].picking == true) {
       responseData.picking1 = 1
+      responseData.border1 = "C://data/draft/border/1.png"
     }
     else if (a[0].player_list[0].picking == false && a[0].player_list[0].heroid !== 0) {
       responseData.picking1 = 1
@@ -1500,8 +1502,10 @@ app.get("/draft", (req, res) => {
     //picked2
     responseData.picking2 = 0
     responseData.picked2 = 0
+    responseData.border2 = "C://data/draft/border/0.png"
     if (a[0].player_list[1].picking == true) {
       responseData.picking2 = 1
+      responseData.border2 = "C://data/draft/border/1.png"
     }
     else if (a[0].player_list[1].picking == false && a[0].player_list[1].heroid !== 0) {
       responseData.picking2 = 1
@@ -1511,8 +1515,10 @@ app.get("/draft", (req, res) => {
     //picked3
     responseData.picking3 = 0
     responseData.picked3 = 0
+    responseData.border3 = "C://data/draft/border/0.png"
     if (a[0].player_list[2].picking == true) {
       responseData.picking3 = 1
+      responseData.border3 = "C://data/draft/border/1.png"
     }
     else if (a[0].player_list[2].picking == false && a[0].player_list[2].heroid !== 0) {
       responseData.picking3 = 1
@@ -1522,8 +1528,10 @@ app.get("/draft", (req, res) => {
     //picked4
     responseData.picking4 = 0
     responseData.picked4 = 0
+    responseData.border4 = "C://data/draft/border/0.png"
     if (a[0].player_list[3].picking == true) {
       responseData.picking4 = 1
+      responseData.border4 = "C://data/draft/border/1.png"
     }
     else if (a[0].player_list[3].picking == false && a[0].player_list[3].heroid !== 0) {
       responseData.picking4 = 1
@@ -1533,8 +1541,10 @@ app.get("/draft", (req, res) => {
     //picked5
     responseData.picking5 = 0
     responseData.picked5 = 0
+    responseData.border5 = "C://data/draft/border/0.png"
     if (a[0].player_list[4].picking == true) {
       responseData.picking5 = 1
+      responseData.border5 = "C://data/draft/border/1.png"
     }
     else if (a[0].player_list[4].picking == false && a[0].player_list[4].heroid !== 0) {
       responseData.picking5 = 1
@@ -1544,8 +1554,10 @@ app.get("/draft", (req, res) => {
     //picked6
     responseData.picking6 = 0
     responseData.picked6 = 0
+    responseData.border6 = "C://data/draft/border/0.png"
     if (a[1].player_list[0].picking == true) {
       responseData.picking6 = 1
+      responseData.border6 = "C://data/draft/border/1.png"
     }
     else if (a[1].player_list[0].picking == false && a[1].player_list[0].heroid !== 0) {
       responseData.picking6 = 1
@@ -1555,8 +1567,10 @@ app.get("/draft", (req, res) => {
     //picked7
     responseData.picking7 = 0
     responseData.picked7 = 0
+    responseData.border7 = "C://data/draft/border/0.png"
     if (a[1].player_list[1].picking == true) {
       responseData.picking7 = 1
+      responseData.border7 = "C://data/draft/border/1.png"
     }
     else if (a[1].player_list[1].picking == false && a[1].player_list[1].heroid !== 0) {
       responseData.picking7 = 1
@@ -1566,8 +1580,10 @@ app.get("/draft", (req, res) => {
     //picked8
     responseData.picking8 = 0
     responseData.picked8 = 0
+    responseData.border8 = "C://data/draft/border/0.png"
     if (a[1].player_list[2].picking == true) {
       responseData.picking8 = 1
+      responseData.border8 = "C://data/draft/border/1.png"
     }
     else if (a[1].player_list[2].picking == false && a[1].player_list[2].heroid !== 0) {
       responseData.picking8 = 1
@@ -1577,8 +1593,10 @@ app.get("/draft", (req, res) => {
     //picked9
     responseData.picking9 = 0
     responseData.picked9 = 0
+    responseData.border9 = "C://data/draft/border/0.png"
     if (a[1].player_list[3].picking == true) {
       responseData.picking9 = 1
+      responseData.border9 = "C://data/draft/border/1.png"
     }
     else if (a[1].player_list[3].picking == false && a[1].player_list[3].heroid !== 0) {
       responseData.picking9 = 1
@@ -1588,8 +1606,10 @@ app.get("/draft", (req, res) => {
     //picked10
     responseData.picking10 = 0
     responseData.picked10 = 0
+    responseData.border10 = "C://data/draft/border/0.png"
     if (a[1].player_list[4].picking == true) {
       responseData.picking10 = 1
+      responseData.border10 = "C://data/draft/border/1.png"
     }
     else if (a[1].player_list[4].picking == false && a[1].player_list[4].heroid !== 0) {
       responseData.picking10 = 1
