@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draft Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.min.css">
+</head>
+<body>
+    <div id="app">
+        <p>Timer: {{ timer }}</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.js"></script>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                timer: '', // Change to a string and initialize to an empty string
+            },
+            created() {
+                this.fetchTimer(); // Fetch the timer data when the component is created
+                setInterval(this.fetchTimer, 1000); // Refresh the timer every second
+            },
+            methods: {
+                async fetchTimer() {
+                    try {
+                        const response = await fetch('/hud');
+
+                        if (response.ok) {
+                            const timerData = await response.json();
+                            console.log('Timer data:', timerData); // Log the received timer data
+                            this.timer = timerData.data[0].gameTime || 'N/A'; // Ensure 'N/A' if gameTime is undefined
+                        } else {
+                            console.error('Error fetching timer data. Status:', response.status);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                },
+            },
+        });
+    </script>
+</body>
+</html>

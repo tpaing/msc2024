@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player List</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.min.css">
+</head>
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container fluid fill-height>
+                    <v-row justify="center" align="center">
+                        <v-col cols="12" md="8">
+                            <v-card elevation="3" class="pa-4">
+                                <h1 class="mb-4">Player List</h1>
+                                <form @submit.prevent="submitForm">
+                                    <div v-for="(player, index) in players" :key="index">
+                                        <v-row>
+                                            <v-col cols="3">
+                                                <v-text-field label="Player ID" v-model="player.playerId" required></v-text-field>
+                                            </v-col>
+                                            <v-col cols="3">
+                                                <v-text-field label="Player Name" v-model="player.playerName" required></v-text-field>
+                                            </v-col>
+                                            <v-col cols="3">
+                                                <v-select label="Player Role" v-model="player.playerRole" :items="roles" required></v-select>
+                                            </v-col>
+                                            <v-col cols="3" class="d-flex align-center">
+                                                <v-btn @click="removePlayer(index)" color="red" class="mt-2">Remove</v-btn>
+                                            </v-col>
+                                        </v-row>
+                                    </div>
+                                    <v-btn @click="addPlayer" color="blue">Add Player</v-btn>
+                                    <v-btn type="submit" color="green">Submit</v-btn>
+                                </form>
+                                <p>{{ formattedData }}</p>
+                                <p :style="{ color: messageColor }">{{ message }}</p>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.js"></script>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                players: [],
+                message: '',
+                messageColor: '',
+                formattedData: {},
+                roles: ['exp', 'jg', 'mid', 'gold', 'roam'],
+            },
+            created() {
+                this.makeGetRequest();
+            },
+            methods: {
+                async makeGetRequest() {
+                    try {
+                        const response = await fetch('/getplayers');
+
+                        if (response.ok) {
+                            const responseData = await response.json();
+                            this.players = Object.keys(responseData.playerList).map(playerId => ({
+                                playerId: playerId,
+                                playerName: responseData.playerList[playerId].name,
+                                playerRole: responseData.playerList[playerId].role,
+                            }));
+                        } else {
+                            this.setMessage('Failed to Fetch player data', 'red')
+                        }
+                    } catch (error) {
+                        console.error('Error', error);
+                        this.setMessage('An error occurred.', 'red')
+                    }
+                },
+                addPlayer() {
+                    this.players.push({ playerId: '', playerName: '', playerRole: 'exp' });
+                },
+                removePlayer(index) {
+                    this.players.splice(index, 1);
+                },
+                async submitForm() {
+                    const validPlayers = this.players.filter(player =>
+                        player.playerId && player.playerName && player.playerRole
+                    );
+
+                    if (validPlayers.length === 0) {
+                        this.setMessage('Please fill in all player details.', 'red');
+                        return;
+                    }
+
+                    this.formattedData = validPlayers.reduce((result, player) => {
+                        result[player.playerId] = {
+                            role: player.playerRole,
+                            name: player.playerName,
+                        };
+                        return result;
+                    }, {});
+
+                    const data = this.formattedData;
+
+                    try {
+                        const response = await fetch('/up', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                        });
+
+                        if (response.ok) {
+                            this.setMessage('Player list uploaded successfully!', 'green');
+                        } else {
+                            this.setMessage('Failed to upload player list.', 'red');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.setMessage('An error occurred.', 'red');
+                    }
+                },
+                setMessage(text, color) {
+                    this.message = text;
+                    this.messageColor = color;
+                },
+            },
+        });
+    </script>
+</body>
+</html>

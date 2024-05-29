@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draft Form</title>
+    <!-- https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.min.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.6.10/vuetify.min.css">
+</head>
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container fluid fill-height>
+                    <v-row align="center" justify="center">
+                        <v-col cols="12" sm="8" md="6">
+                            <v-card elevation="3" class="pa-4 cyan--text">
+                                <v-btn color="primary" @click="submitForm">Submit</v-btn></br>
+                                <h3 class="mb-4">Key</h3>
+                                <v-text-field label="Token" v-model="pass" placeholder="f052754e" required></v-text-field>
+                                <v-text-field label="key" v-model="battleid" placeholder="12345678" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8">Team Name</h3>
+                                <v-text-field label="Team 1 Name" v-model="team1_name" placeholder="Ai Esports" required></v-text-field>
+                                <v-text-field label="Team 1 Short Name" v-model="team1_shortName" placeholder="AI" required></v-text-field>
+                                <v-text-field label="Team 2 Name" v-model="team2_name" placeholder="BURMESE GHOULS" required></v-text-field>
+                                <v-text-field label="Team 2 Short Name" v-model="team2_shortName" placeholder="BG" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">Draft</h3>
+                                <v-text-field label="Team Logo Png" v-model="draft_logo_path" placeholder="C://logo/" required></v-text-field>
+                                <v-text-field label="Player" v-model="draft_player_pic" placeholder="E:/Pick Ban/Player/" required></v-text-field>
+                                <v-text-field label="Default Path 0" v-model="draft_player_default" placeholder="/0/10001.png" required></v-text-field>
+                                <v-text-field label="Action Path 1" v-model="draft_player_action" placeholder="/1/10001.png" required></v-text-field>
+                                <v-text-field label="Pick Hero path" v-model="hero" placeholder="E:/pick/Hero/" required></v-text-field>
+                                <v-text-field label="Hero Image Sequence" v-model="heroImageSequence" placeholder="/10001.png" required></v-text-field>
+                                <v-text-field label="Default Ban Pic" v-model="defaultBan" placeholder="E:/Ban/0.png" required></v-text-field>
+                                <v-text-field label="Ban Hero Path" v-model="banHeroPath" placeholder="E:/Ban/" required></v-text-field>
+                                <v-text-field label="Banning Icon" v-model="banning" placeholder="E:/Ban/1.png" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">Items</h3>
+                                <v-text-field label="itemHero" v-model="itemHeroPath" placeholder="C://hero/" required></v-text-field>
+                                <v-text-field label="item" v-model="itemPath" placeholder="C://items/" required></v-text-field>
+                                <v-text-field label="Battle Spell" v-model="spellPath" placeholder="C://items/" required></v-text-field>
+                                <v-text-field label="gold diff heroes" v-model="goldDiffHeroPath" placeholder="C://hero/" required></v-text-field>
+                                <v-text-field label="gold icon" v-model="goldIconPngPath" placeholder="C://hero/" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8">HUD</h3>
+                                <v-text-field label="Team Logo Png" v-model="hudLogoPath" placeholder="C://mypc/" required></v-text-field>
+                                <v-text-field label="goldIcon" v-model="goldLogo" placeholder="C://mypc/" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">Emblems</h3>
+                                <v-text-field label="Emblems png path" v-model="emblemPath" placeholder="C://emblems/" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">Gold and Damage Ranking</h3>
+                                <v-text-field label="Gold Ranking Hero Path" v-model="goldRankingHeroPath" placeholder="C://goldRanking/" required></v-text-field>
+                                <v-text-field label="Gold Ranking Percent Path" v-model="goldPercentPngPath" placeholder="C://goldRanking/" required></v-text-field>
+                                <v-text-field label="Damage Ranking Hero Path" v-model="damageRankingHeroPath" placeholder="C://damageRanking/" required></v-text-field>
+                                <v-text-field label="Damage Ranking Percent Path" v-model="damagePercentPngPath" placeholder="C://damageRanking/" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">MVP</h3>
+                                <v-text-field label="MVP Team Logo" v-model="mvpLogoPath" placeholder="C://mvp/" required></v-text-field>
+                                <v-text-field label="MVP Player Photo" v-model="mvpPlayerPath" placeholder="C://mvp/" required></v-text-field>
+                                <v-text-field label="MVP Player Spell" v-model="mvpPlayerSpellPath" placeholder="C://mvp/" required></v-text-field>
+                                <v-text-field label="MVP Player Item" v-model="mvpPlayerItemPath" placeholder="C://mvp/" required></v-text-field>
+                                <v-text-field label="MVP Player Hero" v-model="mvpHeroPath" placeholder="C://mvp/" required></v-text-field>
+                                <v-text-field label="MVP Emblems" v-model="mvpEmblemPath" placeholder="C://mvp/" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">POST Data</h3>
+                                <v-text-field label="Postdata Logo" v-model="post1Logo" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Postdata Hero" v-model="post1Hero" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Postdata2 Hero" v-model="post2Hero" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Postdata1 Items" v-model="post1ItemPath" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Players" v-model="resultPlayer" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Spell" v-model="resultSpell" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Emblems" v-model="resultEmblem" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Damage Deal" v-model="totalDamageBar" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Damage Taken" v-model="totalDamageTakenBar" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Tower Damage" v-model="totalTowerDamageBar" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Lord/Turtle/Tower" v-model="TurtleLordTurretBar" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Postdata 2 Players" v-model="hightest" placeholder="C://post2/" required></v-text-field>
+                                <v-text-field label="Main Emblem" v-model="MainEmblem" placeholder="C://post2/" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">POST Data</h3>
+                                <v-text-field label="LordKillPlayer" v-model="bossKillerPath" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="LordKillTeamLogo" v-model="bossKillerLogoPath" placeholder="C://post1/" required></v-text-field>
+
+                                <h3 class="mb-4 mt-8 cyan--text">LED</h3>
+                                <v-text-field label="Alive" v-model="yes" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Not Alive" v-model="no" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Not Picking" v-model="notPickingLed" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Picked" v-model="PickedLed" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Player Alive" v-model="LedPlayerPicYes" placeholder="C://post1/" required></v-text-field>
+                                <v-text-field label="Player Not Alive" v-model="LedPlayerPicNo" placeholder="C://post1/" required></v-text-field>
+                                <v-btn color="primary" @click="submitForm">Submit</v-btn>
+                                <p :style="{ color: messageColor }">{{ message }}</p>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <!-- https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.js"></script>
+    <!-- https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.6.10/vuetify.js"></script>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                message : '',
+                messageColor: '',
+                
+                pass : '',
+                battleid : '',
+                //draft
+                team1_name: '',
+                team1_shortName: '',
+                team2_name: '',
+                team2_shortName: '',
+                draft_logo_path: '',
+                draft_player_pic: '',
+                draft_player_default: '',
+                draft_player_action: '',
+                hero: '',
+                heroImageSequence: '',
+                defaultBan: '',
+                banHeroPath: '',
+                banning: '',
+                //items
+                itemHeroPath: '',
+                itemPath: '',
+                spellPath: '',
+                goldDiffHeroPath: '',
+                goldIconPngPath: '',
+                //hud
+                hudLogoPath: '',
+                goldLogo : '',
+                //emblems
+                emblemPath : '',
+                //gold and Damage ranking
+                goldRankingHeroPath : '',
+                goldPercentPngPath : '',
+                damageRankingHeroPath : '',
+                damagePercentPngPath : '',
+                //mvp
+                mvpLogoPath : '',
+                mvpPlayerPath : '',
+                mvpPlayerSpellPath : '',
+                mvpPlayerItemPath : '',
+                mvpHeroPath : '',
+                mvpEmblemPath : '',
+                //Post Result
+                post1Logo : '',
+                post1Hero : '',
+                post2Hero : '',
+                post1ItemPath : '',
+                resultPlayer : '',
+                resultSpell : '',
+                resultEmblem : '',
+                totalDamageBar : '',
+                totalDamageTakenBar : '',
+                totalTowerDamageBar : '',
+                TurtleLordTurretBar : '',
+                hightest : '',
+                MainEmblem: '',
+                //turtlekill
+                bossKillerPath : '',
+                bossKillerLogoPath : '',
+                //led
+                yes : '',
+                no : '',
+                notPickingLed : '',
+                PickedLed: '',
+                LedPlayerPicYes: '',
+                LedPlayerPicNo : '',
+            },
+            created() {
+                this.getFormData()
+            },
+            methods: {
+                async getFormData() {
+                    try {
+                        const response = await fetch('/getFormData');
+
+                        if(response.ok) {
+                            const formData = await response.json();
+                            this.pass = formData.pass
+                            this.battleid = formData.battleid
+                            this.team1_name = formData.team1_name
+                            this.team1_shortName = formData.team1_shortName
+                            this.team2_name = formData.team2_name
+                            this.team2_shortName = formData.team2_shortName
+                            //draft
+                            this.draft_logo_path = formData.draft_logo_path;
+                            this.draft_player_pic = formData.draft_player_pic;
+                            this.draft_player_default = formData.draft_player_default
+                            this.draft_player_action = formData.draft_player_action
+                            this.hero = formData.hero
+                            this.heroImageSequence = formData.heroImageSequence
+                            this.defaultBan = formData.defaultBan
+                            this.banHeroPath = formData.banHeroPath
+                            this.banning = formData.banning
+                            //items
+                            this.itemHeroPath = formData.itemHeroPath
+                            this.itemPath = formData.itemPath
+                            this.spellPath = formData.spellPath
+                            this.goldDiffHeroPath = formData.goldDiffHeroPath
+                            this.goldIconPngPath = formData.goldIconPngPath
+                            //hud
+                            this.hudLogoPath = formData.hudLogoPath
+                            this.goldLogo = formData.goldLogo
+                            //emblems
+                            this.emblemPath = formData.emblemPath
+                            //gold and damage ranking
+                            this.goldRankingHeroPath = formData.goldRankingHeroPath
+                            this.goldPercentPngPath = formData.goldPercentPngPath
+                            this.damageRankingHeroPath = formData.damageRankingHeroPath
+                            this.damagePercentPngPath = formData.damagePercentPngPath
+                            //mvp
+                            this.mvpLogoPath = formData.mvpLogoPath
+                            this.mvpPlayerPath = formData.mvpPlayerPath
+                            this.mvpPlayerSpellPath = formData.mvpPlayerSpellPath
+                            this.mvpPlayerItemPath = formData.mvpPlayerItemPath
+                            this.mvpHeroPath = formData.mvpHeroPath
+                            this.mvpEmblemPath = formData.mvpEmblemPath
+                            //post result
+                            this.post1Logo = formData.post1Logo
+                            this.post1Hero = formData.post1Hero
+                            this.post2Hero = formData.post2Hero
+                            this.post1ItemPath = formData.post1ItemPath
+                            this.resultPlayer = formData.resultPlayer
+                            this.resultSpell = formData.resultSpell
+                            this.resultEmblem = formData.resultEmblem
+                            this.totalDamageBar = formData.totalDamageBar
+                            this.totalDamageTakenBar = formData.totalDamageTakenBar
+                            this.totalTowerDamageBar = formData.totalTowerDamageBar
+                            this.TurtleLordTurretBar = formData.TurtleLordTurretBar
+                            this.hightest = formData.hightest
+                            this.MainEmblem = formData.MainEmblem
+                            //lordKill
+                            this.bossKillerPath = formData.bossKillerPath
+                            this.bossKillerLogoPath = formData.bossKillerLogoPath
+                            //led
+                            this.yes = formData.yes
+                            this.no = formData.no
+                            this.notPickingLed = formData.notPickingLed
+                            this.PickedLed = formData.PickedLed
+                            this.LedPlayerPicYes = formData.LedPlayerPicYes
+                            this.LedPlayerPicNo = formData.LedPlayerPicNo
+                            console.log(responseData)
+                        }
+                    } catch (error) {
+                        
+                    }
+                },
+                submitForm() {
+                    // Create an object with the form data
+                    const formData = {
+                        pass : this.pass,
+                        battleid : this.battleid,
+                        //draft
+                        team1_name : this.team1_name,
+                        team1_shortName : this.team1_shortName,
+                        team2_name : this.team2_name,
+                        team2_shortName : this.team2_shortName,
+                        draft_logo_path: this.draft_logo_path,
+                        draft_player_pic: this.draft_player_pic,
+                        draft_player_default: this.draft_player_default,
+                        draft_player_action: this.draft_player_action,
+                        hero: this.hero,
+                        heroImageSequence: this.heroImageSequence,
+                        defaultBan: this.defaultBan,
+                        banHeroPath: this.banHeroPath,
+                        banning: this.banning,
+                        //item
+                        itemHeroPath : this.itemHeroPath,
+                        itemPath : this.itemPath,
+                        spellPath : this.spellPath,
+                        goldDiffHeroPath : this.goldDiffHeroPath,
+                        goldIconPngPath : this.goldIconPngPath,
+                        //hud
+                        hudLogoPath: this.hudLogoPath,
+                        goldLogo: this.goldLogo,
+                        //emblems
+                        emblemPath : this.emblemPath,
+                        //gold and damage ranking
+                        goldRankingHeroPath : this.goldRankingHeroPath,
+                        goldPercentPngPath : this.goldPercentPngPath,
+                        damageRankingHeroPath : this.damageRankingHeroPath,
+                        damagePercentPngPath : this.damagePercentPngPath,
+                        //mvp
+                        mvpLogoPath : this.mvpLogoPath,
+                        mvpPlayerPath : this.mvpPlayerPath,
+                        mvpPlayerSpellPath : this.mvpPlayerSpellPath,
+                        mvpPlayerItemPath : this.mvpPlayerItemPath,
+                        mvpHeroPath : this.mvpHeroPath,
+                        mvpEmblemPath : this.mvpEmblemPath,
+                        //postData
+                        post1Logo : this.post1Logo,
+                        post1Hero : this.post1Hero,
+                        post2Hero : this.post2Hero,
+                        post1ItemPath : this.post1ItemPath,
+                        resultPlayer : this.resultPlayer,
+                        resultSpell : this.resultSpell,
+                        resultEmblem : this.resultEmblem,
+                        totalDamageBar : this.totalDamageBar,
+                        totalDamageTakenBar : this.totalDamageTakenBar,
+                        totalTowerDamageBar : this.totalTowerDamageBar,
+                        TurtleLordTurretBar : this.TurtleLordTurretBar,
+                        hightest : this.hightest,
+                        MainEmblem : this.MainEmblem,
+                        //lordkill
+                        bossKillerPath : this.bossKillerPath,
+                        bossKillerLogoPath : this.bossKillerLogoPath,
+                        //led
+                        yes : this.yes,
+                        no : this.no,
+                        notPickingLed : this.notPickingLed,
+                        PickedLed : this.PickedLed,
+                        LedPlayerPicYes : this.LedPlayerPicYes,
+                        LedPlayerPicNo : this.LedPlayerPicNo
+                    };
+
+                    // Send the form data to the server using a fetch POST request
+                    fetch('/pathupdate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Handle success
+                            console.log('Form data successfully submitted.');
+                            alert('ok')
+                        } else {
+                            // Handle error
+                            console.error('Error submitting form data.');
+                            this.message = 'Wrong Token'
+                            this.messageColor = 'red'
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                },
+            },
+        });
+    </script>
+</body>
+</html>

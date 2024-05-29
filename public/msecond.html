@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Millisecond Countdown</title>
+  <style>
+    .m-seconds {
+        color : rgb(190, 3, 3)
+    }
+    h1 {
+      color: #ff0000; /* Set the text color to red */
+      font-family: Tahoma, sans-serif; /* Set the font to Tahoma */
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React library -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+  <!-- Babel to transpile JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    function MillisecondCountdown() {
+      const [milliseconds, setMilliseconds] = React.useState(0);
+      const [counting, setCounting] = React.useState(false);
+      const [duration, setDuration] = React.useState(60000); // Initial duration: 30 seconds
+
+      React.useEffect(() => {
+        let timer;
+        if (counting) {
+          timer = setInterval(() => {
+            setMilliseconds(prevMilliseconds => {
+              if (prevMilliseconds <= 0) {
+                clearInterval(timer);
+                setCounting(false);
+                return 0;
+              }
+              return prevMilliseconds - 10;
+            });
+          }, 10);
+        }
+
+        return () => clearInterval(timer);
+      }, [counting]);
+
+      const formatTime = (time) => {
+        return time < 10 ? '0' + time : time;
+      };
+
+      const handlePause = () => {
+        setCounting(false);
+      };
+
+      const handlePlay = () => {
+        setCounting(true);
+      };
+
+      const handleChangeDuration = (event) => {
+        setDuration(parseInt(event.target.value) * 60000); // Convert minutes to milliseconds
+        setMilliseconds(parseInt(event.target.value) * 60000);
+      };
+
+      return (
+        <div>
+          <h1 class="m-seconds">{formatTime(Math.floor(milliseconds / 60000))}:{formatTime(Math.floor((milliseconds / 1000) % 60))}.{milliseconds.toString().slice(-3)}</h1>
+          <div>
+            <input type="number" min="1" max="60" value={duration / 60000} onChange={handleChangeDuration} />
+            <button onClick={handlePause}>Pause</button>
+            <button onClick={handlePlay}>Play</button>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<MillisecondCountdown />, document.getElementById('root'));
+  </script>
+</body>
+</html>
