@@ -88,11 +88,11 @@ const formatTime = (number) => {
 
 function roles_letter(letter) {
   const roleMap = {
-    gold: 1, 
-    roam: 2, 
-    mid: 3, 
-    jg: 4, 
-    exp: 5, 
+    gold: 1,
+    roam: 2,
+    mid: 3,
+    jg: 4,
+    exp: 5,
   };
   return roleMap[letter] || 0;
 }
@@ -120,6 +120,36 @@ function name_finder(roleid, playerList) {
   } else {
     return null;
   }
+}
+
+function getPickRate(heroid) {
+  const rateObj = rate.find((item) => item.id === heroid);
+
+  if (rateObj) {
+    return rateObj.pick;
+  }
+
+  return null;
+}
+
+function getBanRate(heroid) {
+  const rateObj = rate.find((item) => item.id === heroid);
+
+  if (rateObj) {
+    return rateObj.ban;
+  }
+
+  return null;
+}
+
+function getWinRate(heroid) {
+  const rateObj = rate.find((item) => item.id === heroid);
+
+  if (rateObj) {
+    return rateObj.winrate;
+  }
+
+  return null;
 }
 
 //0874e8b4de7bcdecf0abaddee9b279e2
@@ -155,6 +185,136 @@ const playerNames = {
   415045935: "Yann",
   238782140: "LanShin",
 };
+
+// const rate = { 122 : {pick : "77x", ban : "99x", winrate : "100%" } }
+const rate = [
+  { id: 1, pick: "4x", ban: "0x", winrate: 0.5 },
+  { id: 2, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 3, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 4, pick: "10x", ban: "5x", winrate: 0.6 },
+  { id: 5, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 6, pick: "19x", ban: "31x", winrate: 0.37 },
+  { id: 7, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 8, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 9, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 10, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 11, pick: "2x", ban: "0x", winrate: 0 },
+  { id: 12, pick: "9x", ban: "4x", winrate: 0.33 },
+  { id: 13, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 14, pick: "0x", ban: "0x", winrate: 1 },
+  { id: 15, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 16, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 17, pick: "6x", ban: "28x", winrate: 0.5 },
+  { id: 18, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 19, pick: "11x", ban: "7x", winrate: 0.36 },
+  { id: 20, pick: "7x", ban: "10x", winrate: 0.71 },
+  { id: 21, pick: "19x", ban: "6x", winrate: 0.63 },
+  { id: 22, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 23, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 24, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 25, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 26, pick: "14x", ban: "16x", winrate: 0.43 },
+  { id: 27, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 28, pick: "16x", ban: "10x", winrate: 0.31 },
+  { id: 29, pick: "20x", ban: "18x", winrate: 0.35 },
+  { id: 30, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 31, pick: "34x", ban: "10x", winrate: 0.35 },
+  { id: 32, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 33, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 34, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 35, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 36, pick: "12x", ban: "6x", winrate: 0.58 },
+  { id: 37, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 38, pick: "16x", ban: "12x", winrate: 0.63 },
+  { id: 39, pick: "31x", ban: "0x", winrate: 0.45 },
+  { id: 40, pick: "2x", ban: "0x", winrate: 0 },
+  { id: 41, pick: "25x", ban: "20x", winrate: 0.68 },
+  { id: 42, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 43, pick: "5x", ban: "0x", winrate: 0.8 },
+  { id: 44, pick: "8x", ban: "10x", winrate: 0.38 },
+  { id: 45, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 46, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 47, pick: "3x", ban: "2x", winrate: 0.67 },
+  { id: 48, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 49, pick: "24x", ban: "35x", winrate: 0.42 },
+  { id: 50, pick: "24x", ban: "13x", winrate: 0.63 },
+  { id: 51, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 52, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 53, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 54, pick: "7x", ban: "5x", winrate: 0.57 },
+  { id: 55, pick: "12x", ban: "24x", winrate: 0.5 },
+  { id: 56, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 57, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 58, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 59, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 60, pick: "2x", ban: "3x", winrate: 0 },
+  { id: 61, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 62, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 63, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 64, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 65, pick: "12x", ban: "4x", winrate: 0.5 },
+  { id: 66, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 67, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 68, pick: "10x", ban: "13x", winrate: 0.7 },
+  { id: 69, pick: "3x", ban: "4x", winrate: 0.33 },
+  { id: 70, pick: "3x", ban: "0x", winrate: 0.67 },
+  { id: 71, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 72, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 73, pick: "34x", ban: "34x", winrate: 0.62 },
+  { id: 74, pick: "0x", ban: "2x", winrate: 1 },
+  { id: 75, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 76, pick: "9x", ban: "20x", winrate: 0.56 },
+  { id: 77, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 78, pick: "9x", ban: "9x", winrate: 0.56 },
+  { id: 79, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 80, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 81, pick: "0x", ban: "0x", winrate: 1 },
+  { id: 82, pick: "17x", ban: "8x", winrate: 0.47 },
+  { id: 83, pick: "2x", ban: "0x", winrate: 0.5 },
+  { id: 84, pick: "22x", ban: "22x", winrate: 0.55 },
+  { id: 85, pick: "3x", ban: "0x", winrate: 0.67 },
+  { id: 86, pick: "3x", ban: "2x", winrate: 0.33 },
+  { id: 87, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 88, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 89, pick: "7x", ban: "6x", winrate: 0.29 },
+  { id: 90, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 91, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 92, pick: "2x", ban: "3x", winrate: 1 },
+  { id: 93, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 94, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 95, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 96, pick: "8x", ban: "11x", winrate: 0.38 },
+  { id: 97, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 98, pick: "21x", ban: "14x", winrate: 0.52 },
+  { id: 99, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 100, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 101, pick: "9x", ban: "5x", winrate: 0.44 },
+  { id: 102, pick: "19x", ban: "31x", winrate: 0.42 },
+  { id: 103, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 104, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 105, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 106, pick: "26x", ban: "41x", winrate: 0.58 },
+  { id: 107, pick: "16x", ban: "10x", winrate: 0.5 },
+  { id: 108, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 109, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 110, pick: "24x", ban: "4x", winrate: 0.46 },
+  { id: 111, pick: "29x", ban: "22x", winrate: 0.48 },
+  { id: 112, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 113, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 114, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 115, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 116, pick: "7x", ban: "11x", winrate: 0.57 },
+  { id: 117, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 118, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 119, pick: "3x", ban: "0x", winrate: 0.33 },
+  { id: 120, pick: "13x", ban: "11x", winrate: 0.54 },
+  { id: 121, pick: "0x", ban: "0x", winrate: 0 },
+  { id: 122, pick: "27x", ban: "6x", winrate: 0.44 },
+  { id: 123, pick: "8x", ban: "0x", winrate: 0.5 },
+  { id: 124, pick: "7x", ban: "68x", winrate: 0.57 },
+  { id: 125, pick: "20x", ban: "34x", winrate: 0.6 },
+  { id: 126, pick: "7x", ban: "0x", winrate: 0.57 },
+];
 
 const heroNames = {
   1: "MIYA",
@@ -280,7 +440,9 @@ const heroNames = {
   121: "IXIA",
   122: "NOLAN",
   123: "CICI",
-  124: "CHIP"
+  124: "CHIP",
+  125: "ZHUXIN",
+  126: "SUYOU",
 };
 
 // app.get('/token', (req, res) => {
@@ -446,12 +608,12 @@ app.get("/stats", (req, res) => {
                 e.event_type == "kill_hero" && e.extra_param == "first_blood"
               );
             });
-      let firstBloodPlayer = firstBlood[0].roleid
+      let firstBloodPlayer = firstBlood[0].roleid;
 
       //players team 1
       for (let i = 0; i < 5; i++) {
         responseData[`pick${i + 1}`] = heroNames[`${team1[i].heroid}`];
-        responseData[`Level${i + 1}`] = team1[i].level
+        responseData[`Level${i + 1}`] = team1[i].level;
         responseData[`Kill${i + 1}`] = team1[i].kill_num;
         responseData[`Dead${i + 1}`] = team1[i].dead_num;
         responseData[`Assist${i + 1}`] = team1[i].assist_num;
@@ -461,12 +623,16 @@ app.get("/stats", (req, res) => {
         responseData[`Damage${i + 1}`] = team1[i].total_damage;
         responseData[`DamageTaken${i + 1}`] = team1[i].total_hurt;
         responseData[`TeamFight${i + 1}`] = null;
-        responseData[`kda${i+1}`] = ((team1[i].kill_num + team1[i].assist_num) / (team1[i].dead_num + 1)).toFixed(1);
-        responseData[`FirstBlood${i+1}`] = team1[i].roleid == firstBloodPlayer ? 1 : 0
-        responseData[`DoubleKill${i+1}`] = 0
-        responseData[`TripleKill${i+1}`] = 0
-        responseData[`Miniac${i+1}`] = 0
-        responseData[`Savage${i+1}`] = 0
+        responseData[`kda${i + 1}`] = (
+          (team1[i].kill_num + team1[i].assist_num) /
+          (team1[i].dead_num + 1)
+        ).toFixed(1);
+        responseData[`FirstBlood${i + 1}`] =
+          team1[i].roleid == firstBloodPlayer ? 1 : 0;
+        responseData[`DoubleKill${i + 1}`] = 0;
+        responseData[`TripleKill${i + 1}`] = 0;
+        responseData[`Miniac${i + 1}`] = 0;
+        responseData[`Savage${i + 1}`] = 0;
         responseData[`HealingDone${i + 1}`] = team1[i].total_heal;
         responseData[`Player${i + 1}ID`] = team1[i].roleid;
         responseData[`Player${i + 1}Name`] = name_finder(
@@ -479,7 +645,7 @@ app.get("/stats", (req, res) => {
       //players team 2
       for (let i = 0; i < 5; i++) {
         responseData[`pick${i + 6}`] = heroNames[`${team2[i].heroid}`];
-        responseData[`Level${i + 6}`] = team2[i].level
+        responseData[`Level${i + 6}`] = team2[i].level;
         responseData[`Kill${i + 6}`] = team2[i].kill_num;
         responseData[`Dead${i + 6}`] = team2[i].dead_num;
         responseData[`Assist${i + 6}`] = team2[i].assist_num;
@@ -489,12 +655,16 @@ app.get("/stats", (req, res) => {
         responseData[`Damage${i + 6}`] = team2[i].total_damage;
         responseData[`DamageTaken${i + 6}`] = team2[i].total_hurt;
         responseData[`TeamFight${i + 6}`] = null;
-        responseData[`kda${i+6}`] = ((team2[i].kill_num + team2[i].assist_num) / (team2[i].dead_num + 1)).toFixed(1);
-        responseData[`FirstBlood${i+6}`] = team2[i].roleid == firstBloodPlayer ? 1 : 0
-        responseData[`DoubleKill${i+6}`] = 0
-        responseData[`TripleKill${i+6}`] = 0
-        responseData[`Miniac${i+6}`] = 0
-        responseData[`Savage${i+6}`] = 0
+        responseData[`kda${i + 6}`] = (
+          (team2[i].kill_num + team2[i].assist_num) /
+          (team2[i].dead_num + 1)
+        ).toFixed(1);
+        responseData[`FirstBlood${i + 6}`] =
+          team2[i].roleid == firstBloodPlayer ? 1 : 0;
+        responseData[`DoubleKill${i + 6}`] = 0;
+        responseData[`TripleKill${i + 6}`] = 0;
+        responseData[`Miniac${i + 6}`] = 0;
+        responseData[`Savage${i + 6}`] = 0;
         responseData[`HealingDone${i + 6}`] = team2[i].total_heal;
         responseData[`Player${i + 6}ID`] = team2[i].roleid;
         responseData[`Player${i + 6}Name`] = name_finder(
@@ -505,23 +675,23 @@ app.get("/stats", (req, res) => {
       }
 
       //lordTurtle
-      responseData.Team1Lord = camp1.kill_lord
-      responseData.Team1Turtle = camp1.kill_totoise
-      responseData.Team1Tower = camp1.kill_tower
-      responseData.Team1Damage = camp1.total_damage
-      responseData.Team1Gold = camp1.total_money
-      responseData.Team1RedBuff = camp1.red_buff_num
-      responseData.Team1BlueBuff = camp1.blue_buff_num
-      responseData.Team1Crab = camp1.crab_kill_num
+      responseData.Team1Lord = camp1.kill_lord;
+      responseData.Team1Turtle = camp1.kill_totoise;
+      responseData.Team1Tower = camp1.kill_tower;
+      responseData.Team1Damage = camp1.total_damage;
+      responseData.Team1Gold = camp1.total_money;
+      responseData.Team1RedBuff = camp1.red_buff_num;
+      responseData.Team1BlueBuff = camp1.blue_buff_num;
+      responseData.Team1Crab = camp1.crab_kill_num;
 
-      responseData.Team2Lord = camp2.kill_lord
-      responseData.Team2Turtle = camp2.kill_totoise
-      responseData.Team2Tower = camp2.kill_tower
-      responseData.Team2Damage = camp2.total_damage
-      responseData.Team2Gold = camp2.total_money
-      responseData.Team2RedBuff = camp2.red_buff_num
-      responseData.Team2BlueBuff = camp2.blue_buff_num
-      responseData.Team2Crab = camp2.crab_kill_num
+      responseData.Team2Lord = camp2.kill_lord;
+      responseData.Team2Turtle = camp2.kill_totoise;
+      responseData.Team2Tower = camp2.kill_tower;
+      responseData.Team2Damage = camp2.total_damage;
+      responseData.Team2Gold = camp2.total_money;
+      responseData.Team2RedBuff = camp2.red_buff_num;
+      responseData.Team2BlueBuff = camp2.blue_buff_num;
+      responseData.Team2Crab = camp2.crab_kill_num;
 
       // team2BanHeroList
       responseData.team1BanHeroList = camp1.ban_hero_list.map(
@@ -530,7 +700,7 @@ app.get("/stats", (req, res) => {
       responseData.team2BanHeroList = camp2.ban_hero_list.map(
         (hero) => heroNames[hero]
       );
-      responseData.gameTime = formatTime(data.data.game_time)
+      responseData.gameTime = formatTime(data.data.game_time);
       res.send(responseData);
     } catch (e) {
       res.status(500).send(e);
@@ -555,62 +725,92 @@ app.get("/post-data", (req, res) => {
       role_sorter(team1, playerList);
       role_sorter(team2, playerList);
 
+      //team1Score
+      let team1TotalKill = 0;
+      let team2TotalKill = 0;
+      // for (let i = 0; i < 2; i++) {
+      //   let team = i == 0 ? team1 : team2;
+      //   let teamKill = i == 0 ? team1TotalKill : team2TotalKill;
+      //   team.map((player) => (teamKill = teamKill + player.kill_num));
+      //   responseData[`team${i + 1}TotalKil`] = teamKill;
+      // }
+
+      for (let i = 0; i < 2; i++) {
+        let team = i == 0 ? team1 : team2;
+        let teamKill = i == 0 ? team1TotalKill : team2TotalKill;
+        team.map((player) => (teamKill += player.kill_num));
+        responseData[`team${i + 1}TotalKill`] = teamKill; // Corrected key name
+      }
+
+      // Calculate the combined total kills of both teams
+      let combinedTotalKill =
+        responseData.team1TotalKill + responseData.team2TotalKill;
+      responseData["combinedTotalKill"] = combinedTotalKill;
+
+      // Check if the combined total kill is even or odd
+      if (combinedTotalKill % 2 === 0) {
+        responseData["combinedTotalKillStatus"] = "Even";
+      } else {
+        responseData["combinedTotalKillStatus"] = "Odd";
+      }
+
       // Team1Bars
-      const arrayC = team1.concat(team2)
-      const highestDamageArr = arrayC.sort((a,b) => b.total_damage - a.total_damage)
-      const highestDamage = highestDamageArr[0].total_damage
-      arrayC.sort((a,b) => a.campid - b.campid)
-      role_sorter(arrayC, playerList)
-      arrayC.sort((a,b) => a.campid - b.campid)
-      for (let i = 0; i < 10 ; i++) {
-        responseData[`DamageBar${i+1}`] = 'C://data/result1/damageBar/' + arrayC[i].campid + '/' + ((arrayC[i].total_damage / highestDamage) * 100).toFixed(0) + '.png'
-        responseData[`DamageBarName${i+1}`] = arrayC[i].name
-        responseData[`Damage${i+1}`] = (arrayC[i].total_damage / 1000).toFixed(1) + 'K'
+      const arrayC = team1.concat(team2);
+      const highestDamageArr = arrayC.sort(
+        (a, b) => b.total_damage - a.total_damage
+      );
+      const highestDamage = highestDamageArr[0].total_damage;
+      arrayC.sort((a, b) => a.campid - b.campid);
+      role_sorter(arrayC, playerList);
+      arrayC.sort((a, b) => a.campid - b.campid);
+      for (let i = 0; i < 10; i++) {
+        responseData[`DamageBar${i + 1}`] =
+          "C://data/result1/damageBar/" +
+          arrayC[i].campid +
+          "/" +
+          ((arrayC[i].total_damage / highestDamage) * 100).toFixed(0) +
+          ".png";
+        responseData[`DamageBarName${i + 1}`] = arrayC[i].name;
+        responseData[`Damage${i + 1}`] =
+          (arrayC[i].total_damage / 1000).toFixed(1) + "K";
       }
       // console.log(highestDamageArr)
 
       //team1Bans
 
-
       //team1Kda
-      let team1Kill = 0
-      let team1Dead = 0
-      let team1Assist = 0
+      let team1Kill = 0;
+      let team1Dead = 0;
+      let team1Assist = 0;
       team1.forEach((player) => {
-        team1Kill += player.kill_num
-        team1Dead += player.dead_num
-        team1Assist += player.assist_num
-      })
-      let team1KDA = `${team1Kill}/${team1Dead}/${team1Assist}`
-      responseData.team1KDA = team1KDA
+        team1Kill += player.kill_num;
+        team1Dead += player.dead_num;
+        team1Assist += player.assist_num;
+      });
+      let team1KDA = `${team1Kill}/${team1Dead}/${team1Assist}`;
+      responseData.team1KDA = team1KDA;
 
       // team2Kda
-      let team2Kill = 0
-      let team2Dead = 0
-      let team2Assist = 0
+      let team2Kill = 0;
+      let team2Dead = 0;
+      let team2Assist = 0;
       team2.forEach((player) => {
-        team2Kill += player.kill_num
-        team2Dead += player.dead_num
-        team2Assist += player.assist_num
-      })
-      let team2KDA = `${team2Kill}/${team2Dead}/${team2Assist}`
-      responseData.team2KDA = team2KDA
-
-      //team1Score
-      let team1TotalKill = 0;
-      let team2TotalKill = 0;
-      for (let i = 0; i < 2; i++) {
-        let team = i == 0 ? team1 : team2;
-        let teamKill = i == 0 ? team1TotalKill : team2TotalKill;
-        team.map((player) => (teamKill = teamKill + player.kill_num));
-        responseData[`team${i + 1}TotalKil`] = teamKill;
-      }
+        team2Kill += player.kill_num;
+        team2Dead += player.dead_num;
+        team2Assist += player.assist_num;
+      });
+      let team2KDA = `${team2Kill}/${team2Dead}/${team2Assist}`;
+      responseData.team2KDA = team2KDA;
 
       //victory
       responseData.team1Victory =
-        body.data.win_camp == 1 ? "VICTORY" : "DEFEAT";
+        body.data.win_camp == 1
+          ? "C://data/result/status/1.png"
+          : "C://data/result/status/0.png";
       responseData.team2Victory =
-        body.data.win_camp == 1 ? "DEFEAT" : "VICTORY";
+        body.data.win_camp == 1
+          ? "C://data/result/status/0.png"
+          : "C://data/result/status/1.png";
       //teamName
       for (let i = 0; i < 2; i++) {
         responseData[`team${i + 1}Name`] =
@@ -819,7 +1019,7 @@ app.get("/post-data", (req, res) => {
       }
       //ddbar
       responseData.toTalDamageBar = `${formData.totalDamageBar}${(
-        (camp2.total_damage / (camp1.total_damage + camp2.total_damage)) *
+        (camp1.total_damage / (camp1.total_damage + camp2.total_damage)) *
         100
       ).toFixed(0)}.png`;
       //Damage Taken
@@ -836,7 +1036,7 @@ app.get("/post-data", (req, res) => {
       team2.map((player) => (team2TotalDamageTaken += player.total_hurt));
       //DTBar
       responseData.damageTakenBar = `${formData.totalDamageTakenBar}${(
-        (team2TotalDamageTaken /
+        (team1TotalDamageTaken /
           (team1TotalDamageTaken + team2TotalDamageTaken)) *
         100
       ).toFixed(0)}.png`;
@@ -871,7 +1071,7 @@ app.get("/post-data", (req, res) => {
       let team2Ltt = camp2.kill_lord + camp2.kill_totoise + camp2.kill_tower;
       //lttbar
       responseData.TurtleLordTurretBar = `${formData.TurtleLordTurretBar}${(
-        (team2Ltt / (team1Ltt + team2Ltt)) *
+        (team1Ltt / (team1Ltt + team2Ltt)) *
         100
       ).toFixed(0)}.png`;
       //HightestGold
@@ -974,7 +1174,7 @@ app.get("/mvp", (req, res) => {
         }.png`;
       }
       //customemblem
-      responseData.emblem4 = `${formData.mvpEmblemPath}${mvpPlayer.runeid}.png`
+      responseData.emblem4 = `${formData.mvpEmblemPath}${mvpPlayer.runeid}.png`;
 
       //items
       for (let i = 0; i < 6; i++) {
@@ -1198,24 +1398,128 @@ app.get("/hud", async (req, res) => {
             );
           });
 
-    if (firstBlood.length > 0) {
-      let lastFirstBlood = firstBlood[firstBlood.length - 1];
-      responseData.firstBloodPlayerName = name_finder(
-        lastFirstBlood.killer_id,
+    //tripleKill
+    let tripleKill =
+      data.incre_event_list == null
+        ? []
+        : data.incre_event_list.filter((e) => {
+            return (
+              e.event_type == "kill_hero" && e.extra_param == "triple_kill"
+            );
+          });
+    //miniac
+    let miniac =
+      data.incre_event_list == null
+        ? []
+        : data.incre_event_list.filter((e) => {
+            return (
+              e.event_type == "kill_hero" && e.extra_param == "quadra_kill"
+            );
+          });
+
+    //savage
+    let savage =
+      data.incre_event_list == null
+        ? []
+        : data.incre_event_list.filter((e) => {
+            return e.event_type == "kill_hero" && e.extra_param == "penta_kill";
+          });
+
+    if (savage.length > 0) {
+      let lastsavage = savage[savage.length - 1];
+      responseData.savagePlayerTeamName =
+        lastsavage.campid == 1
+          ? formData.team1_name || team1.team_name
+          : formData.team2_name || team2.team_name;
+      responseData.savagePlayerName = name_finder(
+        lastsavage.killer_id,
         playerList
       );
-      responseData.firstBloodPlayerPic = `${formData.bossKillerPath}${lastFirstBlood.killer_id}.png`;
+      responseData.savagePlayerPic = `${formData.bossKillerPath}${lastsavage.killer_id}.png`;
+      responseData.savagePlayerPicTeamLogo =
+        lastsavage.campid == 1
+          ? `${formData.bossKillerLogoPath}${formData.team1_shortName}.png`
+          : `${formData.bossKillerLogoPath}${formData.team2_shortName}.png`;
+    } else {
+      responseData.savagePlayerName = "";
+      responseData.savagePlayerPic = `${formData.bossKillerPath}0.png`;
+      responseData.savagePlayerTeamName = "";
+      responseData.savagePlayerPicTeamLogo = "";
+    }
+
+    if (miniac.length > 0) {
+      let lastMiniac = miniac[miniac.length - 1];
+      responseData.miniacPlayerTeamName =
+        lastMiniac.campid == 1
+          ? formData.team1_name || team1.team_name
+          : formData.team2_name || team2.team_name;
+      responseData.miniacPlayerName = name_finder(
+        lastMiniac.killer_id,
+        playerList
+      );
+      responseData.miniacPlayerPic = `${formData.bossKillerPath}${lastMiniac.killer_id}.png`;
+      responseData.miniacPlayerPicTeamLogo =
+        lastMiniac.campid == 1
+          ? `${formData.bossKillerLogoPath}${formData.team1_shortName}.png`
+          : `${formData.bossKillerLogoPath}${formData.team2_shortName}.png`;
+    } else {
+      responseData.miniacPlayerName = "";
+      responseData.miniacPlayerPic = `${formData.bossKillerPath}0.png`;
+      responseData.miniacPlayerTeamName = "";
+      responseData.miniacPlayerPicTeamLogo = "";
+    }
+
+    if (tripleKill.length > 0) {
+      let lasttripleKill = tripleKill[tripleKill.length - 1];
+      responseData.tripleKillPlayerTeamName =
+        lasttripleKill.campid == 1
+          ? formData.team1_name || team1.team_name
+          : formData.team2_name || team2.team_name;
+      responseData.tripleKillPlayerName = name_finder(
+        lasttripleKill.killer_id,
+        playerList
+      );
+      responseData.tripleKillPlayerPic = `${formData.bossKillerPath}${lasttripleKill.killer_id}.png`;
+      responseData.tripleKillPlayerPicTeamLogo =
+        lasttripleKill.campid == 1
+          ? `${formData.bossKillerLogoPath}${formData.team1_shortName}.png`
+          : `${formData.bossKillerLogoPath}${formData.team2_shortName}.png`;
+    } else {
+      responseData.tripleKillPlayerName = "";
+      responseData.tripleKillPlayerPic = `${formData.bossKillerPath}0.png`;
+      responseData.tripleKillPlayerTeamName = "";
+      responseData.tripleKillPlayerPicTeamLogo = "";
+    }
+
+    //FB
+    if (firstBlood.length > 0) {
+      let lastfirstBlood = firstBlood[firstBlood.length - 1];
+      responseData.firstBloodPlayerTeamName =
+        lastfirstBlood.campid == 1
+          ? formData.team1_name || team1.team_name
+          : formData.team2_name || team2.team_name;
+      responseData.firstBloodPlayerName = name_finder(
+        lastfirstBlood.killer_id,
+        playerList
+      );
+      responseData.firstBloodPlayerPic = `${formData.bossKillerPath}${lastfirstBlood.killer_id}.png`;
+      responseData.firstBloodPlayerPicTeamLogo =
+        lastfirstBlood.campid == 1
+          ? `${formData.bossKillerLogoPath}${formData.team1_shortName}.png`
+          : `${formData.bossKillerLogoPath}${formData.team2_shortName}.png`;
     } else {
       responseData.firstBloodPlayerName = "";
       responseData.firstBloodPlayerPic = `${formData.bossKillerPath}0.png`;
+      responseData.firstBloodPlayerTeamName = "";
+      responseData.firstBloodPlayerPicTeamLogo = "";
     }
-
+    //
     if (turtleKill.length > 0) {
       let lastTurtleKillEvent = turtleKill[turtleKill.length - 1];
       responseData.turtleKillTeamName =
         lastTurtleKillEvent.campid == 1
           ? formData.team1_name || team1.team_name
-          : formData.team1_name || team2.team_name;
+          : formData.team2_name || team2.team_name;
 
       responseData.turtleKillPlayer = `${formData.bossKillerPath}${lastTurtleKillEvent.killer_id}.png`;
       responseData.turtleKillPlayerName = name_finder(
@@ -1232,12 +1536,13 @@ app.get("/hud", async (req, res) => {
       responseData.turtleKillPlayerName = "";
     }
 
+    //
     if (lordKill.length > 0) {
       let lastLordKillEvent = lordKill[lordKill.length - 1];
       responseData.lordKillTeamName =
         lastLordKillEvent.campid == 1
           ? formData.team1_name || team1.team_name
-          : formData.team1_name || team2.team_name;
+          : formData.team2_name || team2.team_name;
 
       responseData.lordKillPlayer = `${formData.bossKillerPath}${lastLordKillEvent.killer_id}.png`;
       responseData.lordKillPlayerName = name_finder(
@@ -1342,6 +1647,12 @@ app.get("/draft", (req, res) => {
     // const team1 = role_sorter(a[0].player_list, playerList)
     // const team2 = role_sorter(a[1].player_list, playerList)
     //team Name
+    responseData.team1playerlogo = `C://data/draft/playerlogo/${
+      formData.team1_shortName || a[0].team_simple_name
+    }.png`;
+    responseData.team2playerlogo = `C://data/draft/playerlogo/${
+      formData.team2_shortName || a[1].team_simple_name
+    }.png`;
     responseData.team1Name =
       formData.team1_name || data.data.camp_list[0].team_name;
     responseData.team2Name =
@@ -1428,6 +1739,42 @@ app.get("/draft", (req, res) => {
       ] = `${formData.LedPlayerPicYes}led/${team2[i].roleid}.png`;
     }
 
+    //pickrate
+    // responseData.pickrate1 = rate[a[0].player_list[0].heroid].pick || "0"
+
+    //pickrate
+    for (let i = 0; i < 5; i++) {
+      responseData[`pickrate${i + 1}`] = getPickRate(
+        a[0].player_list[i].heroid
+      );
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`pickrate${i + 6}`] = getPickRate(
+        a[1].player_list[i].heroid
+      );
+    }
+
+    //banrate
+    for (let i = 0; i < 5; i++) {
+      responseData[`banrate${i + 1}`] = getBanRate(a[0].player_list[i].heroid);
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`banrate${i + 6}`] = getBanRate(a[1].player_list[i].heroid);
+    }
+
+    //winrate
+    for (let i = 0; i < 5; i++) {
+      responseData[`winrate${i + 1}`] =
+        (getWinRate(a[0].player_list[i].heroid) * 100).toFixed(0) + "%";
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`winrate${i + 6}`] =
+        (getWinRate(a[1].player_list[i].heroid) * 100).toFixed(0) + "%";
+    }
+
     //pickHeroName
     responseData.pick1Name = heroNames[a[0].player_list[0].heroid] || "";
     responseData.pick2Name = heroNames[a[0].player_list[1].heroid] || "";
@@ -1442,186 +1789,227 @@ app.get("/draft", (req, res) => {
     responseData.pick10Name = heroNames[a[1].player_list[4].heroid] || "";
 
     //pickversion2
-    for (let i =0; i < 5; i++) {
-      responseData[`pickHero${i+1}`] = 'C://data/draft/pick/' + team1[i].heroid + '.png'
-      responseData[`spell${i+1}`] = 'C://data/draft/spell/' + team1[i].skillid + '.png'
+    for (let i = 0; i < 5; i++) {
+      responseData[`pickHero${i + 1}`] =
+        "C://data/draft/pick/" + team1[i].heroid + ".png";
+      responseData[`spell${i + 1}`] =
+        "C://data/draft/spell/" + team1[i].skillid + ".png";
     }
 
-    for (let i =0; i < 5; i++) {
-      responseData[`pickHero${i+6}`] = 'C://data/draft/pick/' + team2[i].heroid + '.png'
-      responseData[`spell${i+6}`] = 'C://data/draft/spell/' + team2[i].skillid + '.png'
+    for (let i = 0; i < 5; i++) {
+      responseData[`pickHero${i + 6}`] =
+        "C://data/draft/pick/" + team2[i].heroid + ".png";
+      responseData[`spell${i + 6}`] =
+        "C://data/draft/spell/" + team2[i].skillid + ".png";
     }
-    
+
     //arrow
-    responseData.arrow1 = `C://data/draft/arrow/0.png`
-    responseData.arrow2 = `C://data/draft/arrow/0.png`
+    responseData.arrow1 = `C://data/draft/arrow/0.png`;
+    responseData.arrow2 = `C://data/draft/arrow/0.png`;
 
     //team1Arrow
-    if (a[0].player_list[0].picking == true || a[0].player_list[0].banning == true) {
-      responseData.arrow1 = `C://data/draft/arrow/1.png`
-    } else if (a[0].player_list[1].picking == true || a[0].player_list[1].banning == true) {
-      responseData.arrow1 = `C://data/draft/arrow/1.png`
-    } else if (a[0].player_list[2].picking == true || a[0].player_list[2].banning == true) {
-      responseData.arrow1 = `C://data/draft/arrow/1.png`
-    } else if (a[0].player_list[3].picking == true || a[0].player_list[3].banning == true) {
-      responseData.arrow1 = `C://data/draft/arrow/1.png`
-    } else if(a[0].player_list[4].picking == true || a[0].player_list[4].banning == true) {
-      responseData.arrow1 = `C://data/draft/arrow/1.png`
+    if (
+      a[0].player_list[0].picking == true ||
+      a[0].player_list[0].banning == true
+    ) {
+      responseData.arrow1 = `C://data/draft/arrow/1.png`;
+    } else if (
+      a[0].player_list[1].picking == true ||
+      a[0].player_list[1].banning == true
+    ) {
+      responseData.arrow1 = `C://data/draft/arrow/1.png`;
+    } else if (
+      a[0].player_list[2].picking == true ||
+      a[0].player_list[2].banning == true
+    ) {
+      responseData.arrow1 = `C://data/draft/arrow/1.png`;
+    } else if (
+      a[0].player_list[3].picking == true ||
+      a[0].player_list[3].banning == true
+    ) {
+      responseData.arrow1 = `C://data/draft/arrow/1.png`;
+    } else if (
+      a[0].player_list[4].picking == true ||
+      a[0].player_list[4].banning == true
+    ) {
+      responseData.arrow1 = `C://data/draft/arrow/1.png`;
     } else {
-      responseData.arrow1 = `C://data/draft/arrow/0.png`
+      responseData.arrow1 = `C://data/draft/arrow/2.png`;
     }
 
-    //team2Arrow
-    if (a[1].player_list[0].picking == true || a[1].player_list[0].banning == true) {
-      responseData.arrow2 = `C://data/draft/arrow/2.png`
-    } else if (a[1].player_list[1].picking == true || a[1].player_list[1].banning == true) {
-      responseData.arrow2 = `C://data/draft/arrow/2.png`
-    } else if (a[1].player_list[2].picking == true || a[1].player_list[2].banning == true) {
-      responseData.arrow2 = `C://data/draft/arrow/2.png`
-    } else if (a[1].player_list[3].picking == true || a[1].player_list[3].banning == true) {
-      responseData.arrow2 = `C://data/draft/arrow/2.png`
-    } else if(a[1].player_list[4].picking == true || a[1].player_list[4].banning == true) {
-      responseData.arrow2 = `C://data/draft/arrow/2.png`
-    } else {
-      responseData.arrow2 = `C://data/draft/arrow/0.png`
-    }
+    // //team2Arrow
+    // if (a[1].player_list[0].picking == true || a[1].player_list[0].banning == true) {
+    //   responseData.arrow2 = `C://data/draft/arrow/2.png`
+    // } else if (a[1].player_list[1].picking == true || a[1].player_list[1].banning == true) {
+    //   responseData.arrow2 = `C://data/draft/arrow/2.png`
+    // } else if (a[1].player_list[2].picking == true || a[1].player_list[2].banning == true) {
+    //   responseData.arrow2 = `C://data/draft/arrow/2.png`
+    // } else if (a[1].player_list[3].picking == true || a[1].player_list[3].banning == true) {
+    //   responseData.arrow2 = `C://data/draft/arrow/2.png`
+    // } else if(a[1].player_list[4].picking == true || a[1].player_list[4].banning == true) {
+    //   responseData.arrow2 = `C://data/draft/arrow/2.png`
+    // } else {
+    //   responseData.arrow2 = `C://data/draft/arrow/0.png`
+    // }
 
     //picked1
-    responseData.picking1 = 0
-    responseData.picked1 = 0
-    responseData.border1 = "C://data/draft/border/0.png"
+    responseData.picking1 = 0;
+    responseData.picked1 = 0;
+    responseData.border1 = "C://data/draft/border/0.png";
     if (a[0].player_list[0].picking == true) {
-      responseData.picking1 = 1
-      responseData.border1 = "C://data/draft/border/1.png"
-    }
-    else if (a[0].player_list[0].picking == false && a[0].player_list[0].heroid !== 0) {
-      responseData.picking1 = 1
-      responseData.picked1 = 1
+      responseData.picking1 = 1;
+      responseData.border1 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[0].picking == false &&
+      a[0].player_list[0].heroid !== 0
+    ) {
+      responseData.picking1 = 1;
+      responseData.picked1 = 1;
     }
 
     //picked2
-    responseData.picking2 = 0
-    responseData.picked2 = 0
-    responseData.border2 = "C://data/draft/border/0.png"
+    responseData.picking2 = 0;
+    responseData.picked2 = 0;
+    responseData.border = "C://data/draft/border/0.png";
     if (a[0].player_list[1].picking == true) {
-      responseData.picking2 = 1
-      responseData.border2 = "C://data/draft/border/1.png"
-    }
-    else if (a[0].player_list[1].picking == false && a[0].player_list[1].heroid !== 0) {
-      responseData.picking2 = 1
-      responseData.picked2 = 1
+      responseData.picking2 = 1;
+      responseData.border2 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[1].picking == false &&
+      a[0].player_list[1].heroid !== 0
+    ) {
+      responseData.picking2 = 1;
+      responseData.picked2 = 1;
     }
 
     //picked3
-    responseData.picking3 = 0
-    responseData.picked3 = 0
-    responseData.border3 = "C://data/draft/border/0.png"
+    responseData.picking3 = 0;
+    responseData.picked3 = 0;
+    responseData.border3 = "C://data/draft/border/0.png";
     if (a[0].player_list[2].picking == true) {
-      responseData.picking3 = 1
-      responseData.border3 = "C://data/draft/border/1.png"
-    }
-    else if (a[0].player_list[2].picking == false && a[0].player_list[2].heroid !== 0) {
-      responseData.picking3 = 1
-      responseData.picked3 = 1
+      responseData.picking3 = 1;
+      responseData.border3 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[2].picking == false &&
+      a[0].player_list[2].heroid !== 0
+    ) {
+      responseData.picking3 = 1;
+      responseData.picked3 = 1;
     }
 
     //picked4
-    responseData.picking4 = 0
-    responseData.picked4 = 0
-    responseData.border4 = "C://data/draft/border/0.png"
+    responseData.picking4 = 0;
+    responseData.picked4 = 0;
+    responseData.border4 = "C://data/draft/border/0.png";
     if (a[0].player_list[3].picking == true) {
-      responseData.picking4 = 1
-      responseData.border4 = "C://data/draft/border/1.png"
-    }
-    else if (a[0].player_list[3].picking == false && a[0].player_list[3].heroid !== 0) {
-      responseData.picking4 = 1
-      responseData.picked4 = 1
+      responseData.picking4 = 1;
+      responseData.border4 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[3].picking == false &&
+      a[0].player_list[3].heroid !== 0
+    ) {
+      responseData.picking4 = 1;
+      responseData.picked4 = 1;
     }
 
     //picked5
-    responseData.picking5 = 0
-    responseData.picked5 = 0
-    responseData.border5 = "C://data/draft/border/0.png"
+    responseData.picking5 = 0;
+    responseData.picked5 = 0;
+    responseData.border5 = "C://data/draft/border/0.png";
     if (a[0].player_list[4].picking == true) {
-      responseData.picking5 = 1
-      responseData.border5 = "C://data/draft/border/1.png"
-    }
-    else if (a[0].player_list[4].picking == false && a[0].player_list[4].heroid !== 0) {
-      responseData.picking5 = 1
-      responseData.picked5 = 1
+      responseData.picking5 = 1;
+      responseData.border5 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[4].picking == false &&
+      a[0].player_list[4].heroid !== 0
+    ) {
+      responseData.picking5 = 1;
+      responseData.picked5 = 1;
     }
 
     //picked6
-    responseData.picking6 = 0
-    responseData.picked6 = 0
-    responseData.border6 = "C://data/draft/border/0.png"
+    responseData.picking6 = 0;
+    responseData.picked6 = 0;
+    responseData.border6 = "C://data/draft/border/0.png";
     if (a[1].player_list[0].picking == true) {
-      responseData.picking6 = 1
-      responseData.border6 = "C://data/draft/border/1.png"
-    }
-    else if (a[1].player_list[0].picking == false && a[1].player_list[0].heroid !== 0) {
-      responseData.picking6 = 1
-      responseData.picked6 = 1
+      responseData.picking6 = 1;
+      responseData.border6 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[0].picking == false &&
+      a[1].player_list[0].heroid !== 0
+    ) {
+      responseData.picking6 = 1;
+      responseData.picked6 = 1;
     }
 
     //picked7
-    responseData.picking7 = 0
-    responseData.picked7 = 0
-    responseData.border7 = "C://data/draft/border/0.png"
+    responseData.picking7 = 0;
+    responseData.picked7 = 0;
+    responseData.border7 = "C://data/draft/border/0.png";
     if (a[1].player_list[1].picking == true) {
-      responseData.picking7 = 1
-      responseData.border7 = "C://data/draft/border/1.png"
-    }
-    else if (a[1].player_list[1].picking == false && a[1].player_list[1].heroid !== 0) {
-      responseData.picking7 = 1
-      responseData.picked7 = 1
+      responseData.picking7 = 1;
+      responseData.border7 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[1].picking == false &&
+      a[1].player_list[1].heroid !== 0
+    ) {
+      responseData.picking7 = 1;
+      responseData.picked7 = 1;
     }
 
     //picked8
-    responseData.picking8 = 0
-    responseData.picked8 = 0
-    responseData.border8 = "C://data/draft/border/0.png"
+    responseData.picking8 = 0;
+    responseData.picked8 = 0;
+    responseData.border8 = "C://data/draft/border/0.png";
     if (a[1].player_list[2].picking == true) {
-      responseData.picking8 = 1
-      responseData.border8 = "C://data/draft/border/1.png"
-    }
-    else if (a[1].player_list[2].picking == false && a[1].player_list[2].heroid !== 0) {
-      responseData.picking8 = 1
-      responseData.picked8 = 1
+      responseData.picking8 = 1;
+      responseData.border8 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[2].picking == false &&
+      a[1].player_list[2].heroid !== 0
+    ) {
+      responseData.picking8 = 1;
+      responseData.picked8 = 1;
     }
 
     //picked9
-    responseData.picking9 = 0
-    responseData.picked9 = 0
-    responseData.border9 = "C://data/draft/border/0.png"
+    responseData.picking9 = 0;
+    responseData.picked9 = 0;
+    responseData.border9 = "C://data/draft/border/0.png";
     if (a[1].player_list[3].picking == true) {
-      responseData.picking9 = 1
-      responseData.border9 = "C://data/draft/border/1.png"
+      responseData.picking9 = 1;
+      responseData.border9 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[3].picking == false &&
+      a[1].player_list[3].heroid !== 0
+    ) {
+      responseData.picking9 = 1;
+      responseData.picked9 = 1;
     }
-    else if (a[1].player_list[3].picking == false && a[1].player_list[3].heroid !== 0) {
-      responseData.picking9 = 1
-      responseData.picked9 = 1
-    }
-    
+
     //picked10
-    responseData.picking10 = 0
-    responseData.picked10 = 0
-    responseData.border10 = "C://data/draft/border/0.png"
+    responseData.picking10 = 0;
+    responseData.picked10 = 0;
+    responseData.border10 = "C://data/draft/border/0.png";
     if (a[1].player_list[4].picking == true) {
-      responseData.picking10 = 1
-      responseData.border10 = "C://data/draft/border/1.png"
-    }
-    else if (a[1].player_list[4].picking == false && a[1].player_list[4].heroid !== 0) {
-      responseData.picking10 = 1
-      responseData.picked10 = 1
+      responseData.picking10 = 1;
+      responseData.border10 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[4].picking == false &&
+      a[1].player_list[4].heroid !== 0
+    ) {
+      responseData.picking10 = 1;
+      responseData.picked10 = 1;
     }
     //banForResutl
     for (let i = 0; i < 5; i++) {
-      responseData[`banPicForResult${i+1}`] = 'C://data/result1/ban/' + team1[i].ban_heroid + '.png'
+      responseData[`banPicForResult${i + 1}`] =
+        "C://data/result1/ban/" + team1[i].ban_heroid + ".png";
     }
 
     for (let i = 0; i < 5; i++) {
-      responseData[`banPicForResult${i+6}`] = 'C://data/result1/ban/' + team2[i].ban_heroid + '.png'
+      responseData[`banPicForResult${i + 6}`] =
+        "C://data/result1/ban/" + team2[i].ban_heroid + ".png";
     }
 
     //team1Player1Banning
@@ -1770,6 +2158,14 @@ app.get("/draft", (req, res) => {
     //beforeBanning
     else {
       responseData.ban10 = formData.defaultBan + ".png" || "";
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`ID${i+1}`] = a[0].player_list[i].heroid
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`ID${i+6}`] = a[1].player_list[i].heroid
     }
 
     //---------------------------------------------------------------------------------------
@@ -2019,16 +2415,12 @@ app.get("/draft", (req, res) => {
     //vs
     for (let i = 0; i < 5; i++) {
       responseData[`vsPlayer${i + 1}Pic`] =
-        `C://data/vs/player/${
-          a[0].player_list[i].roleid
-        }.png` || "";
+        `C://data/vs/player/${a[0].player_list[i].roleid}.png` || "";
     }
 
     for (let i = 0; i < 5; i++) {
       responseData[`vsPlayer${i + 6}Pic`] =
-        `C://data/vs/player/${
-          a[1].player_list[i].roleid
-        }.png` || "";
+        `C://data/vs/player/${a[1].player_list[i].roleid}.png` || "";
     }
 
     //vsheroTeam1
@@ -2144,12 +2536,12 @@ app.get("/item", (req, res) => {
 
       //team1exp
       for (let i = 0; i < 5; i++) {
-        responseData[`exp${i+1}`] = team1[i].exp.toLocaleString() || "";
+        responseData[`exp${i + 1}`] = team1[i].exp.toLocaleString() || "";
       }
 
       //team2exp
       for (let i = 0; i < 5; i++) {
-        responseData[`exp${i+6}`] = team2[i].exp.toLocaleString() || "";
+        responseData[`exp${i + 6}`] = team2[i].exp.toLocaleString() || "";
       }
 
       //playerNames
@@ -2268,6 +2660,37 @@ app.get("/item", (req, res) => {
       responseData.goldDiffHero8 = `${formData.goldDiffHeroPath}${team2[2].heroid}.png`;
       responseData.goldDiffHero9 = `${formData.goldDiffHeroPath}${team2[3].heroid}.png`;
       responseData.goldDiffHero10 = `${formData.goldDiffHeroPath}${team2[4].heroid}.png`;
+
+      //led Hero
+      responseData.ledHeroes1 = `C://data/led/item/hero/${team1[0].heroid}.png`;
+      responseData.ledHeroes2 = `C://data/led/item/hero/${team1[1].heroid}.png`;
+      responseData.ledHeroes3 = `C://data/led/item/hero/${team1[2].heroid}.png`;
+      responseData.ledHeroes4 = `C://data/led/item/hero/${team1[3].heroid}.png`;
+      responseData.ledHeroes5 = `C://data/led/item/hero/${team1[4].heroid}.png`;
+
+      responseData.ledHeroes6 = `C://data/led/item/hero/${team2[0].heroid}.png`;
+      responseData.ledHeroes7 = `C://data/led/item/hero/${team2[1].heroid}.png`;
+      responseData.ledHeroes8 = `C://data/led/item/hero/${team2[2].heroid}.png`;
+      responseData.ledHeroes9 = `C://data/led/item/hero/${team2[3].heroid}.png`;
+      responseData.ledHeroes10 = `C://data/led/item/hero/${team2[4].heroid}.png`;
+
+      //vs heroes
+      for (let i = 0; i < 5; i++) {
+        responseData[
+          `vshero${i + 1}`
+        ] = `C://data/vs/hero/${team1[i].heroid}.png`;
+        responseData[
+          `vsPlayer${i + 1}`
+        ] = `C://data/vs/player/1/${team1[i].roleid}.png`;
+      }
+      for (let i = 0; i < 5; i++) {
+        responseData[
+          `vshero${i + 6}`
+        ] = `C://data/vs/hero/${team2[i].heroid}.png`;
+        responseData[
+          `vsPlayer${i + 6}`
+        ] = `C://data/vs/player/2/${team2[i].roleid}.png`;
+      }
 
       //items ----------------------------------------------------------------------------------------------------------
       //P1Items
@@ -2410,51 +2833,570 @@ app.get("/item", (req, res) => {
   });
 });
 
-app.get('/golddiff', (req, res) => {
+app.get("/golddiff", (req, res) => {
   const battleData =
     "http://esportsdata.mobilelegends.com:30260/battledata?authkey=7a468a893e13486ef75107559fea97ef&battleid=" +
     id +
     "&dataid=1";
-  request({ url : battleData, json : true }, (error, response, body) => {
+  request({ url: battleData, json: true }, (error, response, body) => {
     if (error) {
-      return res.status(500).send(error)
+      return res.status(500).send(error);
     }
     try {
-      const data = body
-      let responseData = {}
-      let team = data.data.camp_list
-      let team1 = role_sorter(team[0].player_list, playerList)
-      let team2 = role_sorter(team[1].player_list, playerList)
-      arrayC = team1.concat(team2)
-      arrayC.sort((a,b) => b.gold - a.gold)
-      let hightestGold = arrayC[0].gold
-      role_sorter(team1, playerList)
-      role_sorter(team2, playerList)
+      const data = body;
+      let responseData = {};
+      let team = data.data.camp_list;
+      let team1 = role_sorter(team[0].player_list, playerList);
+      let team2 = role_sorter(team[1].player_list, playerList);
+      arrayC = team1.concat(team2);
+      arrayC.sort((a, b) => b.gold - a.gold);
+      let hightestGold = arrayC[0].gold;
+      role_sorter(team1, playerList);
+      role_sorter(team2, playerList);
       // console.log(hightestGold)
       //team1gold
       for (let i = 0; i < 5; i++) {
-        responseData[`Name${i+1}`] = name_finder(team1[i].roleid, playerList) || team1[i].name
-        responseData[`Hero${i+1}`] = 'C://data/golddiff/hero/' + team1[i].heroid + '.png'
-        responseData[`Player${i+1}Gold`] = team1[i].gold
-        responseData[`Bar${i+1}`] = 'C://data/golddiff/' + team1[i].campid + '/' + ((team1[i].gold / hightestGold) * 100).toFixed(0) + '.png'
+        responseData[`Name${i + 1}`] =
+          name_finder(team1[i].roleid, playerList) || team1[i].name;
+        responseData[`Hero${i + 1}`] =
+          "C://data/golddiff/hero/" + team1[i].heroid + ".png";
+        responseData[`Player${i + 1}Gold`] = team1[i].gold;
+        responseData[`Bar${i + 1}`] =
+          "C://data/golddiff/" +
+          team1[i].campid +
+          "/" +
+          ((team1[i].gold / hightestGold) * 100).toFixed(0) +
+          ".png";
       }
 
       //team2gold
       for (let i = 0; i < 5; i++) {
-        responseData[`Name${i+6}`] = name_finder(team2[i].roleid, playerList) || team2[i].name
-        responseData[`Hero${i+6}`] = 'C://data/golddiff/hero/' + team2[i].heroid + '.png'
-        responseData[`Player${i+6}Gold`] = team2[i].gold
-        responseData[`Bar${i+6}`] = 'C://data/golddiff/' + team2[i].campid + '/' + ((team2[i].gold / hightestGold) * 100).toFixed(0) + '.png'
+        responseData[`Name${i + 6}`] =
+          name_finder(team2[i].roleid, playerList) || team2[i].name;
+        responseData[`Hero${i + 6}`] =
+          "C://data/golddiff/hero/" + team2[i].heroid + ".png";
+        responseData[`Player${i + 6}Gold`] = team2[i].gold;
+        responseData[`Bar${i + 6}`] =
+          "C://data/golddiff/" +
+          team2[i].campid +
+          "/" +
+          ((team2[i].gold / hightestGold) * 100).toFixed(0) +
+          ".png";
       }
 
-      let jsonData = { data : [responseData] }
+      let jsonData = { data: [responseData] };
 
-      res.send(jsonData)
+      res.send(jsonData);
     } catch (e) {
-      res.status(500).send(e)
+      res.status(500).send(e);
     }
-  })
-})
+  });
+});
+
+app.get("/draftled", (req, res) => {
+  const battleData =
+    "http://esportsdata.mobilelegends.com:30260/battledata?authkey=7a468a893e13486ef75107559fea97ef&battleid=" +
+    id +
+    "&dataid=1";
+  request({ url: battleData, json: true }, (error, response, body) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    let responseData = {};
+    let data = body;
+    let a = data.data.camp_list;
+    // let team1 = a[0].player_list;
+    // let team2 = a[1].player_list;
+    let team1 = role_sorter(a[0].player_list, playerList);
+    let team2 = role_sorter(a[1].player_list, playerList);
+    // const team1 = role_sorter(a[0].player_list, playerList)
+    // const team2 = role_sorter(a[1].player_list, playerList)
+    //team Name
+    responseData.team1playerlogo = `C://data/draft/playerlogo/${
+      formData.team1_shortName || a[0].team_simple_name
+    }.png`;
+    responseData.team2playerlogo = `C://data/draft/playerlogo/${
+      formData.team2_shortName || a[1].team_simple_name
+    }.png`;
+    responseData.team1Name =
+      formData.team1_name || data.data.camp_list[0].team_name;
+    responseData.team2Name =
+      formData.team2_name || data.data.camp_list[1].team_name;
+    //teamShortName
+    responseData.team1ShortName =
+      formData.team1_shortName || a[0].team_simple_name;
+    responseData.team2ShortName =
+      formData.team2_shortName || a[1].team_simple_name;
+    //team Logo
+    responseData.team1Logo =
+      formData.draft_logo_path +
+      (formData.team1_shortName || a[0].team_simple_name) +
+      ".png";
+    responseData.team2Logo =
+      formData.draft_logo_path +
+      (formData.team2_shortName || a[1].team_simple_name) +
+      ".png";
+    //playerNames
+    responseData.player1Name =
+      name_finder(a[0].player_list[0].roleid, playerList) ||
+      a[0].player_list[0].name;
+    responseData.player2Name =
+      name_finder(a[0].player_list[1].roleid, playerList) ||
+      a[0].player_list[1].name;
+    responseData.player3Name =
+      name_finder(a[0].player_list[2].roleid, playerList) ||
+      a[0].player_list[2].name;
+    responseData.player4Name =
+      name_finder(a[0].player_list[3].roleid, playerList) ||
+      a[0].player_list[3].name;
+    responseData.player5Name =
+      name_finder(a[0].player_list[4].roleid, playerList) ||
+      a[0].player_list[4].name;
+
+    responseData.player6Name =
+      name_finder(a[1].player_list[0].roleid, playerList) ||
+      a[1].player_list[0].name;
+    responseData.player7Name =
+      name_finder(a[1].player_list[1].roleid, playerList) ||
+      a[1].player_list[1].name;
+    responseData.player8Name =
+      name_finder(a[1].player_list[2].roleid, playerList) ||
+      a[1].player_list[2].name;
+    responseData.player9Name =
+      name_finder(a[1].player_list[3].roleid, playerList) ||
+      a[1].player_list[3].name;
+    responseData.player10Name =
+      name_finder(a[1].player_list[4].roleid, playerList) ||
+      a[1].player_list[4].name;
+
+    //ledPlayers
+    for (let i = 0; i < 5; i++) {
+      responseData[
+        `ledplayerPic${i + 1}`
+      ] = `C://data/led/draft/player/${team1[i].roleid}.png`;
+    }
+    for (let i = 0; i < 5; i++) {
+      responseData[
+        `ledplayerPic${i + 6}`
+      ] = `C://data/led/draft/player/${team2[i].roleid}.png`;
+    }
+
+    //pickrate
+    // responseData.pickrate1 = rate[a[0].player_list[0].heroid].pick || "0"
+
+    //pickrate
+    for (let i = 0; i < 5; i++) {
+      responseData[`pickrate${i + 1}`] = getPickRate(
+        a[0].player_list[i].heroid
+      );
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`pickrate${i + 6}`] = getPickRate(
+        a[1].player_list[i].heroid
+      );
+    }
+
+    //banrate
+    for (let i = 0; i < 5; i++) {
+      responseData[`banrate${i + 1}`] = getBanRate(a[0].player_list[i].heroid);
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`banrate${i + 6}`] = getBanRate(a[1].player_list[i].heroid);
+    }
+
+    //winrate
+    for (let i = 0; i < 5; i++) {
+      responseData[`winrate${i + 1}`] =
+        (getWinRate(a[0].player_list[i].heroid) * 100).toFixed(0) + "%";
+    }
+
+    for (let i = 0; i < 5; i++) {
+      responseData[`winrate${i + 6}`] =
+        (getWinRate(a[1].player_list[i].heroid) * 100).toFixed(0) + "%";
+    }
+
+    //pickHeroName
+    responseData.pick1Name = heroNames[a[0].player_list[0].heroid] || "";
+    responseData.pick2Name = heroNames[a[0].player_list[1].heroid] || "";
+    responseData.pick3Name = heroNames[a[0].player_list[2].heroid] || "";
+    responseData.pick4Name = heroNames[a[0].player_list[3].heroid] || "";
+    responseData.pick5Name = heroNames[a[0].player_list[4].heroid] || "";
+
+    responseData.pick6Name = heroNames[a[1].player_list[0].heroid] || "";
+    responseData.pick7Name = heroNames[a[1].player_list[1].heroid] || "";
+    responseData.pick8Name = heroNames[a[1].player_list[2].heroid] || "";
+    responseData.pick9Name = heroNames[a[1].player_list[3].heroid] || "";
+    responseData.pick10Name = heroNames[a[1].player_list[4].heroid] || "";
+    //picked1
+    responseData.picking1 = 0;
+    responseData.picked1 = 0;
+    responseData.border1 = "C://data/draft/border/0.png";
+    if (a[0].player_list[0].picking == true) {
+      responseData.picking1 = 1;
+      responseData.border1 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[0].picking == false &&
+      a[0].player_list[0].heroid !== 0
+    ) {
+      responseData.picking1 = 1;
+      responseData.picked1 = 1;
+    }
+
+    //picked2
+    responseData.picking2 = 0;
+    responseData.picked2 = 0;
+    responseData.border = "C://data/draft/border/0.png";
+    if (a[0].player_list[1].picking == true) {
+      responseData.picking2 = 1;
+      responseData.border2 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[1].picking == false &&
+      a[0].player_list[1].heroid !== 0
+    ) {
+      responseData.picking2 = 1;
+      responseData.picked2 = 1;
+    }
+
+    //picked3
+    responseData.picking3 = 0;
+    responseData.picked3 = 0;
+    responseData.border3 = "C://data/draft/border/0.png";
+    if (a[0].player_list[2].picking == true) {
+      responseData.picking3 = 1;
+      responseData.border3 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[2].picking == false &&
+      a[0].player_list[2].heroid !== 0
+    ) {
+      responseData.picking3 = 1;
+      responseData.picked3 = 1;
+    }
+
+    //picked4
+    responseData.picking4 = 0;
+    responseData.picked4 = 0;
+    responseData.border4 = "C://data/draft/border/0.png";
+    if (a[0].player_list[3].picking == true) {
+      responseData.picking4 = 1;
+      responseData.border4 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[3].picking == false &&
+      a[0].player_list[3].heroid !== 0
+    ) {
+      responseData.picking4 = 1;
+      responseData.picked4 = 1;
+    }
+
+    //picked5
+    responseData.picking5 = 0;
+    responseData.picked5 = 0;
+    responseData.border5 = "C://data/draft/border/0.png";
+    if (a[0].player_list[4].picking == true) {
+      responseData.picking5 = 1;
+      responseData.border5 = "C://data/draft/border/1.png";
+    } else if (
+      a[0].player_list[4].picking == false &&
+      a[0].player_list[4].heroid !== 0
+    ) {
+      responseData.picking5 = 1;
+      responseData.picked5 = 1;
+    }
+
+    //picked6
+    responseData.picking6 = 0;
+    responseData.picked6 = 0;
+    responseData.border6 = "C://data/draft/border/0.png";
+    if (a[1].player_list[0].picking == true) {
+      responseData.picking6 = 1;
+      responseData.border6 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[0].picking == false &&
+      a[1].player_list[0].heroid !== 0
+    ) {
+      responseData.picking6 = 1;
+      responseData.picked6 = 1;
+    }
+
+    //picked7
+    responseData.picking7 = 0;
+    responseData.picked7 = 0;
+    responseData.border7 = "C://data/draft/border/0.png";
+    if (a[1].player_list[1].picking == true) {
+      responseData.picking7 = 1;
+      responseData.border7 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[1].picking == false &&
+      a[1].player_list[1].heroid !== 0
+    ) {
+      responseData.picking7 = 1;
+      responseData.picked7 = 1;
+    }
+
+    //picked8
+    responseData.picking8 = 0;
+    responseData.picked8 = 0;
+    responseData.border8 = "C://data/draft/border/0.png";
+    if (a[1].player_list[2].picking == true) {
+      responseData.picking8 = 1;
+      responseData.border8 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[2].picking == false &&
+      a[1].player_list[2].heroid !== 0
+    ) {
+      responseData.picking8 = 1;
+      responseData.picked8 = 1;
+    }
+
+    //picked9
+    responseData.picking9 = 0;
+    responseData.picked9 = 0;
+    responseData.border9 = "C://data/draft/border/0.png";
+    if (a[1].player_list[3].picking == true) {
+      responseData.picking9 = 1;
+      responseData.border9 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[3].picking == false &&
+      a[1].player_list[3].heroid !== 0
+    ) {
+      responseData.picking9 = 1;
+      responseData.picked9 = 1;
+    }
+
+    //picked10
+    responseData.picking10 = 0;
+    responseData.picked10 = 0;
+    responseData.border10 = "C://data/draft/border/0.png";
+    if (a[1].player_list[4].picking == true) {
+      responseData.picking10 = 1;
+      responseData.border10 = "C://data/draft/border/1.png";
+    } else if (
+      a[1].player_list[4].picking == false &&
+      a[1].player_list[4].heroid !== 0
+    ) {
+      responseData.picking10 = 1;
+      responseData.picked10 = 1;
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player1picking
+    if (a[0].player_list[0].picking == true) {
+      responseData.pick1 =
+        `C://data/led/draft/player/${a[0].player_list[0].roleid}.png` || "";
+      responseData.ledPic1 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[0].player_list[0].heroid != 0) {
+      responseData.pick1 =
+        `C://data/led/draft/hero/${a[0].player_list[0].heroid}.png` || "";
+      responseData.ledPic1 =
+        `${formData.PickedLed}${a[0].player_list[0].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick1 =
+        `C://data/led/draft/player/${a[0].player_list[0].roleid}.png` || "";
+      responseData.ledPic1 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player2picking
+    if (a[0].player_list[1].picking == true) {
+      responseData.pick2 =
+        `C://data/led/draft/player/${a[0].player_list[1].roleid}.png` || "";
+      responseData.ledPic2 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[0].player_list[1].heroid != 0) {
+      responseData.pick2 =
+        `C://data/led/draft/hero/${a[0].player_list[1].heroid}.png` || "";
+      responseData.ledPic2 =
+        `${formData.PickedLed}${a[0].player_list[1].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick2 =
+        `C://data/led/draft/player/${a[0].player_list[1].roleid}.png` || "";
+      responseData.ledPic2 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player3picking
+    if (a[0].player_list[2].picking == true) {
+      responseData.pick3 =
+        `C://data/led/draft/player/${a[0].player_list[2].roleid}.png` || "";
+      responseData.ledPic3 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[0].player_list[2].heroid != 0) {
+      responseData.pick3 =
+        `C://data/led/draft/hero/${a[0].player_list[2].heroid}.png` || "";
+      responseData.ledPic3 =
+        `${formData.PickedLed}${a[0].player_list[2].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick3 =
+        `C://data/led/draft/player/${a[0].player_list[2].roleid}.png` || "";
+      responseData.ledPic3 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player4picking
+    if (a[0].player_list[3].picking == true) {
+      responseData.pick4 =
+        `C://data/led/draft/player/${a[0].player_list[3].roleid}.png` || "";
+      responseData.ledPic4 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[0].player_list[3].heroid != 0) {
+      responseData.pick4 =
+        `C://data/led/draft/hero/${a[0].player_list[3].heroid}.png` || "";
+      responseData.ledPic4 =
+        `${formData.PickedLed}${a[0].player_list[3].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick4 =
+        `C://data/led/draft/player/${a[0].player_list[3].roleid}.png` || "";
+      responseData.ledPic4 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player5picking
+    if (a[0].player_list[4].picking == true) {
+      responseData.pick5 =
+        `C://data/led/draft/player/${a[0].player_list[4].roleid}.png` || "";
+      responseData.ledPic5 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[0].player_list[4].heroid != 0) {
+      responseData.pick5 =
+        `C://data/led/draft/hero/${a[0].player_list[4].heroid}.png` || "";
+      responseData.ledPic5 =
+        `${formData.PickedLed}${a[0].player_list[4].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick5 =
+        `C://data/led/draft/player/${a[0].player_list[4].roleid}.png` || "";
+      responseData.ledPic5 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player6picking
+    if (a[1].player_list[0].picking == true) {
+      responseData.pick6 =
+        `C://data/led/draft/player/${a[1].player_list[0].roleid}.png` || "";
+      responseData.ledPic6 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[1].player_list[0].heroid != 0) {
+      responseData.pick6 =
+        `C://data/led/draft/hero/${a[1].player_list[0].heroid}.png` || "";
+      responseData.ledPic6 =
+        `${formData.PickedLed}${a[1].player_list[0].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick6 =
+        `C://data/led/draft/player/${a[1].player_list[0].roleid}.png` || "";
+      responseData.ledPic6 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player7picking
+    if (a[1].player_list[1].picking == true) {
+      responseData.pick7 =
+        `C://data/led/draft/player/${a[1].player_list[1].roleid}.png` || "";
+      responseData.ledPic7 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[1].player_list[1].heroid != 0) {
+      responseData.pick7 =
+        `C://data/led/draft/hero/${a[1].player_list[1].heroid}.png` || "";
+      responseData.ledPic7 =
+        `${formData.PickedLed}${a[1].player_list[1].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick7 =
+        `C://data/led/draft/player/${a[1].player_list[1].roleid}.png` || "";
+      responseData.ledPic7 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player8picking
+    if (a[1].player_list[2].picking == true) {
+      responseData.pick8 =
+        `C://data/led/draft/player/${a[1].player_list[2].roleid}.png` || "";
+      responseData.ledPic8 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[1].player_list[2].heroid != 0) {
+      responseData.pick8 =
+        `C://data/led/draft/hero/${a[1].player_list[2].heroid}.png` || "";
+      responseData.ledPic8 =
+        `${formData.PickedLed}${a[1].player_list[2].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick8 =
+        `C://data/led/draft/player/${a[1].player_list[2].roleid}.png` || "";
+      responseData.ledPic8 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player9picking
+    if (a[1].player_list[3].picking == true) {
+      responseData.pick9 =
+        `C://data/led/draft/player/${a[1].player_list[3].roleid}.png` || "";
+      responseData.ledPic9 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[1].player_list[3].heroid != 0) {
+      responseData.pick9 =
+        `C://data/led/draft/hero/${a[1].player_list[3].heroid}.png` || "";
+      responseData.ledPic9 =
+        `${formData.PickedLed}${a[1].player_list[3].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick9 =
+        `C://data/led/draft/player/${a[1].player_list[3].roleid}.png` || "";
+      responseData.ledPic9 = formData.notPickingLed || "";
+    }
+
+    //---------------------------------------------------------------------------------------
+    //player10picking
+    if (a[1].player_list[4].picking == true) {
+      responseData.pick10 =
+        `C://data/led/draft/player/${a[1].player_list[4].roleid}.png` || "";
+      responseData.ledPic10 = formData.notPickingLed || "";
+    }
+    //afterPicking
+    else if (a[1].player_list[4].heroid != 0) {
+      responseData.pick10 =
+        `C://data/led/draft/hero/${a[1].player_list[4].heroid}.png` || "";
+      responseData.ledPic10 =
+        `${formData.PickedLed}${a[1].player_list[4].heroid}.png` || "";
+    }
+    //before picking
+    else {
+      responseData.pick10 =
+        `C://data/led/draft/player/${a[1].player_list[4].roleid}.png` || "";
+      responseData.ledPic10 = formData.notPickingLed || "";
+    }
+
+    responseData.timer = `00:${data.data.state_left_time
+      .toString()
+      .padStart(2, "0")}`;
+
+    let jsonData = { data: [responseData] };
+    res.send(jsonData);
+  });
+});
 
 app.listen(3000, () => {
   console.log("Server Running on localhost:3000");
