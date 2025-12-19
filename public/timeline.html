@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draft Pick Countdown</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <style>
+        html, body {
+            background: transparent;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <video id="timelineVideo" autoplay muted playsinline>
+            <source src="timeline.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const maxTime = 50; // Max countdown time (seconds)
+                const videoDuration = 50; // Video length in seconds
+                const stateLeftTime = ref(maxTime);
+                const video = ref(null);
+                let lastServerTime = maxTime; // Last received state_left_time
+                let lastUpdateTime = Date.now(); // When we last got data
+                let restarting = false; // Reset flag
+
+                const fetchData = async () => {
+                    try {
+                        const response = await fetch("http://192.168.201.138:3000/draft");
+                        const jsonData = await response.json();
+
+                        if (jsonData.data.length > 0) {
+                            let newStateTime = jsonData.data[0].state_left_time;
+
+                            // Detect reset when countdown jumps back up
+                            if (newStateTime > lastServerTime && lastServerTime === 0) {
+                                restarting = true;
+                            }
+
+                            lastServerTime = newStateTime;
+                            lastUpdateTime = Date.now(); // Update time reference
+                        }
+                    } catch (error) {
+                        console.error("Error fetching data:", error);
+                    }
+                };
+
+                const syncVideoProgress = () => {
+                    if (video.value) {
+                        let elapsedTime = (Date.now() - lastUpdateTime) / 1000; // Time since last update
+                        let predictedStateTime = Math.max(0, lastServerTime - elapsedTime); // Smooth estimate
+
+                        let progress = 1 - (predictedStateTime / maxTime); // 0 → 100%
+                        let expectedTime = progress * videoDuration; // Convert to video time
+
+                        let diff = expectedTime - video.value.currentTime;
+
+                        // 🔥 Only Adjust Forward & Smooth 🔥
+                        if (diff > 0.3) {
+                            video.value.currentTime = expectedTime; // Hard correct if lagging behind too much
+                        } else if (diff > 0.05) {
+                            video.value.playbackRate = 1.1; // Slightly speed up to sync
+                        } else {
+                            video.value.playbackRate = 1.0; // Normal speed
+                        }
+
+                        // If state time reaches 0, finish video smoothly
+                        if (predictedStateTime <= 0) {
+                            video.value.currentTime = videoDuration;
+                            video.value.pause();
+                        }
+
+                        // Reset video when new round starts
+                        if (restarting && predictedStateTime > 0) {
+                            restarting = false;
+                            video.value.currentTime = 0;
+                            video.value.play();
+                        }
+                    }
+
+                    requestAnimationFrame(syncVideoProgress);
+                };
+
+                onMounted(() => {
+                    video.value = document.getElementById("timelineVideo");
+                    fetchData().then(() => {
+                        syncVideoProgress();
+                        setInterval(fetchData, 1000); // Fetch every second
+                    });
+                });
+
+                return { stateLeftTime };
+            }
+        }).mount("#app");
+    </script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Level 4 Triggers - Multi Overlay</title>
+  <style>
+    body {
+      background-color: transparent;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .overlay {
+      position: fixed;
+      color: #303131;
+      width: 206px;
+      height: 91px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
+      text-align: center;
+      display: block;
+      box-sizing: border-box;
+      pointer-events: none;
+      border-radius: 5px;
+      background-size: 206px 91px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* Left side overlays (1-5) use leftLevelBG */
+    .overlay-1, .overlay-2, .overlay-3, .overlay-4, .overlay-5 {
+      background-image: url("/assets/images/leftLevelBG.png");
+    }
+
+    /* Right side overlays (6-10) use rightLevelBG */
+    .overlay-6, .overlay-7, .overlay-8, .overlay-9, .overlay-10 {
+      background-image: url("/assets/images/rightLevelBG.png");
+    }
+
+    .overlay-content {
+      margin-top: 0px;
+      position: relative;
+    }
+
+    .role-icon {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      width: 45px;
+      height: 45px;
+      background-size: 45px 45px;
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: 10;
+    }
+
+    .name {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .name-box {
+      width: 100%;
+      padding: 4px 0;
+      margin: 0;
+      top: 0;
+      left: 0;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    /* Slide Left (from left side) */
+    .slide-left-enter-active,
+    .slide-left-leave-active {
+      transition: all 0.5s ease-out;
+    }
+
+    .slide-left-enter {
+      transform: translateX(-220px);
+      opacity: 0;
+    }
+
+    .slide-left-leave-to {
+      transform: translateX(-220px);
+      opacity: 0;
+    }
+
+    /* Slide Right (from right side) */
+    .slide-right-enter-active,
+    .slide-right-leave-active {
+      transition: all 0.5s ease-out;
+    }
+
+    .slide-right-enter {
+      transform: translateX(220px);
+      opacity: 0;
+    }
+
+    .slide-right-leave-to {
+      transform: translateX(220px);
+      opacity: 0;
+    }
+
+    /* Positions for each overlay */
+    .overlay-1  { top: 346px;  left: 0; }
+    .overlay-2  { top: 436px;  left: 0; }
+    .overlay-3  { top: 526px;  left: 0; }
+    .overlay-4  { top: 616px;  left: 0; }
+    .overlay-5  { top: 706px;  left: 0; }
+    .overlay-6  { top: 346px;  right: 0; }
+    .overlay-7  { top: 436px;  right: 0; }
+    .overlay-8  { top: 526px;  right: 0; }
+    .overlay-9  { top: 616px;  right: 0; }
+    .overlay-10 { top: 706px;  right: 0; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <transition
+      v-for="i in 10"
+      :key="i"
+      :name="i <= 5 ? 'slide-left' : 'slide-right'"
+    >
+      <div
+        v-if="overlays[i - 1].visible"
+        :class="'overlay overlay-' + i"
+      >
+        <div class="overlay-content">
+          <div 
+            class="role-icon"
+            :style="{ backgroundImage: 'url(/assets/images/roles/' + overlays[i - 1].role + '.png)' }"
+          ></div>
+          <div class="name-box">
+            <div class="name">{{ overlays[i - 1].name }}</div>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        previousLevels: Array(10).fill(0),
+        overlays: Array.from({ length: 10 }, () => ({
+          visible: false,
+          name: '',
+          role: ''
+        }))
+      },
+      created() {
+        this.fetchData();
+        setInterval(this.fetchData, 1000);
+      },
+      methods: {
+        async fetchData() {
+          try {
+            const response = await fetch('http://localhost:3031/');
+            if (!response.ok) throw new Error('Network error');
+            const jsonData = await response.json();
+            const data = jsonData.data[0];
+
+            for (let i = 0; i < 10; i++) {
+              const levelKey = `level${i + 1}`;
+              const nameKey = `player${i + 1}Name`;
+              const roleKey = `role${i + 1}`;
+              const currentLevel = data[levelKey];
+              const previousLevel = this.previousLevels[i];
+
+              if (currentLevel === 4 && previousLevel < 4) {
+                this.overlays[i].name = data[nameKey];
+                this.overlays[i].role = data[roleKey];
+
+                // Trigger with animation
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    this.overlays[i].visible = true;
+                  });
+                });
+
+                setTimeout(() => {
+                  this.overlays[i].visible = false;
+                }, 5000);
+              }
+
+              this.previousLevels[i] = currentLevel;
+            }
+          } catch (error) {
+            console.error('Fetch error:', error);
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

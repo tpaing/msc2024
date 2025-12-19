@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>First Item Overlay with Animation</title>
+  <style>
+    body {
+      background-color: transparent;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .overlay {
+      position: fixed;
+      display: flex;
+      flex-direction: row;
+      width: 310px;
+      height: 62px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      pointer-events: none;
+      border-radius: 0px 31px 31px 0px;
+    }
+
+    .text-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar {
+      background-color: #ee2924;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
+      font-weight: bold;
+      font-size: 14px;
+      height: 60%;
+    }
+
+    .top-bar img {
+      height: 20px;
+      margin-right: 6px;
+    }
+
+    .bottom-bar {
+      background-color: black;
+      font-size: 12px;
+      font-weight: bold;
+      padding-left: 6px;
+      display: flex;
+      align-items: center;
+      height: 50%;
+    }
+
+    .item-image {
+      width: 62px;
+      height: 62px;
+      background-size: cover;
+      background-position: center;
+      margin-left: -31px;
+    }
+
+    /* Transitions */
+    .slide-left-enter-active,
+    .slide-left-leave-active,
+    .slide-right-enter-active,
+    .slide-right-leave-active {
+      transition: all 0.5s ease-out;
+    }
+
+    .slide-left-enter,
+    .slide-left-leave-to {
+      transform: translateX(-200px);
+      opacity: 0;
+    }
+
+    .slide-right-enter,
+    .slide-right-leave-to {
+      transform: translateX(200px);
+      opacity: 0;
+    }
+
+    /* Overlay positions */
+    .overlay-1  { top: 346px;  left: 0; }
+    .overlay-2  { top: 436px;  left: 0; }
+    .overlay-3  { top: 526px;  left: 0; }
+    .overlay-4  { top: 616px;  left: 0; }
+    .overlay-5  { top: 706px;  left: 0; }
+    .overlay-6  { top: 346px;  right: 0; }
+    .overlay-7  { top: 436px;  right: 0; }
+    .overlay-8  { top: 526px;  right: 0; }
+    .overlay-9  { top: 616px;  right: 0; }
+    .overlay-10 { top: 706px;  right: 0; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <transition
+      v-for="i in 10"
+      :key="i"
+      :name="i <= 5 ? 'slide-left' : 'slide-right'"
+    >
+      <div
+        v-if="overlays[i - 1].visible"
+        :class="'overlay overlay-' + i"
+      >
+        <div class="text-section">
+          <div class="top-bar">
+            <!-- <img src="logo.png" alt="Logo" /> -->
+            {{ overlays[i - 1].playerName }}
+          </div>
+          <div class="bottom-bar">FIRST ITEM PRIORITY</div>
+        </div>
+        <div
+          class="item-image"
+          :style="{ backgroundImage: 'url(data/item/item/' + overlays[i - 1].itemId + '.png)' }"
+        ></div>
+      </div>
+    </transition>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        completedItems: ['2106', '2107', '3009', '3006', '3091', '3026'], // Completed item IDs
+        shown: Array(10).fill(false),
+        overlays: Array.from({ length: 10 }, () => ({
+          visible: false,
+          itemId: '',
+          playerName: ''
+        }))
+      },
+      created() {
+        this.fetchData();
+        setInterval(this.fetchData, 1000);
+      },
+      methods: {
+        async fetchData() {
+          try {
+            const response = await fetch('http://localhost:3031/');
+            if (!response.ok) throw new Error('Network error');
+            const json = await response.json();
+            const data = json.data[0];
+
+            const extractItemId = (path) => {
+              if (!path) return null;
+              const match = path.match(/(\d+)\.png$/);
+              return match ? match[1] : null;
+            };
+
+            for (let i = 0; i < 10; i++) {
+              if (this.shown[i]) continue;
+
+              const itemKeys = Array.from({ length: 6 }, (_, j) => `p${i + 1}Item${j + 1}`);
+              const itemIds = itemKeys.map(key => extractItemId(data[key]));
+
+              const matchedItem = itemIds.find(id => this.completedItems.includes(id));
+
+              if (matchedItem) {
+                this.overlays[i].itemId = matchedItem;
+                this.overlays[i].playerName = data[`player${i + 1}Name`] || `Player ${i + 1}`;
+                this.overlays[i].visible = true;
+                this.shown[i] = true;
+
+                setTimeout(() => {
+                  this.overlays[i].visible = false;
+                }, 5000);
+              }
+            }
+          } catch (err) {
+            console.error('Fetch error:', err);
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

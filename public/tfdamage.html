@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Teamfight Damage</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: transparent;
+        color: white;
+        font-family: "Glancyr", sans-serif;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 1102px;
+        /* max-width: 1400px; */
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .main-panel {
+        position: relative;
+        width: 100%;
+        border-radius: 8px;
+        /* overflow: hidden; */
+        padding: 24px;
+        margin-top: 32px;
+        background-image: url("/assets/images/frame.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        max-height: 224px;
+      }
+
+      .title-image {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: auto;
+        margin-top: -30px ;
+      }
+
+      .icon-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin-top: 32px;
+      }
+
+      .damage-section {
+        position: relative;
+        margin-bottom: 0px;
+      }
+
+      .totals-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .total-left {
+        background-color: white;
+        color: black;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .total-right {
+        background-color: #dc2626;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .main-bar {
+        width: 100%;
+        height: 30px;
+        background-color: #d1d5db;
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+        position: relative;
+        margin-bottom: 8px;
+        margin-top: 45px;
+      }
+
+      .team-section {
+        display: flex;
+        position: relative;
+        border-right: 3px solid #1f2937;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .team-section:last-child {
+        border-right: none;
+      }
+
+      .bar-segment {
+        height: 100%;
+        position: relative;
+        border-right: 3px solid #fbbf24;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .bar-segment:last-child {
+        border-right: none;
+      }
+
+      .bar-segment.left-team {
+        background-color: #ffffff;
+      }
+
+      .bar-segment.right-team {
+        background-color: #ef4444;
+      }
+
+      .title-section {
+        text-align: center;
+      }
+
+      .title {
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        letter-spacing: 0.1em;
+      }
+
+      .icon-wrapper {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateX(0);
+      }
+
+      .damage-text {
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 4px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+      }
+
+      .icon-box {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #fbbf24;
+        background-color: #374151;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+      }
+
+      .hero-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        font-size: 10px;
+        font-weight: bold;
+        color: white;
+      }
+
+      .controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 16px;
+        z-index: 1000;
+      }
+
+      .control-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 120px;
+      }
+
+      .start-btn {
+        background-color: #059669;
+        color: white;
+      }
+
+      .start-btn:hover:not(:disabled) {
+        background-color: #047857;
+        transform: translateY(-2px);
+      }
+
+      .start-btn:disabled {
+        background-color: #6b7280;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .stop-btn {
+        background-color: #dc2626;
+        color: white;
+      }
+
+      .stop-btn:hover:not(:disabled) {
+        background-color: #b91c1c;
+        transform: translateY(-2px);
+      }
+
+      .stop-btn:disabled {
+        background-color: #6b7280;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .tracking-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 14px;
+        z-index: 1000;
+      }
+
+      .titletext {
+        position: absolute;
+        margin-top: -40px;
+        z-index: 1;
+        margin-left: 310px;
+      }
+
+      .tracking-active {
+        background-color: #059669;
+        color: white;
+        animation: pulse 2s infinite;
+      }
+
+      .tracking-stopped {
+        background-color: #dc2626;
+        color: white;
+      }
+
+      .tracking-ready {
+        background-color: #4b5563;
+        color: white;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="container">
+        <div class="tracking-indicator" :class="trackingIndicatorClass">
+          {{ trackingIndicatorText }}
+        </div>
+
+        <div class="main-panel">
+          <div class="titletext">
+            <img
+              src="/assets/images/tfdamage.png"
+              alt="TEAMFIGHT DAMAGE"
+              class="title-image"
+            />
+          </div>
+          <div class="icon-row">
+            <div
+              v-for="(player, index) in allPlayers"
+              :key="player.id"
+              class="icon-wrapper"
+              :style="{ left: player.iconPosition + 'px' }"
+            >
+              <div class="damage-text">
+                {{ formatDamage(player.animatedDamage) }}
+              </div>
+              <div class="icon-box">
+                <img
+                  v-if="player.heroId"
+                  :src="getHeroImagePath(player.heroId)"
+                  :alt="player.heroId"
+                  class="hero-image"
+                  @error="handleImageError($event, player)"
+                  @load="handleImageLoad($event, player)"
+                />
+                <div v-if="player.showFallback" class="hero-fallback">
+                  {{ player.heroId || 'P' + (player.id > 5 ? player.id - 5 :
+                  player.id) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Damage Total Bar -->
+          <div class="damage-section">
+            <div class="main-bar">
+              <!-- Left Team Section -->
+              <div
+                class="team-section"
+                :style="{ width: leftSectionWidth + '%' }"
+              >
+                <div
+                  v-for="(player, index) in leftTeam"
+                  :key="player.id"
+                  class="bar-segment left-team"
+                  :style="{ width: player.segmentWidth + '%', minWidth: '50px' }"
+                ></div>
+              </div>
+
+              <!-- Right Team Section -->
+              <div
+                class="team-section"
+                :style="{ width: rightSectionWidth + '%' }"
+              >
+                <div
+                  v-for="(player, index) in rightTeam"
+                  :key="player.id"
+                  class="bar-segment right-team"
+                  :style="{ width: player.segmentWidth + '%', minWidth: '50px' }"
+                ></div>
+              </div>
+            </div>
+
+            <div class="totals-row">
+              <div class="total-left">
+                {{ formatDamage(animatedLeftTotal) }}
+              </div>
+              <div class="total-right">
+                {{ formatDamage(animatedRightTotal) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="title-section">
+            <img
+              src="/assets/images/tfdamage.png"
+              alt="TEAMFIGHT DAMAGE"
+              class="title-image"
+            />
+          </div> -->
+        </div>
+
+        <div class="controls">
+          <button
+            class="control-btn start-btn"
+            @click="startTracking"
+            :disabled="isTracking"
+          >
+            START TRACKING
+          </button>
+          <button
+            class="control-btn stop-btn"
+            @click="stopTracking"
+            :disabled="!isTracking"
+          >
+            STOP TRACKING
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const { createApp, ref, computed, onMounted, onUnmounted, nextTick } =
+        Vue;
+
+      createApp({
+        setup() {
+          // Reactive state
+          const leftTeam = ref([]);
+          const rightTeam = ref([]);
+          const isTracking = ref(false);
+          const baselineDamage = ref({});
+          const frozenDamage = ref({});
+          const animatedLeftTotal = ref(0);
+          const animatedRightTotal = ref(0);
+
+          let fetchInterval = null;
+          const activeAnimations = new Map(); // Track active animations
+
+          // Animation function for smooth counting
+          const animateValue = (startValue, endValue, duration, callback) => {
+            const startTime = Date.now();
+            const difference = endValue - startValue;
+
+            const step = () => {
+              const elapsed = Date.now() - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+
+              // Easing function for smooth animation
+              const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+              const currentValue = Math.round(
+                startValue + difference * easeOutQuart
+              );
+
+              callback(currentValue);
+
+              if (progress < 1) {
+                requestAnimationFrame(step);
+              }
+            };
+
+            requestAnimationFrame(step);
+          };
+
+          // Hero image handling methods
+          const getHeroImagePath = (heroId) => {
+            if (!heroId) return "";
+            // Convert heroId to number and ensure it's within valid range (1-128)
+            const numericId = parseInt(heroId);
+            if (isNaN(numericId) || numericId < 1 || numericId > 130) {
+              return "";
+            }
+            return `data/avatar/${numericId}.png`;
+          };
+
+          const handleImageError = (event, player) => {
+            console.log(`Failed to load image for hero: ${player.heroId}`);
+            player.showFallback = true;
+            event.target.style.display = "none";
+          };
+
+          const handleImageLoad = (event, player) => {
+            player.showFallback = false;
+            event.target.style.display = "block";
+          };
+
+          // Computed properties
+          const allPlayers = computed(() => [
+            ...leftTeam.value.map((p) => ({ ...p, team: "left" })),
+            ...rightTeam.value.map((p) => ({ ...p, team: "right" })),
+          ]);
+
+          const leftTotal = computed(() =>
+            leftTeam.value.reduce((sum, p) => sum + p.displayDamage, 0)
+          );
+
+          const rightTotal = computed(() =>
+            rightTeam.value.reduce((sum, p) => sum + p.displayDamage, 0)
+          );
+
+          const totalDamage = computed(
+            () => leftTotal.value + rightTotal.value
+          );
+
+          const leftSectionWidth = computed(() => {
+            if (totalDamage.value === 0) return 50;
+
+            let naturalLeftWidth = (leftTotal.value / totalDamage.value) * 100;
+            const MIN_TEAM_WIDTH = 25;
+            const MAX_TEAM_WIDTH = 75;
+
+            if (naturalLeftWidth < MIN_TEAM_WIDTH) return MIN_TEAM_WIDTH;
+            if (naturalLeftWidth > MAX_TEAM_WIDTH) return MAX_TEAM_WIDTH;
+            return naturalLeftWidth;
+          });
+
+          const rightSectionWidth = computed(
+            () => 100 - leftSectionWidth.value
+          );
+
+          const trackingIndicatorText = computed(() => {
+            if (isTracking.value) return "TRACKING ACTIVE";
+            if (Object.keys(frozenDamage.value).length > 0)
+              return "TRACKING STOPPED";
+            return "Ready to Track";
+          });
+
+          const trackingIndicatorClass = computed(() => {
+            if (isTracking.value) return "tracking-active";
+            if (Object.keys(frozenDamage.value).length > 0)
+              return "tracking-stopped";
+            return "tracking-ready";
+          });
+
+          // Methods
+          const formatDamage = (damage) => {
+            return Math.round(damage).toLocaleString();
+          };
+
+          const getDisplayDamage = (player) => {
+            if (
+              !isTracking.value &&
+              Object.keys(frozenDamage.value).length > 0
+            ) {
+              return frozenDamage.value[player.id] || 0;
+            } else if (
+              isTracking.value &&
+              baselineDamage.value[player.id] !== undefined
+            ) {
+              const accumulated =
+                player.damage - baselineDamage.value[player.id];
+              return Math.max(0, accumulated);
+            } else {
+              return 0;
+            }
+          };
+
+          const animateDamageChange = (player, newDamage) => {
+            const playerId = player.id;
+            const oldDamage = player.animatedDamage || 0;
+
+            // Cancel any existing animation for this player
+            if (activeAnimations.has(playerId)) {
+              clearTimeout(activeAnimations.get(playerId));
+            }
+
+            // Only animate if there's a meaningful change
+            if (Math.abs(newDamage - oldDamage) > 0.5) {
+              animateValue(oldDamage, newDamage, 400, (currentValue) => {
+                player.animatedDamage = currentValue;
+              });
+
+              // Set a timeout to clean up the animation tracking
+              const timeoutId = setTimeout(() => {
+                activeAnimations.delete(playerId);
+              }, 500);
+
+              activeAnimations.set(playerId, timeoutId);
+            } else {
+              // For small changes, just set directly
+              player.animatedDamage = newDamage;
+            }
+          };
+
+          const animateTotalChange = (oldTotal, newTotal, isLeft) => {
+            if (Math.abs(newTotal - oldTotal) > 0.5) {
+              animateValue(oldTotal, newTotal, 400, (currentValue) => {
+                if (isLeft) {
+                  animatedLeftTotal.value = currentValue;
+                } else {
+                  animatedRightTotal.value = currentValue;
+                }
+              });
+            } else {
+              if (isLeft) {
+                animatedLeftTotal.value = newTotal;
+              } else {
+                animatedRightTotal.value = newTotal;
+              }
+            }
+          };
+
+          const calculatePlayerWidths = (team, teamTotal) => {
+            if (teamTotal === 0) {
+              return team.map(() => 20);
+            }
+
+            const ZERO_DAMAGE_WIDTH = 5;
+            const zeroPlayers = team.filter(
+              (p) => p.displayDamage === 0
+            ).length;
+            const totalZeroWidth = zeroPlayers * ZERO_DAMAGE_WIDTH;
+            const remainingWidth = 100 - totalZeroWidth;
+
+            const playersWithDamage = team.filter((p) => p.displayDamage > 0);
+            const totalDamageExcludingZeros = playersWithDamage.reduce(
+              (sum, p) => sum + p.displayDamage,
+              0
+            );
+
+            const widths = team.map((player) => {
+              if (player.displayDamage === 0) {
+                return ZERO_DAMAGE_WIDTH;
+              } else {
+                return (
+                  (player.displayDamage / totalDamageExcludingZeros) *
+                  remainingWidth
+                );
+              }
+            });
+
+            const adjustedWidths = widths.map((width, index) => {
+              if (team[index].displayDamage > 0 && width < ZERO_DAMAGE_WIDTH) {
+                return ZERO_DAMAGE_WIDTH + 1;
+              }
+              return width;
+            });
+
+            const total = adjustedWidths.reduce((sum, width) => sum + width, 0);
+            return adjustedWidths.map((width) => (width / total) * 100);
+          };
+
+          const calculateIconPositions = () => {
+            const mainBar = document.querySelector(".main-bar");
+            if (!mainBar) return;
+
+            const mainBarRect = mainBar.getBoundingClientRect();
+
+            // Get all left team segments
+            const leftTeamSection = mainBar.querySelector(
+              ".team-section:first-child"
+            );
+            if (leftTeamSection) {
+              const leftSegments =
+                leftTeamSection.querySelectorAll(".bar-segment");
+              leftSegments.forEach((segment, index) => {
+                if (leftTeam.value[index]) {
+                  const segmentRect = segment.getBoundingClientRect();
+                  const segmentCenter =
+                    segmentRect.left - mainBarRect.left + segmentRect.width / 2;
+                  leftTeam.value[index].iconPosition = segmentCenter - 18;
+                }
+              });
+            }
+
+            // Get all right team segments
+            const rightTeamSection = mainBar.querySelector(
+              ".team-section:last-child"
+            );
+            if (rightTeamSection) {
+              const rightSegments =
+                rightTeamSection.querySelectorAll(".bar-segment");
+              rightSegments.forEach((segment, index) => {
+                if (rightTeam.value[index]) {
+                  const segmentRect = segment.getBoundingClientRect();
+                  const segmentCenter =
+                    segmentRect.left - mainBarRect.left + segmentRect.width / 2;
+                  rightTeam.value[index].iconPosition = segmentCenter - 18;
+                }
+              });
+            }
+          };
+
+          const updateTeamDataSync = (data) => {
+            // Store previous totals for animation
+            const prevLeftTotal = animatedLeftTotal.value;
+            const prevRightTotal = animatedRightTotal.value;
+
+            // Create new team data
+            const newLeftTeam = [
+              { id: 1, damage: data.p1damage, heroId: data.p1hero },
+              { id: 2, damage: data.p2damage, heroId: data.p2hero },
+              { id: 3, damage: data.p3damage, heroId: data.p3hero },
+              { id: 4, damage: data.p4damage, heroId: data.p4hero },
+              { id: 5, damage: data.p5damage, heroId: data.p5hero },
+            ];
+
+            const newRightTeam = [
+              { id: 6, damage: data.p6damage, heroId: data.p6hero },
+              { id: 7, damage: data.p7damage, heroId: data.p7hero },
+              { id: 8, damage: data.p8damage, heroId: data.p8hero },
+              { id: 9, damage: data.p9damage, heroId: data.p9hero },
+              { id: 10, damage: data.p10damage, heroId: data.p10hero },
+            ];
+
+            // Calculate display damage
+            newLeftTeam.forEach((player) => {
+              player.displayDamage = getDisplayDamage(player);
+            });
+
+            newRightTeam.forEach((player) => {
+              player.displayDamage = getDisplayDamage(player);
+            });
+
+            // Update player data and animate damage changes
+            leftTeam.value.forEach((player, index) => {
+              if (newLeftTeam[index]) {
+                player.damage = newLeftTeam[index].damage;
+                player.heroId = newLeftTeam[index].heroId;
+                player.displayDamage = newLeftTeam[index].displayDamage;
+
+                // Animate the damage change
+                animateDamageChange(player, player.displayDamage);
+              }
+            });
+
+            rightTeam.value.forEach((player, index) => {
+              if (newRightTeam[index]) {
+                player.damage = newRightTeam[index].damage;
+                player.heroId = newRightTeam[index].heroId;
+                player.displayDamage = newRightTeam[index].displayDamage;
+
+                // Animate the damage change
+                animateDamageChange(player, player.displayDamage);
+              }
+            });
+
+            // Animate total changes
+            const newLeftTotal = newLeftTeam.reduce(
+              (sum, p) => sum + p.displayDamage,
+              0
+            );
+            const newRightTotal = newRightTeam.reduce(
+              (sum, p) => sum + p.displayDamage,
+              0
+            );
+
+            animateTotalChange(prevLeftTotal, newLeftTotal, true);
+            animateTotalChange(prevRightTotal, newRightTotal, false);
+
+            // Calculate segment widths
+            const leftWidths = calculatePlayerWidths(newLeftTeam, newLeftTotal);
+            const rightWidths = calculatePlayerWidths(
+              newRightTeam,
+              newRightTotal
+            );
+
+            // Update segment widths first (starts bar animation)
+            requestAnimationFrame(() => {
+              leftTeam.value.forEach((player, index) => {
+                player.segmentWidth = leftWidths[index];
+              });
+
+              rightTeam.value.forEach((player, index) => {
+                player.segmentWidth = rightWidths[index];
+              });
+
+              // Wait for bar animation to complete before calculating icon positions
+              // CSS transition is 0.6s, so we wait slightly longer
+              setTimeout(() => {
+                calculateIconPositions();
+              }, 650);
+            });
+          };
+
+          const fetchData = async () => {
+            try {
+              const response = await fetch("/teamfightdamage"); //http://localhost:3031/
+              if (!response.ok) throw new Error("Network error");
+              const jsonData = await response.json();
+              const data = jsonData.data[0];
+
+              updateTeamDataSync(data);
+            } catch (error) {
+              console.error("Fetch error:", error);
+            }
+          };
+
+          const startTracking = () => {
+            isTracking.value = true;
+
+            // Reset and set baseline damage values
+            baselineDamage.value = {};
+            frozenDamage.value = {};
+
+            // Set baseline from current API data
+            [...leftTeam.value, ...rightTeam.value].forEach((player) => {
+              baselineDamage.value[player.id] = player.damage;
+            });
+          };
+
+          const stopTracking = () => {
+            isTracking.value = false;
+
+            // Freeze current accumulated damage
+            [...leftTeam.value, ...rightTeam.value].forEach((player) => {
+              const accumulated =
+                player.damage - (baselineDamage.value[player.id] || 0);
+              frozenDamage.value[player.id] = Math.max(0, accumulated);
+            });
+          };
+
+          // Lifecycle hooks
+          onMounted(() => {
+            // Initialize teams with default structure
+            leftTeam.value = [
+              {
+                id: 1,
+                damage: 0,
+                heroId: "P1",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 2,
+                damage: 0,
+                heroId: "P2",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 3,
+                damage: 0,
+                heroId: "P3",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 4,
+                damage: 0,
+                heroId: "P4",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 5,
+                damage: 0,
+                heroId: "P5",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+            ];
+
+            rightTeam.value = [
+              {
+                id: 6,
+                damage: 0,
+                heroId: "P6",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 7,
+                damage: 0,
+                heroId: "P7",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 8,
+                damage: 0,
+                heroId: "P8",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 9,
+                damage: 0,
+                heroId: "P9",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+              {
+                id: 10,
+                damage: 0,
+                heroId: "P10",
+                displayDamage: 0,
+                animatedDamage: 0,
+                segmentWidth: 20,
+                iconPosition: 0,
+                showFallback: false,
+              },
+            ];
+
+            fetchData();
+            fetchInterval = setInterval(fetchData, 1000);
+
+            // Recalculate positions on window resize
+            window.addEventListener("resize", () => {
+              nextTick(() => {
+                calculateIconPositions();
+              });
+            });
+          });
+
+          onUnmounted(() => {
+            if (fetchInterval) {
+              clearInterval(fetchInterval);
+            }
+            // Clean up any active animations
+            activeAnimations.forEach((timeoutId) => clearTimeout(timeoutId));
+            activeAnimations.clear();
+          });
+
+          // Return reactive state and methods for template
+          return {
+            leftTeam,
+            rightTeam,
+            allPlayers,
+            isTracking,
+            leftTotal,
+            rightTotal,
+            animatedLeftTotal,
+            animatedRightTotal,
+            leftSectionWidth,
+            rightSectionWidth,
+            trackingIndicatorText,
+            trackingIndicatorClass,
+            formatDamage,
+            startTracking,
+            stopTracking,
+            getHeroImagePath,
+            handleImageError,
+            handleImageLoad,
+          };
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>

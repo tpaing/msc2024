@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turtle Kill Video Trigger</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.min.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Turtle kill info display -->
+    <div v-if="showTurtleInfo" class="turtle-info-overlay">
+      <h3>Turtle Kill!</h3>
+      <p>Team: {{ turtleKillTeamName }}</p>
+      <p>Player: {{ turtleKillPlayerName }}</p>
+      <img v-if="turtleKillPlayerTeamLogo" :src="formatImagePath(turtleKillPlayerTeamLogo)" alt="Team Logo" class="team-logo">
+      <img v-if="turtleKillPlayer" :src="formatImagePath(turtleKillPlayer)" alt="Player" class="player-image">
+    </div>
+
+    <!-- Hidden video element -->
+    <video id="turtleVideo" width="640" height="360" style="display: none;" muted autoplay playsinline>
+      <source src="turtle.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.js"></script>
+
+  <style>
+    body {
+      background-color: #f0f0f0;
+      font-family: Arial, sans-serif;
+    }
+    .turtle-info-overlay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      z-index: 1000;
+    }
+    .team-logo, .player-image {
+      max-width: 100px;
+      max-height: 100px;
+      margin: 5px;
+    }
+  </style>
+
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: {
+        lastTurtleKillCount: 0,
+        showTurtleInfo: false,
+        turtleKillTeamName: '',
+        turtleKillPlayerName: '',
+        turtleKillPlayer: '',
+        turtleKillPlayerTeamLogo: ''
+      },
+      created() {
+        this.fetchData();
+        setInterval(this.fetchData, 1000);
+      },
+      methods: {
+        formatImagePath(path) {
+          if (!path) return '';
+          // Strip Windows-style path and return a web-compatible path
+          const stripped = path.replace(/^([A-Z]:)?[\\/]+/, ''); // remove drive letter and slashes
+          return stripped.replace(/\\/g, '/'); // normalize to forward slashes
+        },
+        async fetchData() {
+          try {
+            const response = await fetch('http://localhost:3031/');
+            if (response.ok) {
+              const jsonData = await response.json();
+              const gameData = jsonData.data[0];
+              const newTurtleCount = gameData.totalTurtleKilled || 0;
+
+              if (newTurtleCount > this.lastTurtleKillCount) {
+                // Update turtle kill information
+                this.turtleKillTeamName = gameData.turtleKillTeamName || '';
+                this.turtleKillPlayerName = gameData.turtleKillPlayerName || '';
+                this.turtleKillPlayer = gameData.turtleKillPlayer || '';
+                this.turtleKillPlayerTeamLogo = gameData.turtleKillPlayerTeamLogo || '';
+
+                this.showTurtleInfo = true;
+
+                setTimeout(() => {
+                  this.showTurtleInfo = false;
+                }, 5000);
+
+                this.playTurtleVideo();
+              }
+
+              this.lastTurtleKillCount = newTurtleCount;
+            } else {
+              console.error('Error fetching data:', response.status);
+            }
+          } catch (err) {
+            console.error('Fetch error:', err);
+          }
+        },
+        playTurtleVideo() {
+          const video = document.getElementById('turtleVideo');
+          video.style.display = 'block';
+          video.currentTime = 0;
+          video.play();
+          video.onended = () => {
+            video.style.display = 'none';
+          };
+        }
+      }
+    });
+  </script>
+</body>
+</html>

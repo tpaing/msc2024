@@ -1,0 +1,1 @@
+First item is based on /item route player order.In tournament rooms, Even if raw battle data api is not sorted by roles, The in-game UI is auto sorted by roles.
