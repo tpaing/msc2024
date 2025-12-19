@@ -46,7 +46,7 @@
 
                 const fetchData = async () => {
                     try {
-                        const response = await fetch("http://192.168.201.138:3000/draft");
+                        const response = await fetch("/draft");  //http://192.168.201.138:3000/draft
                         const jsonData = await response.json();
 
                         if (jsonData.data.length > 0) {
