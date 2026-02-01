@@ -1220,7 +1220,8 @@ const heroNames = {
   127: "LUKAS",
   128: "KALEA",
   129: "ZETIAN",
-  130: "OBSIDIA"
+  130: "OBSIDIA",
+  131: "SORA"
 };
 
 // app.get('/token', (req, res) => {
@@ -1642,15 +1643,7 @@ app.get("/post-data", (req, res) => {
         responseData[`SecondRole${i + 1}`] = team1[i].c_role;
       }
 
-      //team1 role pngs
-
-      for (let i = 0; i < 5; i++) {
-        responseData[`RolePng${i + 1}`] = `C://data/result/role/${team1[i].c_role}.png`;
-      }
-
-      for (let i = 0; i < 5; i++) {
-        responseData[`SecondRolePng${i + 1}`] = `C://data/result/role2/${team1[i].c_role}.png`;
-      }
+       
 
       //Team2Role
       for (let i = 0; i < 5; i++) {
@@ -1664,7 +1657,15 @@ app.get("/post-data", (req, res) => {
       //role pngs
 
       for (let i = 0; i < 5; i++) {
+        responseData[`RolePng${i + 1}`] = `C://data/result/role/${team1[i].c_role}.png`;
+      }
+
+      for (let i = 0; i < 5; i++) {
         responseData[`RolePng${i + 6}`] = `C://data/result/role/${team2[i].c_role}.png`;
+      }
+
+      for (let i = 0; i < 5; i++) {
+        responseData[`SecondRolePng${i + 1}`] = `C://data/result/role2/${team1[i].c_role}.png`;
       }
 
       for (let i = 0; i < 5; i++) {
