@@ -2571,12 +2571,14 @@ app.get("/hud", async (req, res) => {
       (e) => e?.event_type === "kill_boss" && e?.boss_name === "tortoise",
       "turtle kill"
     );
+    responseData.turtleKillCount = turtleKill.length;
 
     const lordKill = safeEventFilter(
       eventList,
       (e) => e?.event_type === "kill_boss" && e?.boss_name === "lord",
       "lord kill"
     );
+    responseData.lordKillCount = lordKill.length;
 
     const lordSteal = safeEventFilter(
       eventList,
@@ -3258,17 +3260,29 @@ app.get("/draft", (req, res) => {
 
     //pickversion2
     for (let i = 0; i < 5; i++) {
-      responseData[`pickHero${i + 1}`] =
-        "C://data/draft/pick/" + team1[i].heroid + ".png";
       responseData[`spell${i + 1}`] =
         "C://data/draft/spell/" + team1[i].skillid + ".png";
+      responseData[`pickHero${i + 1}`] =
+        "C://data/draft/pick/" + team1[i].heroid + ".png";
+      responseData[`location2pickHero${i + 1}`] =
+        "C://data/draft/picklocation2/" + team1[i].heroid + ".png";
+      responseData[`location3pickHero${i + 1}`] =
+        "C://data/draft/picklocation3/" + team1[i].heroid + ".png";
+      responseData[`location4pickHero${i + 1}`] =
+        "C://data/draft/picklocation4/" + team1[i].heroid + ".png";
     }
 
     for (let i = 0; i < 5; i++) {
-      responseData[`pickHero${i + 6}`] =
-        "C://data/draft/pick/" + team2[i].heroid + ".png";
       responseData[`spell${i + 6}`] =
         "C://data/draft/spell/" + team2[i].skillid + ".png";
+      responseData[`pickHero${i + 6}`] =
+        "C://data/draft/pick/" + team2[i].heroid + ".png";
+      responseData[`location2pickHero${i + 6}`] =
+        "C://data/draft/picklocation2/" + team2[i].heroid + ".png";
+      responseData[`location3pickHero${i + 6}`] =
+        "C://data/draft/picklocation3/" + team2[i].heroid + ".png";
+      responseData[`location4pickHero${i + 6}`] =
+        "C://data/draft/picklocation4/" + team2[i].heroid + ".png";
     }
 
     //arrow
@@ -3465,6 +3479,7 @@ app.get("/draft", (req, res) => {
       responseData.banned10 = 1;
     }
 
+    //pick light
     if (a[0].player_list[0].picking == true) {
       responseData.picklight1 = "C://data/draft/picklight/1/1.png"
     } else {
@@ -3516,7 +3531,61 @@ app.get("/draft", (req, res) => {
     } else {
       responseData.picklight10 = "C://data/draft/picklight/0/1.png"
     }
-    //
+
+    // location2 picklight
+    if (a[0].player_list[0].picking == true) {
+      responseData.location2picklight1 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight1 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[0].player_list[1].picking == true) {
+      responseData.location2picklight2 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight2 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[0].player_list[2].picking == true) {
+      responseData.location2picklight3 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight3 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[0].player_list[3].picking == true) {
+      responseData.location2picklight4 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight4 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[0].player_list[4].picking == true) {
+      responseData.location2picklight5 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight5 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+
+    if (a[1].player_list[0].picking == true) {
+      responseData.location2picklight6 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight6 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[1].player_list[1].picking == true) {
+      responseData.location2picklight7 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight7 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[1].player_list[2].picking == true) {
+      responseData.location2picklight8 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight8 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[1].player_list[3].picking == true) {
+      responseData.location2picklight9 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight9 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    if (a[1].player_list[4].picking == true) {
+      responseData.location2picklight10 = "C://data/draft/picklightlocation2/1/1.png"
+    } else {
+      responseData.location2picklight10 = "C://data/draft/picklightlocation2/0/1.png"
+    }
+    
+    //ban light
     if (a[0].player_list[0].banning == true) {
       responseData.banlight1 = "C://data/draft/banlight/1/1.png"
     } else {
@@ -3572,10 +3641,8 @@ app.get("/draft", (req, res) => {
     //picked1
     responseData.picking1 = 0;
     responseData.picked1 = 0;
-    responseData.border1 = "C://data/draft/border/0.png";
     if (a[0].player_list[0].picking == true) {
       responseData.picking1 = 1;
-      responseData.border1 = "C://data/draft/border/1.png";
     } else if (
       a[0].player_list[0].picking == false &&
       a[0].player_list[0].heroid !== 0
@@ -3587,10 +3654,8 @@ app.get("/draft", (req, res) => {
     //picked2
     responseData.picking2 = 0;
     responseData.picked2 = 0;
-    responseData.border = "C://data/draft/border/0.png";
     if (a[0].player_list[1].picking == true) {
       responseData.picking2 = 1;
-      responseData.border2 = "C://data/draft/border/1.png";
     } else if (
       a[0].player_list[1].picking == false &&
       a[0].player_list[1].heroid !== 0
@@ -3602,10 +3667,8 @@ app.get("/draft", (req, res) => {
     //picked3
     responseData.picking3 = 0;
     responseData.picked3 = 0;
-    responseData.border3 = "C://data/draft/border/0.png";
     if (a[0].player_list[2].picking == true) {
       responseData.picking3 = 1;
-      responseData.border3 = "C://data/draft/border/1.png";
     } else if (
       a[0].player_list[2].picking == false &&
       a[0].player_list[2].heroid !== 0
@@ -3617,10 +3680,8 @@ app.get("/draft", (req, res) => {
     //picked4
     responseData.picking4 = 0;
     responseData.picked4 = 0;
-    responseData.border4 = "C://data/draft/border/0.png";
     if (a[0].player_list[3].picking == true) {
       responseData.picking4 = 1;
-      responseData.border4 = "C://data/draft/border/1.png";
     } else if (
       a[0].player_list[3].picking == false &&
       a[0].player_list[3].heroid !== 0
@@ -3632,10 +3693,8 @@ app.get("/draft", (req, res) => {
     //picked5
     responseData.picking5 = 0;
     responseData.picked5 = 0;
-    responseData.border5 = "C://data/draft/border/0.png";
     if (a[0].player_list[4].picking == true) {
       responseData.picking5 = 1;
-      responseData.border5 = "C://data/draft/border/1.png";
     } else if (
       a[0].player_list[4].picking == false &&
       a[0].player_list[4].heroid !== 0
@@ -3647,10 +3706,8 @@ app.get("/draft", (req, res) => {
     //picked6
     responseData.picking6 = 0;
     responseData.picked6 = 0;
-    responseData.border6 = "C://data/draft/border/0.png";
     if (a[1].player_list[0].picking == true) {
       responseData.picking6 = 1;
-      responseData.border6 = "C://data/draft/border/1.png";
     } else if (
       a[1].player_list[0].picking == false &&
       a[1].player_list[0].heroid !== 0
@@ -3662,10 +3719,8 @@ app.get("/draft", (req, res) => {
     //picked7
     responseData.picking7 = 0;
     responseData.picked7 = 0;
-    responseData.border7 = "C://data/draft/border/0.png";
     if (a[1].player_list[1].picking == true) {
       responseData.picking7 = 1;
-      responseData.border7 = "C://data/draft/border/1.png";
     } else if (
       a[1].player_list[1].picking == false &&
       a[1].player_list[1].heroid !== 0
@@ -3677,10 +3732,8 @@ app.get("/draft", (req, res) => {
     //picked8
     responseData.picking8 = 0;
     responseData.picked8 = 0;
-    responseData.border8 = "C://data/draft/border/0.png";
     if (a[1].player_list[2].picking == true) {
       responseData.picking8 = 1;
-      responseData.border8 = "C://data/draft/border/1.png";
     } else if (
       a[1].player_list[2].picking == false &&
       a[1].player_list[2].heroid !== 0
@@ -3692,10 +3745,8 @@ app.get("/draft", (req, res) => {
     //picked9
     responseData.picking9 = 0;
     responseData.picked9 = 0;
-    responseData.border9 = "C://data/draft/border/0.png";
     if (a[1].player_list[3].picking == true) {
       responseData.picking9 = 1;
-      responseData.border9 = "C://data/draft/border/1.png";
     } else if (
       a[1].player_list[3].picking == false &&
       a[1].player_list[3].heroid !== 0
@@ -3707,26 +3758,14 @@ app.get("/draft", (req, res) => {
     //picked10
     responseData.picking10 = 0;
     responseData.picked10 = 0;
-    responseData.border10 = "C://data/draft/border/0.png";
     if (a[1].player_list[4].picking == true) {
       responseData.picking10 = 1;
-      responseData.border10 = "C://data/draft/border/1.png";
     } else if (
       a[1].player_list[4].picking == false &&
       a[1].player_list[4].heroid !== 0
     ) {
       responseData.picking10 = 1;
       responseData.picked10 = 1;
-    }
-    //banForResutl
-    for (let i = 0; i < 5; i++) {
-      responseData[`banPicForResult${i + 1}`] =
-        "C://data/result1/ban/" + team1[i].ban_heroid + ".png";
-    }
-
-    for (let i = 0; i < 5; i++) {
-      responseData[`banPicForResult${i + 6}`] =
-        "C://data/result1/ban/" + team2[i].ban_heroid + ".png";
     }
 
     //banlocation2
@@ -3912,27 +3951,24 @@ app.get("/draft", (req, res) => {
     responseData.sequence10 = `C://data/draft/hero/motion/${a[1].player_list[4].heroid}/${a[1].player_list[4].heroid}001.png` || 'heroid_error';
 
     //---------------------------------------------------------------------------------------
+    //picking with player animation
     //player1picking
     if (a[0].player_list[0].picking == true) {
       responseData.pick1 =
         `${formData.draft_player_pic}${a[0].player_list[0].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic1 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[0].player_list[0].heroid != 0) {
       responseData.pick1 =
         `${formData.hero}${a[0].player_list[0].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic1 =
-        `${formData.PickedLed}${a[0].player_list[0].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick1 =
         `${formData.draft_player_pic}${a[0].player_list[0].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic1 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -3941,22 +3977,18 @@ app.get("/draft", (req, res) => {
       responseData.pick2 =
         `${formData.draft_player_pic}${a[0].player_list[1].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic2 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[0].player_list[1].heroid != 0) {
       responseData.pick2 =
         `${formData.hero}${a[0].player_list[1].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic2 =
-        `${formData.PickedLed}${a[0].player_list[1].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick2 =
         `${formData.draft_player_pic}${a[0].player_list[1].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic2 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -3965,22 +3997,18 @@ app.get("/draft", (req, res) => {
       responseData.pick3 =
         `${formData.draft_player_pic}${a[0].player_list[2].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic3 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[0].player_list[2].heroid != 0) {
       responseData.pick3 =
         `${formData.hero}${a[0].player_list[2].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic3 =
-        `${formData.PickedLed}${a[0].player_list[2].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick3 =
         `${formData.draft_player_pic}${a[0].player_list[2].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic3 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -3989,22 +4017,18 @@ app.get("/draft", (req, res) => {
       responseData.pick4 =
         `${formData.draft_player_pic}${a[0].player_list[3].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic4 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[0].player_list[3].heroid != 0) {
       responseData.pick4 =
         `${formData.hero}${a[0].player_list[3].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic4 =
-        `${formData.PickedLed}${a[0].player_list[3].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick4 =
         `${formData.draft_player_pic}${a[0].player_list[3].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic4 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -4013,22 +4037,18 @@ app.get("/draft", (req, res) => {
       responseData.pick5 =
         `${formData.draft_player_pic}${a[0].player_list[4].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic5 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[0].player_list[4].heroid != 0) {
       responseData.pick5 =
         `${formData.hero}${a[0].player_list[4].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic5 =
-        `${formData.PickedLed}${a[0].player_list[4].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick5 =
         `${formData.draft_player_pic}${a[0].player_list[4].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic5 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -4037,22 +4057,18 @@ app.get("/draft", (req, res) => {
       responseData.pick6 =
         `${formData.draft_player_pic}${a[1].player_list[0].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic6 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[1].player_list[0].heroid != 0) {
       responseData.pick6 =
         `${formData.hero}${a[1].player_list[0].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic6 =
-        `${formData.PickedLed}${a[1].player_list[0].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick6 =
         `${formData.draft_player_pic}${a[1].player_list[0].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic6 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -4061,22 +4077,18 @@ app.get("/draft", (req, res) => {
       responseData.pick7 =
         `${formData.draft_player_pic}${a[1].player_list[1].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic7 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[1].player_list[1].heroid != 0) {
       responseData.pick7 =
         `${formData.hero}${a[1].player_list[1].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic7 =
-        `${formData.PickedLed}${a[1].player_list[1].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick7 =
         `${formData.draft_player_pic}${a[1].player_list[1].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic7 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -4085,22 +4097,18 @@ app.get("/draft", (req, res) => {
       responseData.pick8 =
         `${formData.draft_player_pic}${a[1].player_list[2].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic8 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[1].player_list[2].heroid != 0) {
       responseData.pick8 =
         `${formData.hero}${a[1].player_list[2].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic8 =
-        `${formData.PickedLed}${a[1].player_list[2].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick8 =
         `${formData.draft_player_pic}${a[1].player_list[2].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic8 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -4109,22 +4117,18 @@ app.get("/draft", (req, res) => {
       responseData.pick9 =
         `${formData.draft_player_pic}${a[1].player_list[3].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic9 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[1].player_list[3].heroid != 0) {
       responseData.pick9 =
         `${formData.hero}${a[1].player_list[3].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic9 =
-        `${formData.PickedLed}${a[1].player_list[3].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick9 =
         `${formData.draft_player_pic}${a[1].player_list[3].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic9 = formData.notPickingLed || "";
     }
 
     //---------------------------------------------------------------------------------------
@@ -4133,22 +4137,18 @@ app.get("/draft", (req, res) => {
       responseData.pick10 =
         `${formData.draft_player_pic}${a[1].player_list[4].roleid}${formData.draft_player_action}` ||
         "";
-      responseData.ledPic10 = formData.notPickingLed || "";
     }
     //afterPicking
     else if (a[1].player_list[4].heroid != 0) {
       responseData.pick10 =
         `${formData.hero}${a[1].player_list[4].heroid}${formData.heroImageSequence}` ||
         "";
-      responseData.ledPic10 =
-        `${formData.PickedLed}${a[1].player_list[4].heroid}.png` || "";
     }
     //before picking
     else {
       responseData.pick10 =
         `${formData.draft_player_pic}${a[1].player_list[4].roleid}${formData.draft_player_default}` ||
         "";
-      responseData.ledPic10 = formData.notPickingLed || "";
     }
 
     responseData.timer = `00:${data.data.state_left_time
