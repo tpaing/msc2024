@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Hero Draft System — Thet Paing</title>
+    <style>
+        /* ===================================
+           RESET & BASE
+           =================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #0a0e1a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===================================
+           BACKGROUND GRID (matches portfolio)
+           =================================== */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-glow--cyan {
+            background: #00d9ff;
+            top: -200px;
+            right: -150px;
+        }
+        .bg-glow--indigo {
+            background: #6366f1;
+            bottom: -250px;
+            left: -200px;
+        }
+
+        /* ===================================
+           NAVBAR
+           =================================== */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(10, 14, 26, 0.7);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #e2e8f0;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: color 0.3s;
+        }
+        .nav-brand:hover { color: #00d9ff; }
+
+        .nav-brand .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #00d9ff, #6366f1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s, gap 0.3s;
+        }
+        .nav-back:hover {
+            color: #00d9ff;
+            gap: 12px;
+        }
+        .nav-back svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s;
+        }
+        .nav-back:hover svg { transform: translateX(-3px); }
+
+        /* ===================================
+           MAIN LAYOUT
+           =================================== */
+        main {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px 60px;
+        }
+
+        /* ===================================
+           PROJECT HEADER
+           =================================== */
+        .project-header {
+            text-align: center;
+            max-width: 780px;
+            margin-bottom: 36px;
+        }
+
+        .project-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 217, 255, 0.08);
+            border: 1px solid rgba(0, 217, 255, 0.25);
+            color: #00d9ff;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+        .project-tag .dot {
+            width: 6px;
+            height: 6px;
+            background: #00d9ff;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .project-header h1 {
+            font-size: clamp(26px, 4.5vw, 40px);
+            font-weight: 700;
+            line-height: 1.2;
+            background: linear-gradient(135deg, #e2e8f0 0%, #00d9ff 50%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+        }
+
+        .project-header p {
+            color: #94a3b8;
+            font-size: 15px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===================================
+           VIDEO PLAYER CONTAINER
+           =================================== */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #0f1323;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow:
+                0 0 0 1px rgba(99, 102, 241, 0.1),
+                0 25px 60px rgba(0, 0, 0, 0.45),
+                0 0 80px rgba(99, 102, 241, 0.06);
+        }
+
+        /* Title bar */
+        .video-titlebar {
+            display: flex;
+            align-items: center;
+            padding: 12px 18px;
+            background: rgba(15, 19, 35, 0.9);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            gap: 8px;
+        }
+        .titlebar-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .titlebar-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .titlebar-dots .red   { background: #ff5f57; }
+        .titlebar-dots .yellow { background: #febc2e; }
+        .titlebar-dots .green  { background: #28c840; }
+
+        .titlebar-label {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* Video element */
+        .video-container {
+            position: relative;
+            background: #000;
+            aspect-ratio: 16 / 9;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+            background: #000;
+        }
+
+        /* Play overlay (shown before play) */
+        .play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.55);
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 2;
+        }
+        .play-overlay:hover { background: rgba(0, 0, 0, 0.7); }
+        .play-overlay.hidden { display: none; }
+
+        .play-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d9ff, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .play-overlay:hover .play-btn {
+            transform: scale(1.08);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.55);
+        }
+        .play-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+            margin-left: 3px;
+        }
+
+        /* ===================================
+           CUSTOM CONTROLS
+           =================================== */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px 18px 16px;
+            background: #0f1323;
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: relative;
+            height: 4px;
+            background: rgba(99, 102, 241, 0.15);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: height 0.2s;
+        }
+        .progress-bar:hover { height: 6px; }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d9ff, #6366f1);
+            border-radius: 2px;
+            width: 0%;
+            position: relative;
+            transition: width 0.1s linear;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%) scale(0);
+            width: 10px;
+            height: 10px;
+            background: #00d9ff;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
+        }
+        .progress-bar:hover .progress-fill::after { transform: translateY(-50%) scale(1); }
+
+        /* Bottom row: play/pause, time, volume, fullscreen */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s, background 0.2s;
+        }
+        .ctrl-btn:hover {
+            color: #00d9ff;
+            background: rgba(0, 217, 255, 0.08);
+        }
+        .ctrl-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .time-display {
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
+            color: #64748b;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .volume-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 72px;
+            height: 3px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #00d9ff;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(0, 217, 255, 0.4);
+        }
+        .volume-slider::-moz-range-thumb {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #00d9ff;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 6px rgba(0, 217, 255, 0.4);
+        }
+
+        /* ===================================
+           TECH TAGS BELOW VIDEO
+           =================================== */
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 28px;
+            max-width: 900px;
+            width: 100%;
+        }
+        .tech-tag {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 6px;
+            letter-spacing: 0.3px;
+            transition: border-color 0.3s, color 0.3s;
+        }
+        .tech-tag:hover {
+            border-color: rgba(0, 217, 255, 0.4);
+            color: #00d9ff;
+        }
+
+        /* ===================================
+           RESPONSIVE
+           =================================== */
+        @media (max-width: 640px) {
+            nav { padding: 14px 20px; }
+            main { padding: 30px 16px 50px; }
+            .project-header { margin-bottom: 24px; }
+            .controls { padding: 10px 14px 14px; }
+            .volume-group { display: none; }
+            .video-titlebar { padding: 10px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Background decoration -->
+<div class="bg-grid"></div>
+<div class="bg-glow bg-glow--cyan"></div>
+<div class="bg-glow bg-glow--indigo"></div>
+
+<!-- Navigation -->
+<nav>
+    <a href="index.html" class="nav-brand">
+        <div class="brand-icon">TP</div>
+        Thet Paing
+    </a>
+    <a href="index.html" class="nav-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Portfolio
+    </a>
+</nav>
+
+<!-- Main content -->
+<main>
+    <!-- Project header -->
+    <div class="project-header">
+        <div class="project-tag"><span class="dot"></span> Featured Project</div>
+        <h1>Real-time Hero Draft System</h1>
+        <p>An interactive real-time hero drafting system built in Unreal Engine 5, featuring dynamic UI, live player interactions, and cinematic presentation.</p>
+    </div>
+
+    <!-- Video player -->
+    <div class="video-wrapper">
+        <!-- macOS-style title bar -->
+        <div class="video-titlebar">
+            <div class="titlebar-dots">
+                <span class="red"></span>
+                <span class="yellow"></span>
+                <span class="green"></span>
+            </div>
+            <div class="titlebar-label">ue5_hero_draft_demo.mp4</div>
+        </div>
+
+        <!-- Video + play overlay -->
+        <div class="video-container">
+            <video id="video" preload="metadata">
+                <source src="ue5.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="play-overlay" id="playOverlay">
+                <div class="play-btn">
+                    <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom controls -->
+        <div class="controls">
+            <!-- Progress bar -->
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Controls row -->
+            <div class="controls-row">
+                <!-- Play / Pause -->
+                <button class="ctrl-btn" id="playPauseBtn" title="Play">
+                    <svg id="playIcon" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                </button>
+
+                <!-- Time -->
+                <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
+
+                <!-- Volume group -->
+                <div class="volume-group">
+                    <button class="ctrl-btn" id="muteBtn" title="Mute">
+                        <svg id="volIcon" viewBox="0 0 24 24">
+                            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                        </svg>
+                    </button>
+                    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                </div>
+
+                <!-- Fullscreen -->
+                <button class="ctrl-btn" id="fullscreenBtn" title="Fullscreen" style="margin-left: auto;">
+                    <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tech tags -->
+    <!-- Tech tags removed as requested -->
+    <div class="tech-tags"></div>
+</main>
+
+<script>
+// ===================================
+// VIDEO PLAYER LOGIC
+// ===================================
+(function () {
+    const video          = document.getElementById('video');
+    const playOverlay    = document.getElementById('playOverlay');
+    const playPauseBtn   = document.getElementById('playPauseBtn');
+    const playIcon       = document.getElementById('playIcon');
+    const progressBar    = document.getElementById('progressBar');
+    const progressFill   = document.getElementById('progressFill');
+    const timeDisplay    = document.getElementById('timeDisplay');
+    const muteBtn        = document.getElementById('muteBtn');
+    const volIcon        = document.getElementById('volIcon');
+    const volumeSlider   = document.getElementById('volumeSlider');
+    const fullscreenBtn  = document.getElementById('fullscreenBtn');
+
+    // SVG paths
+    const SVG_PLAY  = '<polygon points="5,3 19,12 5,21"/>';
+    const SVG_PAUSE = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+
+    const SVG_VOL_ON  = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>';
+    const SVG_VOL_LOW = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+    const SVG_VOL_OFF = '<path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+
+    // ---- Play / Pause ----
+    function togglePlay() {
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    }
+
+    playOverlay.addEventListener('click', togglePlay);
+    playPauseBtn.addEventListener('click', togglePlay);
+
+    // Double-click on video to toggle play
+    video.addEventListener('dblclick', togglePlay);
+
+    video.addEventListener('play', () => {
+        playOverlay.classList.add('hidden');
+        playIcon.innerHTML = SVG_PAUSE;
+        playPauseBtn.title = 'Pause';
+    });
+
+    video.addEventListener('pause', () => {
+        playIcon.innerHTML = SVG_PLAY;
+        playPauseBtn.title = 'Play';
+        // Show overlay again only if at start or ended
+        if (video.currentTime === 0 || video.ended) {
+            playOverlay.classList.remove('hidden');
+        }
+    });
+
+    video.addEventListener('ended', () => {
+        playOverlay.classList.remove('hidden');
+        video.currentTime = 0;
+    });
+
+    // ---- Progress Bar ----
+    video.addEventListener('timeupdate', () => {
+        if (video.duration) {
+            const pct = (video.currentTime / video.duration) * 100;
+            progressFill.style.width = pct + '%';
+            timeDisplay.textContent = formatTime(video.currentTime) + ' / ' + formatTime(video.duration);
+        }
+    });
+
+    progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const x    = e.clientX - rect.left;
+        const pct  = x / rect.width;
+        video.currentTime = pct * video.duration;
+    });
+
+    // Drag on progress bar
+    let dragging = false;
+    progressBar.addEventListener('mousedown', (e) => { dragging = true; seekTo(e); });
+    document.addEventListener('mousemove', (e) => { if (dragging) seekTo(e); });
+    document.addEventListener('mouseup',   () => { dragging = false; });
+
+    function seekTo(e) {
+        const rect = progressBar.getBoundingClientRect();
+        const x    = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        video.currentTime = (x / rect.width) * video.duration;
+    }
+
+    // ---- Volume ----
+    volumeSlider.addEventListener('input', () => {
+        video.volume = volumeSlider.value;
+        video.muted  = video.volume === 0;
+        updateVolIcon();
+    });
+
+    muteBtn.addEventListener('click', () => {
+        video.muted = !video.muted;
+        volumeSlider.value = video.muted ? 0 : (video.volume || 0.5);
+        updateVolIcon();
+    });
+
+    function updateVolIcon() {
+        if (video.muted || video.volume === 0) {
+            volIcon.innerHTML = SVG_VOL_OFF;
+        } else if (video.volume < 0.5) {
+            volIcon.innerHTML = SVG_VOL_LOW;
+        } else {
+            volIcon.innerHTML = SVG_VOL_ON;
+        }
+    }
+
+    // ---- Fullscreen ----
+    fullscreenBtn.addEventListener('click', () => {
+        const container = document.querySelector('.video-wrapper');
+        if (!document.fullscreenElement) {
+            (container.requestFullscreen || container.webkitRequestFullscreen || container.mozRequestFullScreen || container.msRequestFullscreen).call(container);
+        } else {
+            (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen).call(document);
+        }
+    });
+
+    // ---- Keyboard shortcuts ----
+    document.addEventListener('keydown', (e) => {
+        // Ignore if user is typing in an input
+        if (e.target.tagName === 'INPUT') return;
+
+        switch (e.key) {
+            case ' ':
+            case 'k':
+                e.preventDefault();
+                togglePlay();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                video.currentTime = Math.min(video.currentTime + 5, video.duration);
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                video.currentTime = Math.max(video.currentTime - 5, 0);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                video.volume = Math.min(video.volume + 0.1, 1);
+                volumeSlider.value = video.volume;
+                video.muted = false;
+                updateVolIcon();
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                video.volume = Math.max(video.volume - 0.1, 0);
+                volumeSlider.value = video.volume;
+                updateVolIcon();
+                break;
+            case 'm':
+                muteBtn.click();
+                break;
+            case 'f':
+                fullscreenBtn.click();
+                break;
+        }
+    });
+
+    // ---- Utility ----
+    function formatTime(secs) {
+        if (isNaN(secs)) return '0:00';
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    // Update time display once metadata loads
+    video.addEventListener('loadedmetadata', () => {
+        timeDisplay.textContent = '0:00 / ' + formatTime(video.duration);
+    });
+
+})();
+</script>
+</body>
+</html>

@@ -328,8 +328,8 @@ const rate = [
   },
   {
     "id": 4,
-    "pick": 1,
-    "ban": 3,
+    "pick": 9,
+    "ban": 6,
     "winrate": 0.33
   },
   {
@@ -353,32 +353,32 @@ const rate = [
   {
     "id": 8,
     "pick": 0,
-    "ban": 1,
-    "winrate": 1
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 9,
     "pick": 1,
-    "ban": 1,
+    "ban": 0,
     "winrate": 0
   },
   {
     "id": 10,
-    "pick": 11,
-    "ban": 5,
-    "winrate": 0.6
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 11,
-    "pick": 5,
-    "ban": 9,
-    "winrate": 0.56
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 12,
-    "pick": 1,
-    "ban": 1,
-    "winrate": 1
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 13,
@@ -406,9 +406,9 @@ const rate = [
   },
   {
     "id": 17,
-    "pick": 21,
-    "ban": 7,
-    "winrate": 0.14
+    "pick": 2,
+    "ban": 10,
+    "winrate": 1
   },
   {
     "id": 18,
@@ -418,8 +418,8 @@ const rate = [
   },
   {
     "id": 19,
-    "pick": 0,
-    "ban": 1,
+    "pick": 1,
+    "ban": 0,
     "winrate": 0
   },
   {
@@ -430,15 +430,15 @@ const rate = [
   },
   {
     "id": 21,
-    "pick": 4,
-    "ban": 6,
-    "winrate": 0.17
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 22,
-    "pick": 1,
-    "ban": 0,
-    "winrate": 0
+    "pick": 8,
+    "ban": 33,
+    "winrate": 0.38
   },
   {
     "id": 23,
@@ -454,15 +454,15 @@ const rate = [
   },
   {
     "id": 25,
-    "pick": 1,
-    "ban": 1,
-    "winrate": 1
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 26,
-    "pick": 4,
-    "ban": 10,
-    "winrate": 0.5
+    "pick": 5,
+    "ban": 8,
+    "winrate": 0.4
   },
   {
     "id": 27,
@@ -472,27 +472,27 @@ const rate = [
   },
   {
     "id": 28,
-    "pick": 0,
+    "pick": 1,
     "ban": 0,
     "winrate": 0
   },
   {
     "id": 29,
-    "pick": 5,
-    "ban": 4,
+    "pick": 1,
+    "ban": 2,
     "winrate": 0
   },
   {
     "id": 30,
-    "pick": 17,
-    "ban": 32,
-    "winrate": 0.53
+    "pick": 19,
+    "ban": 13,
+    "winrate": 0.47
   },
   {
     "id": 31,
-    "pick": 2,
-    "ban": 3,
-    "winrate": 0
+    "pick": 3,
+    "ban": 0,
+    "winrate": 0.67
   },
   {
     "id": 32,
@@ -514,9 +514,9 @@ const rate = [
   },
   {
     "id": 35,
-    "pick": 2,
-    "ban": 3,
-    "winrate": 0.67
+    "pick": 15,
+    "ban": 12,
+    "winrate": 0.4
   },
   {
     "id": 36,
@@ -526,9 +526,9 @@ const rate = [
   },
   {
     "id": 37,
-    "pick": 8,
-    "ban": 22,
-    "winrate": 0.32
+    "pick": 7,
+    "ban": 11,
+    "winrate": 0.43
   },
   {
     "id": 38,
@@ -544,33 +544,33 @@ const rate = [
   },
   {
     "id": 40,
-    "pick": 0,
-    "ban": 2,
-    "winrate": 0.5
+    "pick": 15,
+    "ban": 11,
+    "winrate": 0.33
   },
   {
     "id": 41,
-    "pick": 20,
-    "ban": 23,
-    "winrate": 0.39
+    "pick": 4,
+    "ban": 3,
+    "winrate": 0.25
   },
   {
     "id": 42,
+    "pick": 5,
+    "ban": 5,
+    "winrate": 0.8
+  },
+  {
+    "id": 43,
     "pick": 0,
     "ban": 0,
     "winrate": 0
   },
   {
-    "id": 43,
-    "pick": 3,
-    "ban": 6,
-    "winrate": 0.17
-  },
-  {
     "id": 44,
-    "pick": 25,
-    "ban": 24,
-    "winrate": 0.54
+    "pick": 7,
+    "ban": 15,
+    "winrate": 0.43
   },
   {
     "id": 45,
@@ -580,15 +580,15 @@ const rate = [
   },
   {
     "id": 46,
-    "pick": 0,
+    "pick": 3,
     "ban": 0,
-    "winrate": 0
+    "winrate": 0.33
   },
   {
     "id": 47,
-    "pick": 18,
-    "ban": 21,
-    "winrate": 0.48
+    "pick": 2,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 48,
@@ -598,9 +598,9 @@ const rate = [
   },
   {
     "id": 49,
-    "pick": 4,
-    "ban": 2,
-    "winrate": 0
+    "pick": 10,
+    "ban": 5,
+    "winrate": 0.5
   },
   {
     "id": 50,
@@ -610,15 +610,15 @@ const rate = [
   },
   {
     "id": 51,
-    "pick": 3,
+    "pick": 1,
     "ban": 1,
-    "winrate": 0
+    "winrate": 1
   },
   {
     "id": 52,
-    "pick": 12,
-    "ban": 21,
-    "winrate": 0.48
+    "pick": 20,
+    "ban": 4,
+    "winrate": 0.55
   },
   {
     "id": 53,
@@ -634,9 +634,9 @@ const rate = [
   },
   {
     "id": 55,
-    "pick": 54,
-    "ban": 5,
-    "winrate": 0.6
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 56,
@@ -646,9 +646,9 @@ const rate = [
   },
   {
     "id": 57,
-    "pick": 0,
+    "pick": 1,
     "ban": 0,
-    "winrate": 0
+    "winrate": 1
   },
   {
     "id": 58,
@@ -658,9 +658,9 @@ const rate = [
   },
   {
     "id": 59,
-    "pick": 27,
-    "ban": 16,
-    "winrate": 0.5
+    "pick": 14,
+    "ban": 21,
+    "winrate": 0.57
   },
   {
     "id": 60,
@@ -676,15 +676,15 @@ const rate = [
   },
   {
     "id": 62,
-    "pick": 1,
-    "ban": 6,
-    "winrate": 0.17
+    "pick": 2,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 63,
-    "pick": 0,
-    "ban": 1,
-    "winrate": 0
+    "pick": 2,
+    "ban": 2,
+    "winrate": 0.5
   },
   {
     "id": 64,
@@ -694,9 +694,9 @@ const rate = [
   },
   {
     "id": 65,
-    "pick": 2,
-    "ban": 6,
-    "winrate": 0.5
+    "pick": 15,
+    "ban": 4,
+    "winrate": 0.33
   },
   {
     "id": 66,
@@ -706,15 +706,15 @@ const rate = [
   },
   {
     "id": 67,
-    "pick": 0,
-    "ban": 0,
-    "winrate": 0
+    "pick": 22,
+    "ban": 5,
+    "winrate": 0.36
   },
   {
     "id": 68,
-    "pick": 5,
-    "ban": 20,
-    "winrate": 0.6
+    "pick": 3,
+    "ban": 2,
+    "winrate": 0.33
   },
   {
     "id": 69,
@@ -730,9 +730,9 @@ const rate = [
   },
   {
     "id": 71,
-    "pick": 18,
-    "ban": 29,
-    "winrate": 0.45
+    "pick": 17,
+    "ban": 5,
+    "winrate": 0.47
   },
   {
     "id": 72,
@@ -742,9 +742,9 @@ const rate = [
   },
   {
     "id": 73,
-    "pick": 18,
-    "ban": 12,
-    "winrate": 0.17
+    "pick": 14,
+    "ban": 7,
+    "winrate": 0.43
   },
   {
     "id": 74,
@@ -754,51 +754,51 @@ const rate = [
   },
   {
     "id": 75,
-    "pick": 3,
-    "ban": 3,
-    "winrate": 0.33
+    "pick": 1,
+    "ban": 1,
+    "winrate": 1
   },
   {
     "id": 76,
     "pick": 1,
-    "ban": 1,
+    "ban": 0,
     "winrate": 0
   },
   {
     "id": 77,
-    "pick": 5,
-    "ban": 5,
-    "winrate": 0
-  },
-  {
-    "id": 78,
     "pick": 0,
     "ban": 0,
     "winrate": 0
   },
   {
-    "id": 79,
-    "pick": 7,
-    "ban": 37,
-    "winrate": 0.43
-  },
-  {
-    "id": 80,
-    "pick": 0,
-    "ban": 4,
+    "id": 78,
+    "pick": 1,
+    "ban": 0,
     "winrate": 1
   },
   {
+    "id": 79,
+    "pick": 11,
+    "ban": 3,
+    "winrate": 0.64
+  },
+  {
+    "id": 80,
+    "pick": 11,
+    "ban": 13,
+    "winrate": 0.36
+  },
+  {
     "id": 81,
-    "pick": 12,
-    "ban": 8,
-    "winrate": 0.38
+    "pick": 2,
+    "ban": 1,
+    "winrate": 0.5
   },
   {
     "id": 82,
-    "pick": 1,
-    "ban": 7,
-    "winrate": 0.57
+    "pick": 2,
+    "ban": 0,
+    "winrate": 0.5
   },
   {
     "id": 83,
@@ -820,15 +820,15 @@ const rate = [
   },
   {
     "id": 86,
-    "pick": 0,
-    "ban": 0,
-    "winrate": 0
+    "pick": 2,
+    "ban": 1,
+    "winrate": 0.5
   },
   {
     "id": 87,
-    "pick": 44,
-    "ban": 17,
-    "winrate": 0.41
+    "pick": 6,
+    "ban": 34,
+    "winrate": 0.83
   },
   {
     "id": 88,
@@ -838,21 +838,21 @@ const rate = [
   },
   {
     "id": 89,
-    "pick": 25,
-    "ban": 18,
-    "winrate": 0.56
+    "pick": 1,
+    "ban": 0,
+    "winrate": 1
   },
   {
     "id": 90,
     "pick": 0,
-    "ban": 2,
-    "winrate": 0.5
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 91,
     "pick": 0,
-    "ban": 1,
-    "winrate": 1
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 92,
@@ -862,9 +862,9 @@ const rate = [
   },
   {
     "id": 93,
-    "pick": 0,
+    "pick": 1,
     "ban": 0,
-    "winrate": 0
+    "winrate": 1
   },
   {
     "id": 94,
@@ -874,27 +874,27 @@ const rate = [
   },
   {
     "id": 95,
-    "pick": 0,
+    "pick": 2,
     "ban": 1,
-    "winrate": 0
+    "winrate": 0.5
   },
   {
     "id": 96,
-    "pick": 1,
-    "ban": 1,
-    "winrate": 1
+    "pick": 2,
+    "ban": 0,
+    "winrate": 0.5
   },
   {
     "id": 97,
-    "pick": 0,
-    "ban": 0,
-    "winrate": 0
+    "pick": 4,
+    "ban": 5,
+    "winrate": 0.75
   },
   {
     "id": 98,
-    "pick": 8,
-    "ban": 12,
-    "winrate": 0.5
+    "pick": 15,
+    "ban": 4,
+    "winrate": 0.53
   },
   {
     "id": 99,
@@ -910,15 +910,15 @@ const rate = [
   },
   {
     "id": 101,
-    "pick": 5,
-    "ban": 14,
-    "winrate": 0.36
+    "pick": 8,
+    "ban": 12,
+    "winrate": 0.63
   },
   {
     "id": 102,
-    "pick": 14,
-    "ban": 14,
-    "winrate": 0.29
+    "pick": 3,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 103,
@@ -928,27 +928,27 @@ const rate = [
   },
   {
     "id": 104,
-    "pick": 2,
-    "ban": 2,
-    "winrate": 0
+    "pick": 5,
+    "ban": 4,
+    "winrate": 0.4
   },
   {
     "id": 105,
     "pick": 0,
-    "ban": 2,
-    "winrate": 1
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 106,
-    "pick": 23,
-    "ban": 11,
-    "winrate": 0.36
+    "pick": 11,
+    "ban": 10,
+    "winrate": 0.45
   },
   {
     "id": 107,
-    "pick": 4,
-    "ban": 8,
-    "winrate": 0.38
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 108,
@@ -964,9 +964,9 @@ const rate = [
   },
   {
     "id": 110,
-    "pick": 1,
-    "ban": 2,
-    "winrate": 0.5
+    "pick": 7,
+    "ban": 32,
+    "winrate": 0.43
   },
   {
     "id": 111,
@@ -1006,27 +1006,27 @@ const rate = [
   },
   {
     "id": 117,
-    "pick": 5,
-    "ban": 20,
-    "winrate": 0.35
+    "pick": 3,
+    "ban": 11,
+    "winrate": 0.33
   },
   {
     "id": 118,
-    "pick": 13,
-    "ban": 13,
-    "winrate": 0.54
+    "pick": 3,
+    "ban": 1,
+    "winrate": 0
   },
   {
     "id": 119,
-    "pick": 0,
+    "pick": 1,
     "ban": 0,
     "winrate": 0
   },
   {
     "id": 120,
-    "pick": 23,
-    "ban": 22,
-    "winrate": 0.45
+    "pick": 4,
+    "ban": 4,
+    "winrate": 0.25
   },
   {
     "id": 121,
@@ -1042,51 +1042,63 @@ const rate = [
   },
   {
     "id": 123,
-    "pick": 27,
-    "ban": 27,
-    "winrate": 0.56
+    "pick": 2,
+    "ban": 5,
+    "winrate": 0
   },
   {
     "id": 124,
-    "pick": 40,
-    "ban": 15,
-    "winrate": 0.33
+    "pick": 1,
+    "ban": 2,
+    "winrate": 0
   },
   {
     "id": 125,
-    "pick": 31,
-    "ban": 30,
-    "winrate": 0.4
+    "pick": 3,
+    "ban": 40,
+    "winrate": 0.33
   },
   {
     "id": 126,
-    "pick": 0,
-    "ban": 0,
-    "winrate": 0
+    "pick": 20,
+    "ban": 7,
+    "winrate": 0.55
   },
   {
     "id": 127,
-    "pick": 0,
-    "ban": 4,
-    "winrate": 0.75
+    "pick": 1,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 128,
-    "pick": 27,
-    "ban": 13,
-    "winrate": 0.62
+    "pick": 12,
+    "ban": 16,
+    "winrate": 0.5
   },
   {
     "id": 129,
-    "pick": 0,
-    "ban": 0,
-    "winrate": 0
+    "pick": 4,
+    "ban": 1,
+    "winrate": 0.75
   },
   {
     "id": 130,
-    "pick": 0,
-    "ban": 0,
-    "winrate": 0
+    "pick": 16,
+    "ban": 6,
+    "winrate": 0.31
+  },
+  {
+    "id": 131,
+    "pick": 27,
+    "ban": 17,
+    "winrate": 0.52
+  },
+  {
+    "id": 132,
+    "pick": 8,
+    "ban": 14,
+    "winrate": 0.38
   }
 ]
 
@@ -1221,7 +1233,8 @@ const heroNames = {
   128: "KALEA",
   129: "ZETIAN",
   130: "OBSIDIA",
-  131: "SORA"
+  131: "SORA",
+  132: "MARCEL"
 };
 
 // app.get('/token', (req, res) => {
@@ -1824,16 +1837,18 @@ app.get("/post-data", (req, res) => {
       }
 
       //team1PlayerPic
+      const team1WinFlag = body.data.win_camp === 1 ? 1 : 0;
+      const team2WinFlag = body.data.win_camp === 2 ? 1 : 0;
       for (let i = 0; i < 5; i++) {
         responseData[
           `playerPhoto${i + 1}`
-        ] = `${formData.resultPlayer}${team1[i].roleid}.png`;
+        ] = `C://data/result/player/${team1WinFlag}/${team1[i].roleid}.png`;
       }
       //team2PlayerPic
       for (let i = 0; i < 5; i++) {
         responseData[
           `playerPhoto${i + 6}`
-        ] = `${formData.resultPlayer}${team2[i].roleid}.png`;
+        ] = `C://data/result/player/${team2WinFlag}/${team2[i].roleid}.png`;
       }
       //team1Spell
       for (let i = 0; i < 5; i++) {
@@ -3638,6 +3653,59 @@ app.get("/draft", (req, res) => {
       responseData.banlight10 = "C://data/draft/banlight/0/1.png"
     }
 
+    //ban light location2
+    if (a[0].player_list[0].banning == true) {
+      responseData.location2Banlight1 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight1 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[0].player_list[1].banning == true) {
+      responseData.location2Banlight2 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight2 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[0].player_list[2].banning == true) {
+      responseData.location2Banlight3 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight3 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[0].player_list[3].banning == true) {
+      responseData.location2Banlight4 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight4 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[0].player_list[4].banning == true) {
+      responseData.location2Banlight5 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight5 = "C://data/draft/banlight2/0/1.png"
+    }
+
+    if (a[1].player_list[0].banning == true) {
+      responseData.location2Banlight6 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight6 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[1].player_list[1].banning == true) {
+      responseData.location2Banlight7 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight7 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[1].player_list[2].banning == true) {
+      responseData.location2Banlight8 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight8 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[1].player_list[3].banning == true) {
+      responseData.location2Banlight9 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight9 = "C://data/draft/banlight2/0/1.png"
+    }
+    if (a[1].player_list[4].banning == true) {
+      responseData.location2Banlight10 = "C://data/draft/banlight2/1/1.png"
+    } else {
+      responseData.location2Banlight10 = "C://data/draft/banlight2/0/1.png"
+    }
+
     //picked1
     responseData.picking1 = 0;
     responseData.picked1 = 0;
@@ -4715,8 +4783,8 @@ app.get("/item", (req, res) => {
         responseData[`team1GoldDiff${i + 1}`] =
           goldDiff > 0
             ? goldDiff >= 1000
-              ? (goldDiff / 1000).toFixed(1) + "k"
-              : goldDiff.toString()
+              ? "+" + (goldDiff / 1000).toFixed(1) + "k"
+              : "+" + goldDiff.toString()
             : "";
       }
 
@@ -4726,8 +4794,8 @@ app.get("/item", (req, res) => {
         responseData[`team2GoldDiff${i + 1}`] =
           goldDiff > 0
             ? goldDiff >= 1000
-              ? (goldDiff / 1000).toFixed(1) + "k"
-              : goldDiff.toString()
+              ? "+" + (goldDiff / 1000).toFixed(1) + "k"
+              : "+" + goldDiff.toString()
             : "";
       }
 
