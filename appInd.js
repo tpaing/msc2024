@@ -6,8 +6,8 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 
-app.use(express.json({ limit: '5mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded());
 app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -307,9 +307,7 @@ const playerNames = {
 };
 
 // const rate = { 122 : {pick : "77x", ban : "99x", winrate : "100%" } }
-let rate = JSON.parse(fs.readFileSync('winrate.json', 'utf8'));
-
-const _rateBackup = [
+const rate = [
   {
     "id": 1,
     "pick": 0,
@@ -330,8 +328,8 @@ const _rateBackup = [
   },
   {
     "id": 4,
-    "pick": 9,
-    "ban": 6,
+    "pick": 3,
+    "ban": 3,
     "winrate": 0.33
   },
   {
@@ -360,7 +358,7 @@ const _rateBackup = [
   },
   {
     "id": 9,
-    "pick": 1,
+    "pick": 0,
     "ban": 0,
     "winrate": 0
   },
@@ -408,8 +406,8 @@ const _rateBackup = [
   },
   {
     "id": 17,
-    "pick": 2,
-    "ban": 10,
+    "pick": 3,
+    "ban": 1,
     "winrate": 1
   },
   {
@@ -420,7 +418,7 @@ const _rateBackup = [
   },
   {
     "id": 19,
-    "pick": 1,
+    "pick": 0,
     "ban": 0,
     "winrate": 0
   },
@@ -438,9 +436,9 @@ const _rateBackup = [
   },
   {
     "id": 22,
-    "pick": 8,
-    "ban": 33,
-    "winrate": 0.38
+    "pick": 10,
+    "ban": 2,
+    "winrate": 0.5
   },
   {
     "id": 23,
@@ -462,9 +460,9 @@ const _rateBackup = [
   },
   {
     "id": 26,
-    "pick": 5,
-    "ban": 8,
-    "winrate": 0.4
+    "pick": 2,
+    "ban": 2,
+    "winrate": 0
   },
   {
     "id": 27,
@@ -474,27 +472,27 @@ const _rateBackup = [
   },
   {
     "id": 28,
-    "pick": 1,
-    "ban": 0,
+    "pick": 0,
+    "ban": 1,
     "winrate": 0
   },
   {
     "id": 29,
-    "pick": 1,
-    "ban": 2,
+    "pick": 0,
+    "ban": 1,
     "winrate": 0
   },
   {
     "id": 30,
-    "pick": 19,
-    "ban": 13,
-    "winrate": 0.47
+    "pick": 6,
+    "ban": 4,
+    "winrate": 0.25
   },
   {
     "id": 31,
-    "pick": 3,
+    "pick": 0,
     "ban": 0,
-    "winrate": 0.67
+    "winrate": 0
   },
   {
     "id": 32,
@@ -516,9 +514,9 @@ const _rateBackup = [
   },
   {
     "id": 35,
-    "pick": 15,
-    "ban": 12,
-    "winrate": 0.4
+    "pick": 2,
+    "ban": 6,
+    "winrate": 0.33
   },
   {
     "id": 36,
@@ -528,9 +526,9 @@ const _rateBackup = [
   },
   {
     "id": 37,
-    "pick": 7,
-    "ban": 11,
-    "winrate": 0.43
+    "pick": 3,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 38,
@@ -546,21 +544,21 @@ const _rateBackup = [
   },
   {
     "id": 40,
-    "pick": 15,
-    "ban": 11,
-    "winrate": 0.33
+    "pick": 2,
+    "ban": 5,
+    "winrate": 0.2
   },
   {
     "id": 41,
-    "pick": 4,
-    "ban": 3,
-    "winrate": 0.25
+    "pick": 0,
+    "ban": 1,
+    "winrate": 0
   },
   {
     "id": 42,
-    "pick": 5,
-    "ban": 5,
-    "winrate": 0.8
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 43,
@@ -570,9 +568,9 @@ const _rateBackup = [
   },
   {
     "id": 44,
-    "pick": 7,
-    "ban": 15,
-    "winrate": 0.43
+    "pick": 8,
+    "ban": 1,
+    "winrate": 0
   },
   {
     "id": 45,
@@ -582,14 +580,14 @@ const _rateBackup = [
   },
   {
     "id": 46,
-    "pick": 3,
-    "ban": 0,
-    "winrate": 0.33
+    "pick": 0,
+    "ban": 2,
+    "winrate": 0
   },
   {
     "id": 47,
-    "pick": 2,
-    "ban": 0,
+    "pick": 0,
+    "ban": 1,
     "winrate": 0
   },
   {
@@ -600,8 +598,8 @@ const _rateBackup = [
   },
   {
     "id": 49,
-    "pick": 10,
-    "ban": 5,
+    "pick": 1,
+    "ban": 2,
     "winrate": 0.5
   },
   {
@@ -612,15 +610,15 @@ const _rateBackup = [
   },
   {
     "id": 51,
-    "pick": 1,
+    "pick": 0,
     "ban": 1,
     "winrate": 1
   },
   {
     "id": 52,
-    "pick": 20,
-    "ban": 4,
-    "winrate": 0.55
+    "pick": 1,
+    "ban": 6,
+    "winrate": 0.5
   },
   {
     "id": 53,
@@ -648,9 +646,9 @@ const _rateBackup = [
   },
   {
     "id": 57,
-    "pick": 1,
+    "pick": 0,
     "ban": 0,
-    "winrate": 1
+    "winrate": 0
   },
   {
     "id": 58,
@@ -660,9 +658,9 @@ const _rateBackup = [
   },
   {
     "id": 59,
-    "pick": 14,
-    "ban": 21,
-    "winrate": 0.57
+    "pick": 4,
+    "ban": 6,
+    "winrate": 0.67
   },
   {
     "id": 60,
@@ -678,15 +676,15 @@ const _rateBackup = [
   },
   {
     "id": 62,
-    "pick": 2,
+    "pick": 0,
     "ban": 0,
     "winrate": 0
   },
   {
     "id": 63,
-    "pick": 2,
-    "ban": 2,
-    "winrate": 0.5
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 64,
@@ -696,8 +694,8 @@ const _rateBackup = [
   },
   {
     "id": 65,
-    "pick": 15,
-    "ban": 4,
+    "pick": 1,
+    "ban": 3,
     "winrate": 0.33
   },
   {
@@ -708,15 +706,15 @@ const _rateBackup = [
   },
   {
     "id": 67,
-    "pick": 22,
-    "ban": 5,
-    "winrate": 0.36
+    "pick": 3,
+    "ban": 6,
+    "winrate": 0.5
   },
   {
     "id": 68,
-    "pick": 3,
-    "ban": 2,
-    "winrate": 0.33
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 69,
@@ -732,9 +730,9 @@ const _rateBackup = [
   },
   {
     "id": 71,
-    "pick": 17,
+    "pick": 2,
     "ban": 5,
-    "winrate": 0.47
+    "winrate": 0.6
   },
   {
     "id": 72,
@@ -744,9 +742,9 @@ const _rateBackup = [
   },
   {
     "id": 73,
-    "pick": 14,
-    "ban": 7,
-    "winrate": 0.43
+    "pick": 1,
+    "ban": 2,
+    "winrate": 0
   },
   {
     "id": 74,
@@ -762,7 +760,7 @@ const _rateBackup = [
   },
   {
     "id": 76,
-    "pick": 1,
+    "pick": 0,
     "ban": 0,
     "winrate": 0
   },
@@ -774,33 +772,33 @@ const _rateBackup = [
   },
   {
     "id": 78,
-    "pick": 1,
+    "pick": 0,
     "ban": 0,
-    "winrate": 1
+    "winrate": 0
   },
   {
     "id": 79,
-    "pick": 11,
-    "ban": 3,
-    "winrate": 0.64
+    "pick": 0,
+    "ban": 4,
+    "winrate": 0.75
   },
   {
     "id": 80,
-    "pick": 11,
-    "ban": 13,
-    "winrate": 0.36
+    "pick": 5,
+    "ban": 3,
+    "winrate": 0.33
   },
   {
     "id": 81,
-    "pick": 2,
-    "ban": 1,
-    "winrate": 0.5
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 82,
-    "pick": 2,
+    "pick": 0,
     "ban": 0,
-    "winrate": 0.5
+    "winrate": 0
   },
   {
     "id": 83,
@@ -822,15 +820,15 @@ const _rateBackup = [
   },
   {
     "id": 86,
-    "pick": 2,
-    "ban": 1,
-    "winrate": 0.5
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 87,
-    "pick": 6,
-    "ban": 34,
-    "winrate": 0.83
+    "pick": 9,
+    "ban": 2,
+    "winrate": 1
   },
   {
     "id": 88,
@@ -840,8 +838,8 @@ const _rateBackup = [
   },
   {
     "id": 89,
-    "pick": 1,
-    "ban": 0,
+    "pick": 0,
+    "ban": 1,
     "winrate": 1
   },
   {
@@ -864,9 +862,9 @@ const _rateBackup = [
   },
   {
     "id": 93,
-    "pick": 1,
+    "pick": 0,
     "ban": 0,
-    "winrate": 1
+    "winrate": 0
   },
   {
     "id": 94,
@@ -876,27 +874,27 @@ const _rateBackup = [
   },
   {
     "id": 95,
-    "pick": 2,
-    "ban": 1,
-    "winrate": 0.5
+    "pick": 0,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 96,
-    "pick": 2,
-    "ban": 0,
-    "winrate": 0.5
+    "pick": 0,
+    "ban": 1,
+    "winrate": 1
   },
   {
     "id": 97,
-    "pick": 4,
-    "ban": 5,
-    "winrate": 0.75
+    "pick": 2,
+    "ban": 2,
+    "winrate": 1
   },
   {
     "id": 98,
-    "pick": 15,
-    "ban": 4,
-    "winrate": 0.53
+    "pick": 0,
+    "ban": 3,
+    "winrate": 0.67
   },
   {
     "id": 99,
@@ -912,13 +910,13 @@ const _rateBackup = [
   },
   {
     "id": 101,
-    "pick": 8,
-    "ban": 12,
-    "winrate": 0.63
+    "pick": 2,
+    "ban": 2,
+    "winrate": 0.5
   },
   {
     "id": 102,
-    "pick": 3,
+    "pick": 0,
     "ban": 0,
     "winrate": 0
   },
@@ -930,9 +928,9 @@ const _rateBackup = [
   },
   {
     "id": 104,
-    "pick": 5,
-    "ban": 4,
-    "winrate": 0.4
+    "pick": 0,
+    "ban": 1,
+    "winrate": 0
   },
   {
     "id": 105,
@@ -942,9 +940,9 @@ const _rateBackup = [
   },
   {
     "id": 106,
-    "pick": 11,
-    "ban": 10,
-    "winrate": 0.45
+    "pick": 1,
+    "ban": 4,
+    "winrate": 0.75
   },
   {
     "id": 107,
@@ -966,9 +964,9 @@ const _rateBackup = [
   },
   {
     "id": 110,
-    "pick": 7,
-    "ban": 32,
-    "winrate": 0.43
+    "pick": 11,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 111,
@@ -1008,27 +1006,27 @@ const _rateBackup = [
   },
   {
     "id": 117,
-    "pick": 3,
-    "ban": 11,
-    "winrate": 0.33
-  },
-  {
-    "id": 118,
-    "pick": 3,
-    "ban": 1,
-    "winrate": 0
-  },
-  {
-    "id": 119,
-    "pick": 1,
+    "pick": 5,
     "ban": 0,
     "winrate": 0
   },
   {
+    "id": 118,
+    "pick": 1,
+    "ban": 2,
+    "winrate": 0
+  },
+  {
+    "id": 119,
+    "pick": 0,
+    "ban": 1,
+    "winrate": 0
+  },
+  {
     "id": 120,
-    "pick": 4,
-    "ban": 4,
-    "winrate": 0.25
+    "pick": 3,
+    "ban": 0,
+    "winrate": 0
   },
   {
     "id": 121,
@@ -1045,62 +1043,62 @@ const _rateBackup = [
   {
     "id": 123,
     "pick": 2,
-    "ban": 5,
+    "ban": 1,
     "winrate": 0
   },
   {
     "id": 124,
-    "pick": 1,
-    "ban": 2,
+    "pick": 0,
+    "ban": 0,
     "winrate": 0
   },
   {
     "id": 125,
-    "pick": 3,
-    "ban": 40,
+    "pick": 9,
+    "ban": 3,
     "winrate": 0.33
   },
   {
     "id": 126,
-    "pick": 20,
-    "ban": 7,
-    "winrate": 0.55
+    "pick": 2,
+    "ban": 6,
+    "winrate": 0.67
   },
   {
     "id": 127,
-    "pick": 1,
+    "pick": 0,
     "ban": 0,
     "winrate": 0
   },
   {
     "id": 128,
-    "pick": 12,
-    "ban": 16,
-    "winrate": 0.5
+    "pick": 3,
+    "ban": 6,
+    "winrate": 0.67
   },
   {
     "id": 129,
-    "pick": 4,
+    "pick": 1,
     "ban": 1,
-    "winrate": 0.75
+    "winrate": 1
   },
   {
     "id": 130,
-    "pick": 16,
-    "ban": 6,
-    "winrate": 0.31
+    "pick": 3,
+    "ban": 3,
+    "winrate": 0.33
   },
   {
     "id": 131,
-    "pick": 27,
-    "ban": 17,
-    "winrate": 0.52
+    "pick": 3,
+    "ban": 9,
+    "winrate": 0.33
   },
   {
     "id": 132,
-    "pick": 8,
-    "ban": 14,
-    "winrate": 0.38
+    "pick": 1,
+    "ban": 0,
+    "winrate": 0
   }
 ]
 
@@ -1299,31 +1297,6 @@ app.get("/playerList", (req, res) => {
 
 app.get("/path", (req, res) => {
   res.sendFile(__dirname + "/public/path.html");
-});
-
-app.get("/winrate", (req, res) => {
-  res.sendFile(__dirname + "/public/winrate.html");
-});
-
-app.post("/winrateup", (req, res) => {
-  const data = req.body;
-  if (Array.isArray(data) && data.length > 0) {
-    try {
-      const jsonData = JSON.stringify(data, null, 2);
-      fs.writeFileSync('winrate.json', jsonData);
-      rate = data;
-      return res.status(200).send('Win rate data updated successfully');
-    } catch (err) {
-      console.error('Error saving winrate data:', err);
-      return res.status(500).send('Error saving winrate data');
-    }
-  } else {
-    return res.status(400).send('Invalid data. Must be a JSON array.');
-  }
-});
-
-app.get("/getrate", (req, res) => {
-  res.json(rate);
 });
 
 app.post("/pathupdate", (req, res) => {
@@ -2043,29 +2016,47 @@ app.get("/post-data", (req, res) => {
       // console.log(hightestDamageTaken.name)
       // console.log(hightestAssist.name);
       //gold
-      responseData.hightestGoldPlayer =
+      const formatRoleText = (roleid) => {
+        const role = role_finder(roleid, playerList) || "";
+        return role.length > 15 ? role.slice(0, 15) : role;
+      };
+
+      const rolePng = (roleid) => {
+        const role = role_finder(roleid, playerList) || "undefined";
+        return `C://data/result/role/${role}.png`;
+      };
+
+      responseData.topGoldPlayer =
         name_finder(hightestGoldPlayer.roleid, playerList) ||
         hightestGoldPlayer.name;
-      responseData.hightestGoldPlayerPic = `${formData.hightest}${hightestGoldPlayer.roleid}.png`;
+      responseData.topGoldPic = `${formData.hightest}${hightestGoldPlayer.roleid}.png`;
+      responseData.topGoldPlayerRole = formatRoleText(hightestGoldPlayer.roleid);
+      responseData.topGoldPlayerRolePng = rolePng(hightestGoldPlayer.roleid);
       responseData.hightestGold = hightestGoldPlayer.min_money;
       //damage
-      responseData.hightestDamagePlayer =
+      responseData.topDmgPlayer =
         name_finder(hightestDamagePlayer.roleid, playerList) ||
         hightestDamagePlayer.name;
-      responseData.hightestDamagePlayerPic = `${formData.hightest}${hightestDamagePlayer.roleid}.png`;
+      responseData.topDmgPic = `${formData.hightest}${hightestDamagePlayer.roleid}.png`;
+      responseData.topDmgPlayerRole = formatRoleText(hightestDamagePlayer.roleid);
+      responseData.topDmgPlayerRolePng = rolePng(hightestDamagePlayer.roleid);
       responseData.hightestDamage =
         hightestDamagePlayer.total_damage.toLocaleString();
       //damageTaken
-      responseData.hightestDamageTakenPlayer =
+      responseData.topDmgTakenPlyr =
         name_finder(hightestDamageTaken.roleid, playerList) ||
         hightestDamageTaken.name;
-      responseData.hightestDamageTakenPlayerPic = `${formData.hightest}${hightestDamageTaken.roleid}.png`;
-      responseData.hightestDamageTaken =
+      responseData.topDmgTakenPic = `${formData.hightest}${hightestDamageTaken.roleid}.png`;
+      responseData.topDmgTakenPlyrRole = formatRoleText(hightestDamageTaken.roleid);
+      responseData.topDmgTakenPlyrRolePng = rolePng(hightestDamageTaken.roleid);
+      responseData.topDmgTaken =
         hightestDamageTaken.total_hurt.toLocaleString();
       //mostAssist
-      responseData.hightestAssistPlayer =
+      responseData.topAssistPlayer =
         name_finder(hightestAssist.roleid, playerList) || hightestAssist.name;
-      responseData.hightestAssistPlayerPic = `${formData.hightest}${hightestAssist.roleid}.png`;
+      responseData.topAssistPic = `${formData.hightest}${hightestAssist.roleid}.png`;
+      responseData.topAssistPlayerRole = formatRoleText(hightestAssist.roleid);
+      responseData.topAssistPlayerRolePng = rolePng(hightestAssist.roleid);
       responseData.hightestAssist = hightestAssist.assist_num;
 
       let jsonData = { data: [responseData] };
@@ -2151,6 +2142,8 @@ app.get("/mvp", (req, res) => {
       responseData.heroName = heroNames[mvpPlayer.heroid];
       responseData.heroPic = `${formData.mvpHeroPath}${mvpPlayer.heroid}.png`;
       responseData.BattleSpell = `${formData.mvpPlayerSpellPath}${mvpPlayer.skillid}.png`;
+      responseData.totalDamage = mvpPlayer.total_damage.toLocaleString();
+      responseData.damageShort = (mvpPlayer.total_damage / 1000).toFixed(0) + "k";
 
       for (let i = 0; i < 3; i++) {
         responseData[`emblem${i + 1}`] = `${formData.mvpEmblemPath}${
@@ -2432,6 +2425,8 @@ app.get("/hud", async (req, res) => {
       responseData.team2Name = formData?.team2_name || team2?.team_name || "Team 2";
       responseData.team1ShortName = formData?.team1_shortName || team1?.team_simple_name || "T1";
       responseData.team2ShortName = formData?.team2_shortName || team2?.team_simple_name || "T2";
+      responseData.turtleLeftTime = data.tortoise_left_time ?? 0;
+      responseData.lordLeftTime = data.lord_left_time ?? 0;
 
       // Team logos with safe path construction
       const hudLogoPath = formData?.hudLogoPath || "";
@@ -2447,6 +2442,8 @@ app.get("/hud", async (req, res) => {
       responseData.team2ShortName = "T2";
       responseData.team1Logo = "";
       responseData.team2Logo = "";
+      responseData.turtleLeftTime = "";
+      responseData.lordLeftTime = "";
     }
 
     // Game time formatting
@@ -2523,6 +2520,52 @@ app.get("/hud", async (req, res) => {
       responseData.Tower2 = 0;
     }
 
+    // Lord Kill Advantage
+    try {
+      const lkAdv1 = team1?.kill_lord_advantage;
+      const lkAdv2 = team2?.kill_lord_advantage;
+
+      if (Array.isArray(lkAdv1) && lkAdv1.length > 0) {
+        const last1 = lkAdv1[lkAdv1.length - 1];
+        responseData.lkAdvGold1 = last1.gold || 0;
+        responseData.lkAdvExp1 = last1.exp || 0;
+        responseData.lkAdvTwrHp1 = last1.tower_hp || 0;
+      } else {
+        responseData.lkAdvGold1 = 0;
+        responseData.lkAdvExp1 = 0;
+        responseData.lkAdvTwrHp1 = 0;
+      }
+
+      if (Array.isArray(lkAdv2) && lkAdv2.length > 0) {
+        const last2 = lkAdv2[lkAdv2.length - 1];
+        responseData.lkAdvGold2 = last2.gold || 0;
+        responseData.lkAdvExp2 = last2.exp || 0;
+        responseData.lkAdvTwrHp2 = last2.tower_hp || 0;
+      } else {
+        responseData.lkAdvGold2 = 0;
+        responseData.lkAdvExp2 = 0;
+        responseData.lkAdvTwrHp2 = 0;
+      }
+
+      // Which team killed the last lord
+      const lordEvents = (data.incre_event_list || []).filter(
+        e => e?.event_type === "kill_boss" && e?.boss_name === "lord"
+      );
+      if (lordEvents.length > 0) {
+        responseData.killLordLast = lordEvents[lordEvents.length - 1].campid || 0;
+      } else {
+        responseData.killLordLast = 0;
+      }
+    } catch (error) {
+      console.error('Error processing lord kill advantage:', error);
+      responseData.lkAdvGold1 = 0;
+      responseData.lkAdvExp1 = 0;
+      responseData.lkAdvTwrHp1 = 0;
+      responseData.lkAdvGold2 = 0;
+      responseData.lkAdvExp2 = 0;
+      responseData.lkAdvTwrHp2 = 0;
+    }
+
     // Enhanced event processing with comprehensive error handling
     const eventList = data.incre_event_list || [];
 
@@ -2590,9 +2633,9 @@ app.get("/hud", async (req, res) => {
     }
 
     // Helper function to safely get team logo
-    function getSafeTeamLogo(campid) {
+    function getSafeTeamLogo(campid, customLogoPath) {
       try {
-        const logoPath = formData?.bossKillerLogoPath || "";
+        const logoPath = customLogoPath || formData?.bossKillerLogoPath || "";
         if (campid === 1) {
           const shortName = formData?.team1_shortName || "team1";
           return `${logoPath}${shortName}.png`;
@@ -2658,6 +2701,18 @@ app.get("/hud", async (req, res) => {
       "first blood"
     );
 
+    const doubleKill = safeEventFilter(
+      eventList,
+      (e) => {
+        if (e?.event_type !== "kill_hero") return false;
+        if (Array.isArray(e.extra_param)) {
+          return e.extra_param.includes("double_kill");
+        }
+        return e.extra_param === "double_kill";
+      },
+      "double kill"
+    );
+
     const tripleKill = safeEventFilter(
       eventList,
       (e) => {
@@ -2698,134 +2753,162 @@ app.get("/hud", async (req, res) => {
     try {
       if (savage.length > 0) {
         const lastsavage = savage[savage.length - 1];
-        responseData.savagePlayerTeamName = getSafeTeamName(lastsavage.campid);
-        responseData.savagePlayerName = getSafePlayerName(lastsavage.killer_id);
-        responseData.savagePlayerRole = getSafePlayerRole(lastsavage.killer_id);
-        responseData.savagePlayerPic = `C://data/firstblood/${lastsavage.killer_id || 0}.png`;
-        responseData.savagePlayerPicTeamLogo = getSafeTeamLogo(lastsavage.campid);
-        responseData.savagePlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lastsavage.killer_id)}.png`;
+        responseData.svgTeamName = getSafeTeamName(lastsavage.campid);
+        responseData.svgName = getSafePlayerName(lastsavage.killer_id);
+        responseData.svgRole = getSafePlayerRole(lastsavage.killer_id);
+        responseData.svgPic = `C://data/savage/${lastsavage.killer_id || 0}.png`;
+        responseData.svgTeamLogo = getSafeTeamLogo(lastsavage.campid, "C://data/savage/logo/");
+        responseData.svgRolepng = `C://data/savage/role/${getSafePlayerRole(lastsavage.killer_id)}.png`;
       } else {
-        responseData.savagePlayerName = "";
-        responseData.savagePlayerRole = "";
-        responseData.savagePlayerPic = "C://data/firstblood/0.png";
-        responseData.savagePlayerTeamName = "";
-        responseData.savagePlayerPicTeamLogo = "";
-        responseData.savagePlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.svgName = "";
+        responseData.svgRole = "";
+        responseData.svgPic = "C://data/savage/0.png";
+        responseData.svgTeamName = "";
+        responseData.svgTeamLogo = "";
+        responseData.svgRolepng = "C://data/savage/role/Unknown Role.png";
       }
     } catch (error) {
       console.error('Error processing savage data:', error);
-      responseData.savagePlayerName = "";
-      responseData.savagePlayerRole = "";
-      responseData.savagePlayerPic = "C://data/firstblood/0.png";
-      responseData.savagePlayerTeamName = "";
-      responseData.savagePlayerPicTeamLogo = "";
-      responseData.savagePlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.svgName = "";
+      responseData.svgRole = "";
+      responseData.svgPic = "C://data/savage/0.png";
+      responseData.svgTeamName = "";
+      responseData.svgTeamLogo = "";
+      responseData.svgRolepng = "C://data/savage/role/Unknown Role.png";
+    }
+
+    // Process Double Kill
+    try {
+      if (doubleKill.length > 0) {
+        const lastdoubleKill = doubleKill[doubleKill.length - 1];
+        responseData.dbKillTeamName = getSafeTeamName(lastdoubleKill.campid);
+        responseData.dbKillName = getSafePlayerName(lastdoubleKill.killer_id);
+        responseData.dbKillRole = getSafePlayerRole(lastdoubleKill.killer_id);
+        responseData.dbKillPic = `C://data/dbkill/${lastdoubleKill.killer_id || 0}.png`;
+        responseData.dbKillTeamLogo = getSafeTeamLogo(lastdoubleKill.campid, "C://data/dbkill/logo/");
+        responseData.dbKillRolepng = `C://data/dbkill/role/${getSafePlayerRole(lastdoubleKill.killer_id)}.png`;
+      } else {
+        responseData.dbKillName = "";
+        responseData.dbKillRole = "";
+        responseData.dbKillPic = "C://data/dbkill/0.png";
+        responseData.dbKillTeamName = "";
+        responseData.dbKillTeamLogo = "";
+        responseData.dbKillRolepng = "C://data/dbkill/role/Unknown Role.png";
+      }
+    } catch (error) {
+      console.error('Error processing double kill data:', error);
+      responseData.dbKillName = "";
+      responseData.dbKillRole = "";
+      responseData.dbKillPic = "C://data/dbkill/0.png";
+      responseData.dbKillTeamName = "";
+      responseData.dbKillTeamLogo = "";
+      responseData.dbKillRolepng = "C://data/dbkill/role/Unknown Role.png";
     }
 
     // Process Maniac Kill
     try {
       if (miniac.length > 0) {
         const lastMiniac = miniac[miniac.length - 1];
-        responseData.miniacPlayerTeamName = getSafeTeamName(lastMiniac.campid);
-        responseData.miniacPlayerName = getSafePlayerName(lastMiniac.killer_id);
-        responseData.miniacPlayerRole = getSafePlayerRole(lastMiniac.killer_id);
-        responseData.miniacPlayerPic = `C://data/firstblood/${lastMiniac.killer_id || 0}.png`;
-        responseData.miniacPlayerPicTeamLogo = getSafeTeamLogo(lastMiniac.campid);
-        responseData.miniacPlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lastMiniac.killer_id)}.png`;
+        responseData.miniacTeamName = getSafeTeamName(lastMiniac.campid);
+        responseData.miniacName = getSafePlayerName(lastMiniac.killer_id);
+        responseData.miniacRole = getSafePlayerRole(lastMiniac.killer_id);
+        responseData.miniacPlayerPic = `C://data/miniac/${lastMiniac.killer_id || 0}.png`;
+        responseData.miniacTeamLogo = getSafeTeamLogo(lastMiniac.campid, "C://data/miniac/logo/");
+        responseData.miniacRolepng = `C://data/miniac/role/${getSafePlayerRole(lastMiniac.killer_id)}.png`;
       } else {
-        responseData.miniacPlayerName = "";
-        responseData.miniacPlayerRole = "";
-        responseData.miniacPlayerPic = "C://data/firstblood/0.png";
-        responseData.miniacPlayerTeamName = "";
-        responseData.miniacPlayerPicTeamLogo = "";
-        responseData.miniacPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.miniacName = "";
+        responseData.miniacRole = "";
+        responseData.miniacPlayerPic = "C://data/miniac/0.png";
+        responseData.miniacTeamName = "";
+        responseData.miniacTeamLogo = "";
+        responseData.miniacRolepng = "C://data/miniac/role/Unknown Role.png";
       }
     } catch (error) {
       console.error('Error processing maniac data:', error);
-      responseData.miniacPlayerName = "";
-      responseData.miniacPlayerRole = "";
-      responseData.miniacPlayerPic = "C://data/firstblood/0.png";
-      responseData.miniacPlayerTeamName = "";
-      responseData.miniacPlayerPicTeamLogo = "";
-      responseData.miniacPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.miniacName = "";
+      responseData.miniacRole = "";
+      responseData.miniacPlayerPic = "C://data/miniac/0.png";
+      responseData.miniacTeamName = "";
+      responseData.miniacTeamLogo = "";
+      responseData.miniacRolepng = "C://data/miniac/role/Unknown Role.png";
     }
 
     // Process Triple Kill
     try {
       if (tripleKill.length > 0) {
         const lasttripleKill = tripleKill[tripleKill.length - 1];
-        responseData.tripleKillPlayerTeamName = getSafeTeamName(lasttripleKill.campid);
-        responseData.tripleKillPlayerName = getSafePlayerName(lasttripleKill.killer_id);
-        responseData.tripleKillPlayerRole = getSafePlayerRole(lasttripleKill.killer_id);
-        responseData.tripleKillPlayerPic = `C://data/firstblood/${lasttripleKill.killer_id || 0}.png`;
-        responseData.tripleKillPlayerPicTeamLogo = getSafeTeamLogo(lasttripleKill.campid);
-        responseData.tripleKillPlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lasttripleKill.killer_id)}.png`;
+        responseData.tkTeamName = getSafeTeamName(lasttripleKill.campid);
+        responseData.tkPlayerName = getSafePlayerName(lasttripleKill.killer_id);
+        responseData.tkPlayerRole = getSafePlayerRole(lasttripleKill.killer_id);
+        responseData.tkPlayerPic = `C://data/tpkill/${lasttripleKill.killer_id || 0}.png`;
+        responseData.tkTeamLogo = getSafeTeamLogo(lasttripleKill.campid, "C://data/tpkill/logo/");
+        responseData.tkPlayerRolepng = `C://data/tpkill/role/${getSafePlayerRole(lasttripleKill.killer_id)}.png`;
       } else {
-        responseData.tripleKillPlayerName = "";
-        responseData.tripleKillPlayerRole = "";
-        responseData.tripleKillPlayerPic = "C://data/firstblood/0.png";
-        responseData.tripleKillPlayerTeamName = "";
-        responseData.tripleKillPlayerPicTeamLogo = "";
-        responseData.tripleKillPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.tkPlayerName = "";
+        responseData.tkPlayerRole = "";
+        responseData.tkPlayerPic = "C://data/tpkill/0.png";
+        responseData.tkTeamName = "";
+        responseData.tkTeamLogo = "";
+        responseData.tkPlayerRolepng = "C://data/tpkill/role/Unknown Role.png";
       }
     } catch (error) {
       console.error('Error processing triple kill data:', error);
-      responseData.tripleKillPlayerName = "";
-      responseData.tripleKillPlayerRole = "";
-      responseData.tripleKillPlayerPic = "C://data/firstblood/0.png";
-      responseData.tripleKillPlayerTeamName = "";
-      responseData.tripleKillPlayerPicTeamLogo = "";
-      responseData.tripleKillPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.tkPlayerName = "";
+      responseData.tkPlayerRole = "";
+      responseData.tkPlayerPic = "C://data/tpkill/0.png";
+      responseData.tkTeamName = "";
+      responseData.tkTeamLogo = "";
+      responseData.tkPlayerRolepng = "C://data/tpkill/role/Unknown Role.png";
     }
 
     // Process First Blood
     try {
       if (firstBlood.length > 0) {
         const lastfirstBlood = firstBlood[firstBlood.length - 1];
-        responseData.firstBloodPlayerTeamName = getSafeTeamName(lastfirstBlood.campid);
-        responseData.firstBloodPlayerName = getSafePlayerName(
+        responseData.fbTeamName = getSafeTeamName(lastfirstBlood.campid);
+        responseData.fbPlayerName = getSafePlayerName(
           lastfirstBlood.killer_id,
           lastfirstBlood.killer_name
         );
-        responseData.firstBloodPlayerRole = getSafePlayerRole(lastfirstBlood.killer_id);
-        responseData.firstBloodPlayerPic = `C://data/firstblood/${lastfirstBlood.killer_id || 0}.png`;
-        responseData.firstBloodPlayerPicTeamLogo = getSafeTeamLogo(lastfirstBlood.campid);
-        responseData.firstBloodPlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lastfirstBlood.killer_id)}.png`;
+        responseData.fbPlayerRole = getSafePlayerRole(lastfirstBlood.killer_id);
+        responseData.fbPlayerPic = `C://data/firstblood/${lastfirstBlood.killer_id || 0}.png`;
+        responseData.fbTeamLogo = getSafeTeamLogo(lastfirstBlood.campid, "C://data/firstblood/logo/");
+        responseData.fbPlayerRolepng = `C://data/firstblood/role/${getSafePlayerRole(lastfirstBlood.killer_id)}.png`;
       } else {
-        responseData.firstBloodPlayerName = "";
-        responseData.firstBloodPlayerRole = "";
-        responseData.firstBloodPlayerPic = `${formData?.bossKillerPath || "C://data/firstblood/"}0.png`;
-        responseData.firstBloodPlayerTeamName = "";
-        responseData.firstBloodPlayerPicTeamLogo = "";
-        responseData.firstBloodPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.fbPlayerName = "";
+        responseData.fbPlayerRole = "";
+        responseData.fbPlayerPic = "C://data/firstblood/0.png";
+        responseData.fbTeamName = "";
+        responseData.fbTeamLogo = "";
+        responseData.fbPlayerRolepng = "C://data/firstblood/role/Unknown Role.png";
       }
     } catch (error) {
       console.error('Error processing first blood data:', error);
-      responseData.firstBloodPlayerName = "";
-      responseData.firstBloodPlayerRole = "";
-      responseData.firstBloodPlayerPic = `${formData?.bossKillerPath || "C://data/firstblood/"}0.png`;
-      responseData.firstBloodPlayerTeamName = "";
-      responseData.firstBloodPlayerPicTeamLogo = "";
-      responseData.firstBloodPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.fbPlayerName = "";
+      responseData.fbPlayerRole = "";
+      responseData.fbPlayerPic = "C://data/firstblood/0.png";
+      responseData.fbTeamName = "";
+      responseData.fbTeamLogo = "";
+      responseData.fbPlayerRolepng = "C://data/firstblood/role/Unknown Role.png";
     }
 
     // Process Turtle Kill
     try {
       if (turtleKill.length > 0) {
         const lastTurtleKillEvent = turtleKill[turtleKill.length - 1];
-        responseData.turtleKillTeamName = getSafeTeamName(lastTurtleKillEvent.campid);
-        responseData.turtleKillPlayerName = getSafePlayerName(lastTurtleKillEvent.killer_id);
-        responseData.turtleKillPlayerRole = getSafePlayerRole(lastTurtleKillEvent.killer_id);
-        responseData.turtleKillPlayer = `${formData?.bossKillerPath || ""}${lastTurtleKillEvent.killer_id || 0}.png`;
-        responseData.turtleKillPlayerTeamLogo = getSafeTeamLogo(lastTurtleKillEvent.campid);
-        responseData.turtleKillPlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lastTurtleKillEvent.killer_id)}.png`;
+        responseData.tKillTeamName = getSafeTeamName(lastTurtleKillEvent.campid);
+        responseData.tKillName = getSafePlayerName(lastTurtleKillEvent.killer_id);
+        responseData.tKillRole = getSafePlayerRole(lastTurtleKillEvent.killer_id);
+        responseData.tKillPlayer = `C://data/tkill/${lastTurtleKillEvent.killer_id || 0}.png`;
+        responseData.tKillTeamLogo = getSafeTeamLogo(lastTurtleKillEvent.campid, "C://data/tkill/logo/");
+        responseData.tKillRolepng = `C://data/tkill/role/${getSafePlayerRole(lastTurtleKillEvent.killer_id)}.png`;
       } else {
-        responseData.turtleKillTeamName = "";
-        responseData.turtleKillPlayer = `${formData?.bossKillerPath || ""}0.png`;
-        responseData.turtleKillPlayerName = "";
-        responseData.turtleKillPlayerRole = "";
-        responseData.turtleKillPlayerTeamLogo = "";
-        responseData.turtleKillPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.tKillTeamName = "";
+        responseData.tKillPlayer = "C://data/tkill/0.png";
+        responseData.tKillName = "";
+        responseData.tKillRole = "";
+        responseData.tKillTeamLogo = "";
+        responseData.tKillRolepng = "C://data/tkill/role/Unknown Role.png";
       }
 
       // Count turtle kills per team safely
@@ -2847,12 +2930,12 @@ app.get("/hud", async (req, res) => {
       responseData.totalTurtleKilled = team1TurtleKills + team2TurtleKills;
     } catch (error) {
       console.error('Error processing turtle kill data:', error);
-      responseData.turtleKillTeamName = "";
-      responseData.turtleKillPlayer = `${formData?.bossKillerPath || ""}0.png`;
-      responseData.turtleKillPlayerName = "";
-      responseData.turtleKillPlayerRole = "";
+      responseData.tKillTeamName = "";
+      responseData.tKillPlayer = "C://data/tkill/player/0.png";
+      responseData.tKillName = "";
+      responseData.tKillRole = "";
       responseData.turtleKillPlayerTeamLogo = "";
-      responseData.turtleKillPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.tKillRolepng = "C://data/tkill/role/Unknown Role.png";
       responseData.totalTurtleKilled = 0;
     }
 
@@ -2860,60 +2943,60 @@ app.get("/hud", async (req, res) => {
     try {
       if (lordKill.length > 0) {
         const lastLordKillEvent = lordKill[lordKill.length - 1];
-        responseData.lordKillTeamName = getSafeTeamName(lastLordKillEvent.campid);
-        responseData.lordKillPlayerName = getSafePlayerName(lastLordKillEvent.killer_id);
-        responseData.lordKillPlayerRole = getSafePlayerRole(lastLordKillEvent.killer_id);
-        responseData.lordKillPlayer = `${formData?.bossKillerPath || ""}${lastLordKillEvent.killer_id || 0}.png`;
-        responseData.lordKillPlayerTeamLogo = getSafeTeamLogo(lastLordKillEvent.campid);
-        responseData.lordKillPlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lastLordKillEvent.killer_id)}.png`;
+        responseData.lKillTeamName = getSafeTeamName(lastLordKillEvent.campid);
+        responseData.lKillName = getSafePlayerName(lastLordKillEvent.killer_id);
+        responseData.lKillPlayerRole = getSafePlayerRole(lastLordKillEvent.killer_id);
+        responseData.lordKillPlayer = `C://data/lkill/player/${lastLordKillEvent.killer_id || 0}.png`;
+        responseData.lKillTeamLogo = getSafeTeamLogo(lastLordKillEvent.campid, "C://data/lkill/logo/");
+        responseData.lKillRolepng = `C://data/lkill/role/${getSafePlayerRole(lastLordKillEvent.killer_id)}.png`;
       } else {
-        responseData.lordKillTeamName = "";
-        responseData.lordKillPlayer = `${formData?.bossKillerPath || ""}0.png`;
-        responseData.lordKillPlayerName = "";
-        responseData.lordKillPlayerRole = "";
-        responseData.lordKillPlayerTeamLogo = "";
-        responseData.lordKillPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.lKillTeamName = "";
+        responseData.lordKillPlayer = "C://data/lkill/player/0.png";
+        responseData.lKillName = "";
+        responseData.lKillPlayerRole = "";
+        responseData.lKillTeamLogo = "";
+        responseData.lKillRolepng = "C://data/lkill/role/Unknown Role.png";
       }
     } catch (error) {
       console.error('Error processing lord kill data:', error);
-      responseData.lordKillTeamName = "";
-      responseData.lordKillPlayer = `${formData?.bossKillerPath || ""}0.png`;
-      responseData.lordKillPlayerName = "";
-      responseData.lordKillPlayerRole = "";
-      responseData.lordKillPlayerTeamLogo = "";
-      responseData.lordKillPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.lKillTeamName = "";
+      responseData.lordKillPlayer = "C://data/lkill/player/0.png";
+      responseData.lKillName = "";
+      responseData.lKillPlayerRole = "";
+      responseData.lKillTeamLogo = "";
+      responseData.lKillRolepng = "C://data/lkill/role/Unknown Role.png";
     }
 
     // Process Lord Steal
     try {
       if (lordSteal.length > 0) {
         const lastLordStealEvent = lordSteal[lordSteal.length - 1];
-        responseData.lordStealTeamName = getSafeTeamName(lastLordStealEvent.campid);
-        responseData.lordStealPlayerName = getSafePlayerName(lastLordStealEvent.killer_id);
-        responseData.lordStealPlayerRole = getSafePlayerRole(lastLordStealEvent.killer_id);
-        responseData.lordStealPlayer = `${formData?.bossKillerPath || ""}${lastLordStealEvent.killer_id || 0}.png`;
-        responseData.lordStealPlayerTeamLogo = getSafeTeamLogo(lastLordStealEvent.campid);
-        responseData.lordStealPlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lastLordStealEvent.killer_id)}.png`;
+        responseData.lStealTeamName = getSafeTeamName(lastLordStealEvent.campid);
+        responseData.lStealName = getSafePlayerName(lastLordStealEvent.killer_id);
+        responseData.lStealRole = getSafePlayerRole(lastLordStealEvent.killer_id);
+        responseData.lordStealPlayer = `C://data/lsteal/player/${lastLordStealEvent.killer_id || 0}.png`;
+        responseData.lStealTeamLogo = getSafeTeamLogo(lastLordStealEvent.campid, "C://data/lsteal/logo/");
+        responseData.lStealRolepng = `C://data/lsteal/role/${getSafePlayerRole(lastLordStealEvent.killer_id)}.png`;
         responseData.lordStealTime = lastLordStealEvent.game_time || 0;
         responseData.lordStealCount = lordSteal.length;
       } else {
-        responseData.lordStealTeamName = "";
-        responseData.lordStealPlayer = `${formData?.bossKillerPath || ""}0.png`;
-        responseData.lordStealPlayerName = "";
-        responseData.lordStealPlayerRole = "";
-        responseData.lordStealPlayerTeamLogo = "";
-        responseData.lordStealPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.lStealTeamName = "";
+        responseData.lordStealPlayer = "C://data/lsteal/player/0.png";
+        responseData.lStealName = "";
+        responseData.lStealRole = "";
+        responseData.lStealTeamLogo = "";
+        responseData.lStealRolepng = "C://data/lsteal/role/Unknown Role.png";
         responseData.lordStealTime = 0;
         responseData.lordStealCount = 0;
       }
     } catch (error) {
       console.error('Error processing lord steal data:', error);
-      responseData.lordStealTeamName = "";
-      responseData.lordStealPlayer = `${formData?.bossKillerPath || ""}0.png`;
-      responseData.lordStealPlayerName = "";
-      responseData.lordStealPlayerRole = "";
-      responseData.lordStealPlayerTeamLogo = "";
-      responseData.lordStealPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.lStealTeamName = "";
+      responseData.lordStealPlayer = "C://data/lsteal/player/0.png";
+      responseData.lStealName = "";
+      responseData.lStealRole = "";
+      responseData.lStealTeamLogo = "";
+      responseData.lStealRolepng = "C://data/lsteal/role/Unknown Role.png";
       responseData.lordStealTime = 0;
       responseData.lordStealCount = 0;
     }
@@ -2922,34 +3005,34 @@ app.get("/hud", async (req, res) => {
     try {
       if (turtleSteal.length > 0) {
         const lastTurtleStealEvent = turtleSteal[turtleSteal.length - 1];
-        responseData.turtleStealTeamName = getSafeTeamName(lastTurtleStealEvent.campid);
-        responseData.turtleStealPlayerName = getSafePlayerName(lastTurtleStealEvent.killer_id);
-        responseData.turtleStealPlayerRole = getSafePlayerRole(lastTurtleStealEvent.killer_id);
-        responseData.turtleStealPlayer = `${formData?.bossKillerPath || ""}${lastTurtleStealEvent.killer_id || 0}.png`;
-        responseData.turtleStealPlayerTeamLogo = getSafeTeamLogo(lastTurtleStealEvent.campid);
-        responseData.turtleStealPlayerRolepng = `C://data/lordkill/role/${getSafePlayerRole(lastTurtleStealEvent.killer_id)}.png`;
+        responseData.tStealTeamName = getSafeTeamName(lastTurtleStealEvent.campid);
+        responseData.tStealName = getSafePlayerName(lastTurtleStealEvent.killer_id);
+        responseData.tStealRole = getSafePlayerRole(lastTurtleStealEvent.killer_id);
+        responseData.tStealPlayer = `C://data/tsteal/player/${lastTurtleStealEvent.killer_id || 0}.png`;
+        responseData.tStealTeamLogo = getSafeTeamLogo(lastTurtleStealEvent.campid, "C://data/tsteal/logo/");
+        responseData.tStealRolepng = `C://data/tsteal/role/${getSafePlayerRole(lastTurtleStealEvent.killer_id)}.png`;
         responseData.turtleStealTime = lastTurtleStealEvent.game_time || 0;
-        responseData.turtleStealCount = turtleSteal.length;
+        responseData.tStealCount = turtleSteal.length;
       } else {
-        responseData.turtleStealTeamName = "";
-        responseData.turtleStealPlayer = `${formData?.bossKillerPath || ""}0.png`;
-        responseData.turtleStealPlayerName = "";
-        responseData.turtleStealPlayerRole = "";
-        responseData.turtleStealPlayerTeamLogo = "";
-        responseData.turtleStealPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+        responseData.tStealTeamName = "";
+        responseData.tStealPlayer = "C://data/tsteal/player/0.png";
+        responseData.tStealName = "";
+        responseData.tStealRole = "";
+        responseData.tStealTeamLogo = "";
+        responseData.tStealRolepng = "C://data/tsteal/role/Unknown Role.png";
         responseData.turtleStealTime = 0;
-        responseData.turtleStealCount = 0;
+        responseData.tStealCount = 0;
       }
     } catch (error) {
       console.error('Error processing turtle steal data:', error);
-      responseData.turtleStealTeamName = "";
-      responseData.turtleStealPlayer = `${formData?.bossKillerPath || ""}0.png`;
-      responseData.turtleStealPlayerName = "";
-      responseData.turtleStealPlayerRole = "";
-      responseData.turtleStealPlayerTeamLogo = "";
-      responseData.turtleStealPlayerRolepng = "C://data/lordkill/role/Unknown Role.png";
+      responseData.tStealTeamName = "";
+      responseData.tStealPlayer = "C://data/tsteal/player/0.png";
+      responseData.tStealName = "";
+      responseData.tStealRole = "";
+      responseData.tStealTeamLogo = "";
+      responseData.tStealRolepng = "C://data/tsteal/role/Unknown Role.png";
       responseData.turtleStealTime = 0;
-      responseData.turtleStealCount = 0;
+      responseData.tStealCount = 0;
     }
 
     // Return response
@@ -3576,55 +3659,55 @@ app.get("/draft", (req, res) => {
 
     // location2 picklight
     if (a[0].player_list[0].picking == true) {
-      responseData.location2picklight1 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick1 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight1 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick1 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[0].player_list[1].picking == true) {
-      responseData.location2picklight2 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick2 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight2 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick2 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[0].player_list[2].picking == true) {
-      responseData.location2picklight3 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick3 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight3 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick3 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[0].player_list[3].picking == true) {
-      responseData.location2picklight4 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick4 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight4 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick4 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[0].player_list[4].picking == true) {
-      responseData.location2picklight5 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick5 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight5 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick5 = "C://data/draft/picklightlocation2/0/1.png"
     }
 
     if (a[1].player_list[0].picking == true) {
-      responseData.location2picklight6 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick6 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight6 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick6 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[1].player_list[1].picking == true) {
-      responseData.location2picklight7 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick7 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight7 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick7 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[1].player_list[2].picking == true) {
-      responseData.location2picklight8 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick8 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight8 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick8 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[1].player_list[3].picking == true) {
-      responseData.location2picklight9 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick9 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight9 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick9 = "C://data/draft/picklightlocation2/0/1.png"
     }
     if (a[1].player_list[4].picking == true) {
-      responseData.location2picklight10 = "C://data/draft/picklightlocation2/1/1.png"
+      responseData.loc2Pick10 = "C://data/draft/picklightlocation2/1/1.png"
     } else {
-      responseData.location2picklight10 = "C://data/draft/picklightlocation2/0/1.png"
+      responseData.loc2Pick10 = "C://data/draft/picklightlocation2/0/1.png"
     }
     
     //ban light
@@ -3682,55 +3765,55 @@ app.get("/draft", (req, res) => {
 
     //ban light location2
     if (a[0].player_list[0].banning == true) {
-      responseData.location2Banlight1 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban1 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight1 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban1 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[0].player_list[1].banning == true) {
-      responseData.location2Banlight2 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban2 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight2 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban2 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[0].player_list[2].banning == true) {
-      responseData.location2Banlight3 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban3 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight3 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban3 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[0].player_list[3].banning == true) {
-      responseData.location2Banlight4 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban4 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight4 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban4 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[0].player_list[4].banning == true) {
-      responseData.location2Banlight5 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban5 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight5 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban5 = "C://data/draft/banlight2/0/1.png"
     }
 
     if (a[1].player_list[0].banning == true) {
-      responseData.location2Banlight6 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban6 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight6 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban6 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[1].player_list[1].banning == true) {
-      responseData.location2Banlight7 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban7 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight7 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban7 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[1].player_list[2].banning == true) {
-      responseData.location2Banlight8 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban8 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight8 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban8 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[1].player_list[3].banning == true) {
-      responseData.location2Banlight9 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban9 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight9 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban9 = "C://data/draft/banlight2/0/1.png"
     }
     if (a[1].player_list[4].banning == true) {
-      responseData.location2Banlight10 = "C://data/draft/banlight2/1/1.png"
+      responseData.loc2Ban10 = "C://data/draft/banlight2/1/1.png"
     } else {
-      responseData.location2Banlight10 = "C://data/draft/banlight2/0/1.png"
+      responseData.loc2Ban10 = "C://data/draft/banlight2/0/1.png"
     }
 
     //picked1

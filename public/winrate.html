@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Win Rate Update</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.min.css">
+</head>
+<body>
+    <div id="app">
+        <v-app>
+            <v-main>
+                <v-container fluid>
+                    <v-row justify="center">
+                        <v-col cols="12" md="10">
+                            <v-card elevation="3" class="pa-4">
+                                <h1 class="mb-4">Win Rate Update</h1>
+
+                                <v-textarea
+                                    label="Paste JSON data here"
+                                    v-model="jsonInput"
+                                    rows="12"
+                                    outlined
+                                    placeholder='[{"id":1,"pick":0,"ban":0,"winrate":0}, ...]'
+                                ></v-textarea>
+
+                                <v-row class="mb-4">
+                                    <v-col>
+                                        <v-btn color="primary" @click="submitData" large>
+                                            Submit Win Rates
+                                        </v-btn>
+                                        <v-btn color="secondary" @click="loadCurrent" class="ml-2" large>
+                                            Load Current Data
+                                        </v-btn>
+                                    </v-col>
+                                </v-row>
+
+
+
+                                <v-simple-table v-if="tableData.length" dense class="mt-4">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Pick</th>
+                                            <th>Ban</th>
+                                            <th>Win Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="item in tableData" :key="item.id">
+                                            <td>{{ item.id }}</td>
+                                            <td>{{ item.pick }}</td>
+                                            <td>{{ item.ban }}</td>
+                                            <td>{{ item.winrate }}</td>
+                                        </tr>
+                                    </tbody>
+                                </v-simple-table>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-main>
+        </v-app>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            vuetify: new Vuetify(),
+            data: {
+                jsonInput: '',
+                tableData: []
+            },
+            methods: {
+                async submitData() {
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(this.jsonInput);
+                    } catch (e) {
+                        alert('FAILED: Invalid JSON format');
+                        return;
+                    }
+
+                    if (!Array.isArray(parsed)) {
+                        alert('FAILED: Data must be a JSON array');
+                        return;
+                    }
+
+                    try {
+                        const res = await fetch('/winrateup', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(parsed)
+                        });
+                        const text = await res.text();
+                        if (res.ok) {
+                            alert('SUCCESS: ' + text);
+                            this.tableData = parsed;
+                        } else {
+                            alert('FAILED: ' + text);
+                        }
+                    } catch (e) {
+                        alert('FAILED: Could not send data');
+                    }
+                },
+                async loadCurrent() {
+                    try {
+                        const res = await fetch('/getrate');
+                        const data = await res.json();
+                        this.jsonInput = JSON.stringify(data, null, 2);
+                        this.tableData = data;
+                        alert('SUCCESS: Current data loaded');
+                    } catch (e) {
+                        alert('FAILED: Could not load current data');
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
