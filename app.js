@@ -1765,11 +1765,11 @@ app.get("/post-data", (req, res) => {
 
       //team1PlayerLvl
       for (let i = 0; i < 5; i++) {
-        responseData[`Level${i + 1}`] = `LV${team1[i].level}`;
+        responseData[`Level${i + 1}`] = `${team1[i].level}`;
       }
       //team2PlayerLvl
       for (let i = 0; i < 5; i++) {
-        responseData[`Level${i + 6}`] = `LV${team2[i].level}`;
+        responseData[`Level${i + 6}`] = `${team2[i].level}`;
       }
       //team1PlayerHero
       for (let i = 0; i < 5; i++) {
@@ -2222,6 +2222,42 @@ app.get("/damageRanking", (req, res) => {
           index === 0 ? "100" : percent === "100" ? "99" : percent
         }.png`;
       });
+      res.send(players);
+    } catch (e) {
+      return res.status(500).send(e);
+    }
+  });
+});
+
+app.get("/explvl", (req, res) => {
+  const battleData =
+    "http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
+    id +
+    "&dataid=1";
+  request({ url: battleData, json: true }, (error, response, body) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+
+    try {
+      let a = body.data.camp_list;
+      const selectedCamps = a.filter(
+        (camp) => camp.campid === 1 || camp.campid === 2
+      );
+      const players = selectedCamps
+        .map((camp) => camp.player_list)
+        .flat()
+        .map((player) => {
+          return {
+            team: player.campid,
+            id: player.roleid,
+            name: name_finder(player.roleid, playerList) || player.name,
+            level: player.level,
+            levelText: `LV.${player.level}`,
+            hero: `C://data/exp/hero/${player.heroid}.png`,
+          };
+        });
+      players.sort((a, b) => b.level - a.level);
       res.send(players);
     } catch (e) {
       return res.status(500).send(e);
