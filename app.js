@@ -4421,17 +4421,17 @@ app.get("/item", (req, res) => {
       responseData.SLhero10 = team2[4].heroid ? `C://data/sideled/hero/${team2[4].heroid}.png` : "";
 
       //SLhero
-      responseData.SLbanhero1 = team1[0].ban_heroid ? `C://data/sideled/hero/${team1[0].ban_heroid}.png` : "";
-      responseData.SLbanhero2 = team1[1].ban_heroid ? `C://data/sideled/hero/${team1[1].ban_heroid}.png` : "";
-      responseData.SLbanhero3 = team1[2].ban_heroid ? `C://data/sideled/hero/${team1[2].ban_heroid}.png` : "";
-      responseData.SLbanhero4 = team1[3].ban_heroid ? `C://data/sideled/hero/${team1[3].ban_heroid}.png` : "";
-      responseData.SLbanhero5 = team1[4].ban_heroid ? `C://data/sideled/hero/${team1[4].ban_heroid}.png` : "";
+      responseData.SLbanhero1 = team1[0].ban_heroid ? `C://data/sideled/banhero/${team1[0].ban_heroid}.png` : "";
+      responseData.SLbanhero2 = team1[1].ban_heroid ? `C://data/sideled/banhero/${team1[1].ban_heroid}.png` : "";
+      responseData.SLbanhero3 = team1[2].ban_heroid ? `C://data/sideled/banhero/${team1[2].ban_heroid}.png` : "";
+      responseData.SLbanhero4 = team1[3].ban_heroid ? `C://data/sideled/banhero/${team1[3].ban_heroid}.png` : "";
+      responseData.SLbanhero5 = team1[4].ban_heroid ? `C://data/sideled/banhero/${team1[4].ban_heroid}.png` : "";
 
-      responseData.SLbanhero6 = team2[0].ban_heroid ? `C://data/sideled/hero/${team2[0].ban_heroid}.png` : "";
-      responseData.SLbanhero7 = team2[1].ban_heroid ? `C://data/sideled/hero/${team2[1].ban_heroid}.png` : "";
-      responseData.SLbanhero8 = team2[2].ban_heroid ? `C://data/sideled/hero/${team2[2].ban_heroid}.png` : "";
-      responseData.SLbanhero9 = team2[3].ban_heroid ? `C://data/sideled/hero/${team2[3].ban_heroid}.png` : "";
-      responseData.SLbanhero10 = team2[4].ban_heroid ? `C://data/sideled/hero/${team2[4].ban_heroid}.png` : "";
+      responseData.SLbanhero6 = team2[0].ban_heroid ? `C://data/sideled/banhero/${team2[0].ban_heroid}.png` : "";
+      responseData.SLbanhero7 = team2[1].ban_heroid ? `C://data/sideled/banhero/${team2[1].ban_heroid}.png` : "";
+      responseData.SLbanhero8 = team2[2].ban_heroid ? `C://data/sideled/banhero/${team2[2].ban_heroid}.png` : "";
+      responseData.SLbanhero9 = team2[3].ban_heroid ? `C://data/sideled/banhero/${team2[3].ban_heroid}.png` : "";
+      responseData.SLbanhero10 = team2[4].ban_heroid ? `C://data/sideled/banhero/${team2[4].ban_heroid}.png` : "";
 
       //SLRoleSmall
       responseData.SLRoleSmall1 = `C://data/sideled/rolesmall/${role_finder(team1[0].roleid, playerList) || ""}.png`;
