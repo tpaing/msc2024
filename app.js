@@ -5742,6 +5742,145 @@ app.get('/mileStone', (req, res) => {
   });
 });
 
+app.get("/playercam", async (req, res) => {
+  try {
+    const battleData = `http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=${id}&dataid=1`;
+
+    const { response: apiResponse, body } = await makeRequest(battleData);
+
+    if (apiResponse.statusCode !== 200) {
+      return res.status(500).json({ error: "API request failed", statusCode: apiResponse.statusCode });
+    }
+
+    if (!body || !body.data || !body.data.camp_list) {
+      return res.status(500).json({ error: "Invalid API response structure" });
+    }
+
+    const campList = body.data.camp_list;
+
+    if (!Array.isArray(campList) || campList.length < 2) {
+      return res.status(500).json({ error: "Invalid camp list" });
+    }
+
+    // Get player lists and sort each team by role: exp → jg → mid → roam → gold
+    const team1 = Array.isArray(campList[0]?.player_list) ? [...campList[0].player_list] : [];
+    const team2 = Array.isArray(campList[1]?.player_list) ? [...campList[1].player_list] : [];
+
+    role_sorter(team1, playerList);
+    role_sorter(team2, playerList);
+
+    const responseData = {};
+    const itemPath = "C://data/pcam/item/";
+    const allPlayers = [...team1.slice(0, 5), ...team2.slice(0, 5)];
+
+    for (let i = 0; i < allPlayers.length; i++) {
+      const n = i + 1;
+      const player = allPlayers[i];
+
+      try {
+        if (!player) {
+          responseData[`playername${n}`] = "";
+          responseData[`role${n}`] = "";
+          responseData[`kda${n}`] = "0 / 0 / 0";
+          responseData[`gold${n}`] = "0";
+          for (let j = 1; j <= 6; j++) responseData[`item${n}_${j}`] = `${itemPath}0.png`;
+          responseData[`ultReady${n}`] = "C://data/pcam/ult/0.png";
+          responseData[`hero${n}`] = "C://data/pcam/0.png";
+          responseData[`level${n}`] = 0;
+          continue;
+        }
+
+        // Player name
+        try {
+          responseData[`playername${n}`] = name_finder(player.roleid, playerList) || player.name || "";
+        } catch (e) {
+          responseData[`playername${n}`] = "";
+        }
+
+        // Role
+        try {
+          responseData[`role${n}`] = role_finder(player.roleid, playerList) || player.c_role || "";
+        } catch (e) {
+          responseData[`role${n}`] = "";
+        }
+
+        // KDA
+        try {
+          const k = player.kill_num ?? 0;
+          const d = player.dead_num ?? 0;
+          const a = player.assist_num ?? 0;
+          responseData[`kda${n}`] = `${k} / ${d} / ${a}`;
+        } catch (e) {
+          responseData[`kda${n}`] = "0 / 0 / 0";
+        }
+
+        // Gold in 12,345 format
+        try {
+          const gold = player.gold ?? 0;
+          responseData[`gold${n}`] = gold.toLocaleString("en-US");
+        } catch (e) {
+          responseData[`gold${n}`] = "0";
+        }
+
+        // Items 1-6
+        try {
+          for (let j = 0; j < 6; j++) {
+            responseData[`item${n}_${j + 1}`] =
+              player.equip_list && player.equip_list[j]
+                ? `${itemPath}${player.equip_list[j]}.png`
+                : `${itemPath}0.png`;
+          }
+        } catch (e) {
+          for (let j = 1; j <= 6; j++) responseData[`item${n}_${j}`] = `${itemPath}0.png`;
+        }
+
+        // Ult ready: major_left_time === 0 means ult is ready
+        try {
+          const ultReady = (player.major_left_time ?? 1) === 0;
+          responseData[`ultReady${n}`] = ultReady ? "C://data/pcam/ult/1.png" : "C://data/pcam/ult/0.png";
+        } catch (e) {
+          responseData[`ultReady${n}`] = "C://data/pcam/ult/0.png";
+        }
+
+        // Pick hero image
+        try {
+          responseData[`hero${n}`] = player.heroid ? `C://data/pcam/${player.heroid}.png` : "C://data/pcam/0.png";
+        } catch (e) {
+          responseData[`hero${n}`] = "C://data/pcam/0.png";
+        }
+
+        // Level
+        try {
+          responseData[`level${n}`] = player.level ?? 0;
+        } catch (e) {
+          responseData[`level${n}`] = 0;
+        }
+
+      } catch (playerError) {
+        console.error(`Error processing player ${n} in /playercam:`, playerError);
+        responseData[`playername${n}`] = "";
+        responseData[`role${n}`] = "";
+        responseData[`kda${n}`] = "0 / 0 / 0";
+        responseData[`gold${n}`] = "0";
+        for (let j = 1; j <= 6; j++) responseData[`item${n}_${j}`] = `${itemPath}0.png`;
+        responseData[`ultReady${n}`] = "C://data/pcam/ult/0.png";
+        responseData[`hero${n}`] = "C://data/pcam/0.png";
+        responseData[`level${n}`] = 0;
+      }
+    }
+
+    res.json({ data: [responseData] });
+
+  } catch (criticalError) {
+    console.error("Critical error in /playercam route:", criticalError);
+    res.status(500).json({
+      error: "Internal server error",
+      message: criticalError.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server Running on localhost:3000");
 });
