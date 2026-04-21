@@ -5781,6 +5781,7 @@ app.get("/playercam", async (req, res) => {
         if (!player) {
           responseData[`playername${n}`] = "";
           responseData[`role${n}`] = "";
+          responseData[`rolePng${n}`] = "C://data/pcam/role/.png";
           responseData[`kda${n}`] = "0 / 0 / 0";
           responseData[`gold${n}`] = "0";
           for (let j = 1; j <= 6; j++) responseData[`item${n}_${j}`] = `${itemPath}0.png`;
@@ -5799,9 +5800,12 @@ app.get("/playercam", async (req, res) => {
 
         // Role
         try {
-          responseData[`role${n}`] = role_finder(player.roleid, playerList) || player.c_role || "";
+          const roleVal = role_finder(player.roleid, playerList) || player.c_role || "";
+          responseData[`role${n}`] = roleVal;
+          responseData[`rolePng${n}`] = `C://data/pcam/role/${roleVal}.png`;
         } catch (e) {
           responseData[`role${n}`] = "";
+          responseData[`rolePng${n}`] = "C://data/pcam/role/.png";
         }
 
         // KDA
@@ -5860,6 +5864,7 @@ app.get("/playercam", async (req, res) => {
         console.error(`Error processing player ${n} in /playercam:`, playerError);
         responseData[`playername${n}`] = "";
         responseData[`role${n}`] = "";
+        responseData[`rolePng${n}`] = "C://data/pcam/role/.png";
         responseData[`kda${n}`] = "0 / 0 / 0";
         responseData[`gold${n}`] = "0";
         for (let j = 1; j <= 6; j++) responseData[`item${n}_${j}`] = `${itemPath}0.png`;
