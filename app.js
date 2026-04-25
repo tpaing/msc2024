@@ -5838,9 +5838,10 @@ app.get("/playercam", async (req, res) => {
           for (let j = 1; j <= 6; j++) responseData[`item${n}_${j}`] = `${itemPath}0.png`;
         }
 
-        // Ult ready: major_left_time === 0 means ult is ready
+        // Ult ready only after level 4 unlock, and major_left_time === 0
         try {
-          const ultReady = (player.major_left_time ?? 1) === 0;
+          const playerLevel = Number(player.level ?? 0);
+          const ultReady = playerLevel >= 4 && (player.major_left_time ?? 1) === 0;
           responseData[`ultReady${n}`] = ultReady ? "C://data/pcam/ult/1.png" : "C://data/pcam/ult/0.png";
         } catch (e) {
           responseData[`ultReady${n}`] = "C://data/pcam/ult/0.png";
