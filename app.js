@@ -1894,7 +1894,7 @@ app.get("/post-data", (req, res) => {
         for (let n = 0; n < 3; n++) {
           responseData[`p${i + 1}Emblem${n + 1}`] = `${
             formData.resultEmblem
-          }${team1[i].rune_map[n + 1] || 0}.png`;
+          }${team1[i].rune_map ? team1[i].rune_map[n + 1] || 0 : 0}.png`;
         }
       }
       //team2Emblem
@@ -1902,7 +1902,7 @@ app.get("/post-data", (req, res) => {
         for (let n = 0; n < 3; n++) {
           responseData[`p${i + 6}Emblem${n + 1}`] = `${
             formData.resultEmblem
-          }${team2[i].rune_map[n + 1] || 0}.png`;
+          }${team2[i].rune_map ? team2[i].rune_map[n + 1] || 0 : 0}.png`;
         }
       }
       //team1MainEmblem
