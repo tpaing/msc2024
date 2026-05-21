@@ -3336,6 +3336,19 @@ app.get("/draft", (req, res) => {
     responseData.rolePng9 =`C://data/draft/role/${role_finder(a[1].player_list[3].roleid, playerList)}.png` || "norole";
     responseData.rolePng10 =`C://data/draft/role/${role_finder(a[1].player_list[4].roleid, playerList)}.png` || "norole";
 
+    //x2
+    responseData.x2rolePng1 =`C://data/draft/role2/${role_finder(a[0].player_list[0].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng2 =`C://data/draft/role2/${role_finder(a[0].player_list[1].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng3 =`C://data/draft/role2/${role_finder(a[0].player_list[2].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng4 =`C://data/draft/role2/${role_finder(a[0].player_list[3].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng5 =`C://data/draft/role2/${role_finder(a[0].player_list[4].roleid, playerList)}.png` || "norole";
+
+    responseData.x2rolePng6 =`C://data/draft/role2/${role_finder(a[1].player_list[0].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng7 =`C://data/draft/role2/${role_finder(a[1].player_list[1].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng8 =`C://data/draft/role2/${role_finder(a[1].player_list[2].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng9 =`C://data/draft/role2/${role_finder(a[1].player_list[3].roleid, playerList)}.png` || "norole";
+    responseData.x2rolePng10 =`C://data/draft/role2/${role_finder(a[1].player_list[4].roleid, playerList)}.png` || "norole";
+
     //pickversion2
     for (let i = 0; i < 5; i++) {
       responseData[`spell${i + 1}`] =
@@ -3426,6 +3439,35 @@ app.get("/draft", (req, res) => {
     } else {
       responseData.arrow2 = `C://data/draft/arrow/0/1.png`;
     }
+
+    // Check if team 1 is banning
+    const team1Banning = a[0].player_list.some(p => p.banning === true);
+    // Check if team 2 is banning
+    const team2Banning = a[1].player_list.some(p => p.banning === true);
+    // Check if team 1 is picking
+    const team1Picking = a[0].player_list.some(p => p.picking === true);
+    // Check if team 2 is picking
+    const team2Picking = a[1].player_list.some(p => p.picking === true);
+
+    // Normalize state and check phase
+    const _state = (data.data.state || "").toString().toLowerCase();
+    const isBanPhase = _state === "ban";
+    const isPickPhase = _state === "pick";
+
+    // left_banning - show active only during ban phase when team 1 is banning
+    responseData.left_banning = (isBanPhase && team1Banning) ? `C://data/draft/arrow2/1/1/1.png` : `C://data/draft/arrow2/1/1/0.png`;
+
+    // right_banning - show active only during ban phase when team 2 is banning
+    responseData.right_banning = (isBanPhase && team2Banning) ? `C://data/draft/arrow2/1/2/1.png` : `C://data/draft/arrow2/1/2/0.png`;
+
+    // left_picking - show active only during pick phase when team 1 is picking
+    responseData.left_picking = (isPickPhase && team1Picking) ? `C://data/draft/arrow2/2/1/1.png` : `C://data/draft/arrow2/2/1/0.png`;
+
+    // right_picking - show active only during pick phase when team 2 is picking
+    responseData.right_picking = (isPickPhase && team2Picking) ? `C://data/draft/arrow2/2/2/1.png` : `C://data/draft/arrow2/2/2/0.png`;
+
+    // last_change - 3/1/1.png if state is adjust, otherwise 3/1/0.png
+    responseData.last_change = _state === "adjust" ? `C://data/draft/arrow2/3/1/1.png` : `C://data/draft/arrow2/3/1/0.png`;
 
     //Banned1
     responseData.banning1 = 0;
