@@ -2154,7 +2154,7 @@ app.get("/mvp", (req, res) => {
 
       for (let i = 0; i < 3; i++) {
         responseData[`emblem${i + 1}`] = `${formData.mvpEmblemPath}${
-          mvpPlayer.rune_map[i + 1]
+          mvpPlayer.rune_map ? mvpPlayer.rune_map[i + 1] || 0 : 0
         }.png`;
       }
       //customemblem
