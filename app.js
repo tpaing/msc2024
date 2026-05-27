@@ -4716,6 +4716,34 @@ app.get("/item", (req, res) => {
             ? `${formData.spellPath}${team2[i].skillid}.png`
             : `${formData.spellPath}0.png`;
       }
+
+      //Team1 spell cooldowns
+      for (let i = 0; i < 5; i++) {
+        responseData[`spellCd${i + 1}`] =
+          team1[i] && team1[i].skill_left_time > 0
+            ? team1[i].skill_left_time
+            : "";
+      }
+
+      //Team2 spell cooldowns
+      for (let i = 0; i < 5; i++) {
+        responseData[`spellCd${i + 6}`] =
+          team2[i] && team2[i].skill_left_time > 0
+            ? team2[i].skill_left_time
+            : "";
+      }
+
+      //Team1 spell cover images
+      for (let i = 0; i < 5; i++) {
+        const spellCd1 = responseData[`spellCd${i + 1}`];
+        responseData[`spellCover${i + 1}`] = `C://data/item/spellcd/${spellCd1 ? 1 : 0}.png`;
+      }
+
+      //Team2 spell cover images
+      for (let i = 0; i < 5; i++) {
+        const spellCd2 = responseData[`spellCd${i + 6}`];
+        responseData[`spellCover${i + 6}`] = `C://data/item/spellcd/${spellCd2 ? 1 : 0}.png`;
+      }
       
       //heroes - ADD NULL CHECK
       responseData.hero1 = team1[0].heroid ? `${formData.itemHeroPath}${team1[0].heroid}.png` : `${formData.itemHeroPath}0.png`;
