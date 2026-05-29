@@ -1744,6 +1744,31 @@ app.get("/post-data", (req, res) => {
           `playerKDA${i + 6}`
         ] = `${team2[i].kill_num} / ${team2[i].dead_num} / ${team2[i].assist_num}`;
       }
+      //team1PlayerKP
+      for (let i = 0; i < 5; i++) {
+        const teamKillTotal = responseData.team1TotalKill || 0;
+        if (teamKillTotal === 0) {
+          responseData[`playerKP${i + 1}`] = "0%";
+          responseData[`kpPng${i + 1}`] = "C://data/result/kp/0.png";
+        } else {
+          const kp = ((team1[i].kill_num + team1[i].assist_num) / teamKillTotal) * 100;
+          responseData[`playerKP${i + 1}`] = `${kp.toFixed(0)}%`;
+          responseData[`kpPng${i + 1}`] = `C://data/result/kp/${kp.toFixed(0)}.png`;
+        }
+      }
+
+      //team2PlayerKP
+      for (let i = 0; i < 5; i++) {
+        const teamKillTotal = responseData.team2TotalKill || 0;
+        if (teamKillTotal === 0) {
+          responseData[`playerKP${i + 6}`] = "0%";
+          responseData[`kpPng${i + 6}`] = "C://data/result/kp/0.png";
+        } else {
+          const kp = ((team2[i].kill_num + team2[i].assist_num) / teamKillTotal) * 100;
+          responseData[`playerKP${i + 6}`] = `${kp.toFixed(0)}%`;
+          responseData[`kpPng${i + 6}`] = `C://data/result/kp/${kp.toFixed(0)}.png`;
+        }
+      }
       //team1PlayerGold
       for (let i = 0; i < 5; i++) {
         responseData[`playerGold${i + 1}`] = team1[i].total_money;
