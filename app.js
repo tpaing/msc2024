@@ -1236,7 +1236,8 @@ const heroNames = {
   129: "ZETIAN",
   130: "OBSIDIA",
   131: "SORA",
-  132: "MARCEL"
+  132: "MARCEL",
+  133: "HIRARA",
 };
 
 // app.get('/token', (req, res) => {
@@ -3435,7 +3436,7 @@ app.get("/draft", (req, res) => {
       responseData.arrow1 = `C://data/draft/arrow/0/1.png`;
     }
 
-    //team1Arrow
+    //team2Arrow
     if (
       a[1].player_list[0].picking == true ||
       a[1].player_list[0].banning == true
@@ -3465,6 +3466,7 @@ app.get("/draft", (req, res) => {
       responseData.arrow2 = `C://data/draft/arrow/0/1.png`;
     }
 
+
     // Check if team 1 is banning
     const team1Banning = a[0].player_list.some(p => p.banning === true);
     // Check if team 2 is banning
@@ -3478,6 +3480,19 @@ app.get("/draft", (req, res) => {
     const _state = (data.data.state || "").toString().toLowerCase();
     const isBanPhase = _state === "ban";
     const isPickPhase = _state === "pick";
+
+    //team status
+    responseData.team1Status = team1Picking
+      ? "PICKING"
+      : team1Banning
+      ? "BANNING"
+      : "";
+
+    responseData.team2Status = team2Picking
+      ? "PICKING"
+      : team2Banning
+      ? "BANNING"
+      : "";
 
     // left_banning - show active only during ban phase when team 1 is banning
     responseData.left_banning = (isBanPhase && team1Banning) ? `C://data/draft/arrow2/1/1/1.png` : `C://data/draft/arrow2/1/1/0.png`;
@@ -4136,17 +4151,17 @@ app.get("/draft", (req, res) => {
     }
 
     //Hero Image Sequence
-    responseData.sequence1 = `C://data/draft/hero/motion/${a[0].player_list[0].heroid}/${a[0].player_list[0].heroid}001.png` || 'heroid_error';
-    responseData.sequence2 = `C://data/draft/hero/motion/${a[0].player_list[1].heroid}/${a[0].player_list[1].heroid}001.png` || 'heroid_error';
-    responseData.sequence3 = `C://data/draft/hero/motion/${a[0].player_list[2].heroid}/${a[0].player_list[2].heroid}001.png` || 'heroid_error';
-    responseData.sequence4 = `C://data/draft/hero/motion/${a[0].player_list[3].heroid}/${a[0].player_list[3].heroid}001.png` || 'heroid_error';
-    responseData.sequence5 = `C://data/draft/hero/motion/${a[0].player_list[4].heroid}/${a[0].player_list[4].heroid}001.png` || 'heroid_error';
+    responseData.sequence1 = `C://data/draft/hero/motion/${a[0].player_list[0].heroid}/1.png` || 'heroid_error';
+    responseData.sequence2 = `C://data/draft/hero/motion/${a[0].player_list[1].heroid}/1.png` || 'heroid_error';
+    responseData.sequence3 = `C://data/draft/hero/motion/${a[0].player_list[2].heroid}/1.png` || 'heroid_error';
+    responseData.sequence4 = `C://data/draft/hero/motion/${a[0].player_list[3].heroid}/1.png` || 'heroid_error';
+    responseData.sequence5 = `C://data/draft/hero/motion/${a[0].player_list[4].heroid}/1.png` || 'heroid_error';
 
-    responseData.sequence6 = `C://data/draft/hero/motion/${a[1].player_list[0].heroid}/${a[1].player_list[0].heroid}001.png` || 'heroid_error';
-    responseData.sequence7 = `C://data/draft/hero/motion/${a[1].player_list[1].heroid}/${a[1].player_list[1].heroid}001.png` || 'heroid_error';
-    responseData.sequence8 = `C://data/draft/hero/motion/${a[1].player_list[2].heroid}/${a[1].player_list[2].heroid}001.png` || 'heroid_error';
-    responseData.sequence9 = `C://data/draft/hero/motion/${a[1].player_list[3].heroid}/${a[1].player_list[3].heroid}001.png` || 'heroid_error';
-    responseData.sequence10 = `C://data/draft/hero/motion/${a[1].player_list[4].heroid}/${a[1].player_list[4].heroid}001.png` || 'heroid_error';
+    responseData.sequence6 = `C://data/draft/hero/motion/${a[1].player_list[0].heroid}/1.png` || 'heroid_error';
+    responseData.sequence7 = `C://data/draft/hero/motion/${a[1].player_list[1].heroid}/1.png` || 'heroid_error';
+    responseData.sequence8 = `C://data/draft/hero/motion/${a[1].player_list[2].heroid}/1.png` || 'heroid_error';
+    responseData.sequence9 = `C://data/draft/hero/motion/${a[1].player_list[3].heroid}/1.png` || 'heroid_error';
+    responseData.sequence10 = `C://data/draft/hero/motion/${a[1].player_list[4].heroid}/1.png` || 'heroid_error';
 
     //---------------------------------------------------------------------------------------
     //picking with player animation
@@ -4782,6 +4797,19 @@ app.get("/item", (req, res) => {
       responseData.hero8 = team2[2].heroid ? `${formData.itemHeroPath}${team2[2].heroid}.png` : `${formData.itemHeroPath}0.png`;
       responseData.hero9 = team2[3].heroid ? `${formData.itemHeroPath}${team2[3].heroid}.png` : `${formData.itemHeroPath}0.png`;
       responseData.hero10 = team2[4].heroid ? `${formData.itemHeroPath}${team2[4].heroid}.png` : `${formData.itemHeroPath}0.png`;
+
+      //emblem heroes
+      responseData.emblemHero1 = team1[0].heroid ? `C://data/emblem/hero/${team1[0].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero2 = team1[1].heroid ? `C://data/emblem/hero/${team1[1].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero3 = team1[2].heroid ? `C://data/emblem/hero/${team1[2].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero4 = team1[3].heroid ? `C://data/emblem/hero/${team1[3].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero5 = team1[4].heroid ? `C://data/emblem/hero/${team1[4].heroid}.png` : `C://data/emblem/hero/0.png`;
+
+      responseData.emblemHero6 = team2[0].heroid ? `C://data/emblem/hero/${team2[0].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero7 = team2[1].heroid ? `C://data/emblem/hero/${team2[1].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero8 = team2[2].heroid ? `C://data/emblem/hero/${team2[2].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero9 = team2[3].heroid ? `C://data/emblem/hero/${team2[3].heroid}.png` : `C://data/emblem/hero/0.png`;
+      responseData.emblemHero10 = team2[4].heroid ? `C://data/emblem/hero/${team2[4].heroid}.png` : `C://data/emblem/hero/0.png`;
 
       //Emb roles
       responseData.rolePng1 = `C://data/emblem/role/${role_finder(team1[0].roleid, playerList)}.png`
