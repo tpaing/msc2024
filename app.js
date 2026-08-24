@@ -2281,9 +2281,48 @@ app.get("/explvl", (req, res) => {
             level: player.level,
             levelText: `LV.${player.level}`,
             hero: `C://data/exp/hero/${player.heroid}.png`,
+            exp: player.exp,
           };
         });
-      players.sort((a, b) => b.level - a.level);
+
+      try {
+        // sort high to low by exp (fallback to level if exp missing)
+        players.sort((a, b) => {
+          const ae = typeof a.exp === "number" && !isNaN(a.exp) ? a.exp : (a.level || 0);
+          const be = typeof b.exp === "number" && !isNaN(b.exp) ? b.exp : (b.level || 0);
+          return be - ae;
+        });
+
+        const expValues = players
+          .map((p) => p.exp)
+          .filter((e) => typeof e === "number" && !isNaN(e) && isFinite(e));
+        const maxExp = expValues.length ? Math.max(...expValues) : 0;
+
+        players.forEach((p) => {
+          try {
+            if (
+              !maxExp ||
+              typeof p.exp !== "number" ||
+              isNaN(p.exp) ||
+              !isFinite(p.exp)
+            ) {
+              p.expPng = `C://data/exp/bar/0.png`;
+              return;
+            }
+            let pct = Math.round((p.exp / maxExp) * 100 / 4) * 4;
+            if (isNaN(pct) || !isFinite(pct)) pct = 0;
+            pct = Math.min(100, Math.max(0, pct));
+            p.expPng = `C://data/exp/bar/${pct}.png`;
+          } catch (innerErr) {
+            p.expPng = `C://data/exp/bar/0.png`;
+          }
+        });
+      } catch (rankErr) {
+        players.forEach((p) => {
+          p.expPng = `C://data/exp/bar/0.png`;
+        });
+      }
+
       res.send(players);
     } catch (e) {
       return res.status(500).send(e);
@@ -5254,6 +5293,65 @@ app.get("/inGameOverlay", (req, res) => {
     responseData.game_time = data.data.game_time;
     responseData.win_camp = data.data.win_camp;
 
+    // helper: hp bar path based on % of max hp
+    function getHpBar(player) {
+      try {
+        // Dead players always show an empty bar, regardless of stale HP values
+        if (player.dead) {
+          return `C://data/ingame/bar/3/0.png`;
+        }
+
+        const cur = player.cur_health_point;
+        const max = player.max_health_point;
+        if (
+          typeof cur !== "number" ||
+          typeof max !== "number" ||
+          isNaN(cur) ||
+          isNaN(max) ||
+          !isFinite(cur) ||
+          !isFinite(max) ||
+          max <= 0
+        ) {
+          return `C://data/ingame/bar/3/0.png`;
+        }
+
+        // Also treat 0/negative current HP as dead/empty, even if the
+        // "dead" flag hasn't been set yet by the API
+        if (cur <= 0) {
+          return `C://data/ingame/bar/3/0.png`;
+        }
+
+        let pct = Math.round((cur / max) * 100);
+        pct = Math.min(100, Math.max(0, pct));
+        let folder;
+        if (pct >= 80) folder = 1;
+        else if (pct >= 20) folder = 2;
+        else folder = 3;
+        return `C://data/ingame/bar/${folder}/${pct}.png`;
+      } catch (e) {
+        return `C://data/ingame/bar/3/0.png`;
+      }
+    }
+
+    // helper: ult ready path
+    function getUltReady(player) {
+      try {
+        const majorLeft = player.major_left_time;
+        if (
+          typeof majorLeft !== "number" ||
+          isNaN(majorLeft) ||
+          !isFinite(majorLeft)
+        ) {
+          return `C://data/ingame/ult/0.png`;
+        }
+        return majorLeft <= 0
+          ? `C://data/ingame/ult/1.png`
+          : `C://data/ingame/ult/0.png`;
+      } catch (e) {
+        return `C://data/ingame/ult/0.png`;
+      }
+    }
+
     // Team 1 Players (1-5)
     for (let i = 0; i < 5; i++) {
       const playerNum = i + 1;
@@ -5300,7 +5398,7 @@ app.get("/inGameOverlay", (req, res) => {
 
         // Spell overlay (0 if countdown > 0, else 1)
         const countdown = player.skill_left_time || 0;
-        responseData[`SpellOverlay${playerNum}`] = countdown > 0 
+        responseData[`SpellOverlay${playerNum}`] = countdown > 0
           ? `C://data/ingame/spell/overlay/0.png`
           : `C://data/ingame/spell/overlay/1.png`;
 
@@ -5318,6 +5416,12 @@ app.get("/inGameOverlay", (req, res) => {
 
         // Level
         responseData[`Level${playerNum}`] = player.level || 1;
+
+        // HP bar
+        responseData[`hpBar${playerNum}`] = getHpBar(player);
+
+        // Ult ready
+        responseData[`ultReady${playerNum}`] = getUltReady(player);
       } else {
         // Default values for missing players
         responseData[`hero${playerNum}`] = `C://data/ingame/hero/0.png`;
@@ -5335,6 +5439,8 @@ app.get("/inGameOverlay", (req, res) => {
         responseData[`IsAlive${playerNum}`] =
           "C://data/ingame/overlay/1.png";
         responseData[`Level${playerNum}`] = 1;
+        responseData[`hpBar${playerNum}`] = `C://data/ingame/bar/3/0.png`;
+        responseData[`ultReady${playerNum}`] = `C://data/ingame/ult/0.png`;
       }
     }
 
@@ -5375,7 +5481,7 @@ app.get("/inGameOverlay", (req, res) => {
 
         // Spell overlay (0 if countdown > 0, else 1)
         const countdown = player.skill_left_time || 0;
-        responseData[`SpellOverlay${playerNum}`] = countdown > 0 
+        responseData[`SpellOverlay${playerNum}`] = countdown > 0
           ? `C://data/ingame/spell/overlay/0.png`
           : `C://data/ingame/spell/overlay/1.png`;
 
@@ -5402,6 +5508,12 @@ app.get("/inGameOverlay", (req, res) => {
 
         // Level
         responseData[`Level${playerNum}`] = player.level || 1;
+
+        // HP bar
+        responseData[`hpBar${playerNum}`] = getHpBar(player);
+
+        // Ult ready
+        responseData[`ultReady${playerNum}`] = getUltReady(player);
       } else {
         // Default values for missing players
         responseData[`hero${playerNum}`] = `C://data/ingame/hero/0.png`;
@@ -5419,6 +5531,8 @@ app.get("/inGameOverlay", (req, res) => {
         responseData[`IsAlive${playerNum}`] =
           "C://data/ingame/overlay/1.png";
         responseData[`Level${playerNum}`] = 1;
+        responseData[`hpBar${playerNum}`] = `C://data/ingame/bar/3/0.png`;
+        responseData[`ultReady${playerNum}`] = `C://data/ingame/ult/0.png`;
       }
     }
 
