@@ -3320,7 +3320,7 @@ app.get("/draft", (req, res) => {
       `C://data/draft/player2/${a[0]?.player_list[4]?.picking || a[0]?.player_list[4].banning ? a[0].player_list[4].roleid : 0}.png` || "";
 
     responseData.x2player6Pic = 
-      `C://data/draft/player2/${a[1]?.player_list[0]?.picking || a[0]?.player_list[0].banning ? a[1].player_list[0].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[1]?.player_list[0]?.picking || a[1]?.player_list[0].banning ? a[1].player_list[0].roleid : 0}.png` || "";
     responseData.x2player7Pic = 
       `C://data/draft/player2/${a[1]?.player_list[1]?.picking || a[1]?.player_list[1].banning ? a[1].player_list[1].roleid : 0}.png` || "";
     responseData.x2player8Pic = 
