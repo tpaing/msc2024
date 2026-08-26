@@ -3232,51 +3232,103 @@ app.get("/draft", (req, res) => {
       a[1].player_list[4].name;
 
     //pics
+    
+    //check banning as well
+
     responseData.player1Pic =
-      `C://data/draft/player/${a[0]?.player_list[0]?.picking ? a[0].player_list[0].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[0]?.player_list[0]?.picking || a[0]?.player_list[0]?.banning ? a[0].player_list[0].roleid : 0}.png` || "";
     responseData.player2Pic =
-      `C://data/draft/player/${a[0]?.player_list[1]?.picking ? a[0].player_list[1].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[0]?.player_list[1]?.picking || a[0]?.player_list[1]?.banning ? a[0].player_list[1].roleid : 0}.png` || "";
     responseData.player3Pic =
-      `C://data/draft/player/${a[0]?.player_list[2]?.picking ? a[0].player_list[2].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[0]?.player_list[2]?.picking || a[0]?.player_list[2]?.banning ? a[0].player_list[2].roleid : 0}.png` || "";
     responseData.player4Pic =
-      `C://data/draft/player/${a[0]?.player_list[3]?.picking ? a[0].player_list[3].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[0]?.player_list[3]?.picking || a[0]?.player_list[3]?.banning ? a[0].player_list[3].roleid : 0}.png` || "";
     responseData.player5Pic =
-      `C://data/draft/player/${a[0]?.player_list[4]?.picking ? a[0].player_list[4].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[0]?.player_list[4]?.picking || a[0]?.player_list[4]?.banning ? a[0].player_list[4].roleid : 0}.png` || "";
 
     responseData.player6Pic =
-      `C://data/draft/player/${a[1]?.player_list[0]?.picking ? a[1].player_list[0].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[1]?.player_list[0]?.picking || a[1]?.player_list[0]?.banning ? a[1].player_list[0].roleid : 0}.png` || "";
     responseData.player7Pic =
-      `C://data/draft/player/${a[1]?.player_list[1]?.picking ? a[1].player_list[1].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[1]?.player_list[1]?.picking || a[1]?.player_list[1]?.banning ? a[1].player_list[1].roleid : 0}.png` || "";
     responseData.player8Pic =
-      `C://data/draft/player/${a[1]?.player_list[2]?.picking ? a[1].player_list[2].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[1]?.player_list[2]?.picking || a[1]?.player_list[2]?.banning ? a[1].player_list[2].roleid : 0}.png` || "";
     responseData.player9Pic =
-      `C://data/draft/player/${a[1]?.player_list[3]?.picking ? a[1].player_list[3].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[1]?.player_list[3]?.picking || a[1]?.player_list[3]?.banning ? a[1].player_list[3].roleid : 0}.png` || "";
     responseData.player10Pic =
-      `C://data/draft/player/${a[1]?.player_list[4]?.picking ? a[1].player_list[4].roleid : 0}.png` || "";
+      `C://data/draft/player/${a[1]?.player_list[4]?.picking || a[1]?.player_list[4]?.banning ? a[1].player_list[4].roleid : 0}.png` || "";
+
+
+    // old
+    // responseData.player1Pic =
+    //   `C://data/draft/player/${a[0]?.player_list[0]?.picking ? a[0].player_list[0].roleid : 0}.png` || "";
+    // responseData.player2Pic =
+    //   `C://data/draft/player/${a[0]?.player_list[1]?.picking ? a[0].player_list[1].roleid : 0}.png` || "";
+    // responseData.player3Pic =
+    //   `C://data/draft/player/${a[0]?.player_list[2]?.picking ? a[0].player_list[2].roleid : 0}.png` || "";
+    // responseData.player4Pic =
+    //   `C://data/draft/player/${a[0]?.player_list[3]?.picking ? a[0].player_list[3].roleid : 0}.png` || "";
+    // responseData.player5Pic =
+    //   `C://data/draft/player/${a[0]?.player_list[4]?.picking ? a[0].player_list[4].roleid : 0}.png` || "";
+
+    // responseData.player6Pic =
+    //   `C://data/draft/player/${a[1]?.player_list[0]?.picking ? a[1].player_list[0].roleid : 0}.png` || "";
+    // responseData.player7Pic =
+    //   `C://data/draft/player/${a[1]?.player_list[1]?.picking ? a[1].player_list[1].roleid : 0}.png` || "";
+    // responseData.player8Pic =
+    //   `C://data/draft/player/${a[1]?.player_list[2]?.picking ? a[1].player_list[2].roleid : 0}.png` || "";
+    // responseData.player9Pic =
+    //   `C://data/draft/player/${a[1]?.player_list[3]?.picking ? a[1].player_list[3].roleid : 0}.png` || "";
+    // responseData.player10Pic =
+    //   `C://data/draft/player/${a[1]?.player_list[4]?.picking ? a[1].player_list[4].roleid : 0}.png` || "";
 
     //0if not picking
     //pics - original 10 players
+    //old
+    // responseData.x2player1Pic = 
+    //   `C://data/draft/player2/${a[0]?.player_list[0]?.picking ? a[0].player_list[0].roleid : 0}.png` || "";
+    // responseData.x2player2Pic = 
+    //   `C://data/draft/player2/${a[0]?.player_list[1]?.picking ? a[0].player_list[1].roleid : 0}.png` || "";
+    // responseData.x2player3Pic = 
+    //   `C://data/draft/player2/${a[0]?.player_list[2]?.picking ? a[0].player_list[2].roleid : 0}.png` || "";
+    // responseData.x2player4Pic = 
+    //   `C://data/draft/player2/${a[0]?.player_list[3]?.picking ? a[0].player_list[3].roleid : 0}.png` || "";
+    // responseData.x2player5Pic = 
+    //   `C://data/draft/player2/${a[0]?.player_list[4]?.picking ? a[0].player_list[4].roleid : 0}.png` || "";
+
+    // responseData.x2player6Pic = 
+    //   `C://data/draft/player2/${a[1]?.player_list[0]?.picking ? a[1].player_list[0].roleid : 0}.png` || "";
+    // responseData.x2player7Pic = 
+    //   `C://data/draft/player2/${a[1]?.player_list[1]?.picking ? a[1].player_list[1].roleid : 0}.png` || "";
+    // responseData.x2player8Pic = 
+    //   `C://data/draft/player2/${a[1]?.player_list[2]?.picking ? a[1].player_list[2].roleid : 0}.png` || "";
+    // responseData.x2player9Pic = 
+    //   `C://data/draft/player2/${a[1]?.player_list[3]?.picking ? a[1].player_list[3].roleid : 0}.png` || "";
+    // responseData.x2player10Pic = 
+    //   `C://data/draft/player2/${a[1]?.player_list[4]?.picking ? a[1].player_list[4].roleid : 0}.png` || "";
+
+    //check if banning
+    //new
     responseData.x2player1Pic = 
-      `C://data/draft/player2/${a[0]?.player_list[0]?.picking ? a[0].player_list[0].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[0]?.player_list[0]?.picking || a[0]?.player_list[0].banning ? a[0].player_list[0].roleid : 0}.png` || "";
     responseData.x2player2Pic = 
-      `C://data/draft/player2/${a[0]?.player_list[1]?.picking ? a[0].player_list[1].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[0]?.player_list[1]?.picking || a[0]?.player_list[1].banning ? a[0].player_list[1].roleid : 0}.png` || "";
     responseData.x2player3Pic = 
-      `C://data/draft/player2/${a[0]?.player_list[2]?.picking ? a[0].player_list[2].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[0]?.player_list[2]?.picking || a[0]?.player_list[2].banning ? a[0].player_list[2].roleid : 0}.png` || "";
     responseData.x2player4Pic = 
-      `C://data/draft/player2/${a[0]?.player_list[3]?.picking ? a[0].player_list[3].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[0]?.player_list[3]?.picking || a[0]?.player_list[3].banning ? a[0].player_list[3].roleid : 0}.png` || "";
     responseData.x2player5Pic = 
-      `C://data/draft/player2/${a[0]?.player_list[4]?.picking ? a[0].player_list[4].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[0]?.player_list[4]?.picking || a[0]?.player_list[4].banning ? a[0].player_list[4].roleid : 0}.png` || "";
 
     responseData.x2player6Pic = 
-      `C://data/draft/player2/${a[1]?.player_list[0]?.picking ? a[1].player_list[0].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[1]?.player_list[0]?.picking || a[0]?.player_list[0].banning ? a[1].player_list[0].roleid : 0}.png` || "";
     responseData.x2player7Pic = 
-      `C://data/draft/player2/${a[1]?.player_list[1]?.picking ? a[1].player_list[1].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[1]?.player_list[1]?.picking || a[1]?.player_list[1].banning ? a[1].player_list[1].roleid : 0}.png` || "";
     responseData.x2player8Pic = 
-      `C://data/draft/player2/${a[1]?.player_list[2]?.picking ? a[1].player_list[2].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[1]?.player_list[2]?.picking || a[1]?.player_list[2].banning ? a[1].player_list[2].roleid : 0}.png` || "";
     responseData.x2player9Pic = 
-      `C://data/draft/player2/${a[1]?.player_list[3]?.picking ? a[1].player_list[3].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[1]?.player_list[3]?.picking || a[1]?.player_list[3].banning ? a[1].player_list[3].roleid : 0}.png` || "";
     responseData.x2player10Pic = 
-      `C://data/draft/player2/${a[1]?.player_list[4]?.picking ? a[1].player_list[4].roleid : 0}.png` || "";
+      `C://data/draft/player2/${a[1]?.player_list[4]?.picking || a[1]?.player_list[4].banning ? a[1].player_list[4].roleid : 0}.png` || "";
 
     //playerX2Location
     responseData.x2playerPng1 =
