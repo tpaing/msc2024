@@ -2074,6 +2074,11 @@ app.get("/post-data", (req, res) => {
         hightestGoldPlayer.name;
       responseData.hightestGoldPlayerPic = `${formData.hightest}${hightestGoldPlayer.roleid}.png`;
       responseData.hightestGold = hightestGoldPlayer.min_money;
+
+      responseData.Result4heroPngGold = `C://data/result4/hero/${hightestGoldPlayer.heroid}.png`;
+      responseData.Result4roleGold = `C://data/result4/role/${hightestGoldPlayer.c_role}.png`;
+      responseData.Result4spellGold = `C://data/result4/${hightestGoldPlayer.skillid}.png`;
+
       //damage
       responseData.hightestDamagePlayer =
         name_finder(hightestDamagePlayer.roleid, playerList) ||
@@ -2081,6 +2086,10 @@ app.get("/post-data", (req, res) => {
       responseData.hightestDamagePlayerPic = `${formData.hightest}${hightestDamagePlayer.roleid}.png`;
       responseData.hightestDamage =
         hightestDamagePlayer.total_damage.toLocaleString();
+
+      responseData.Result4heroPngDamage = `C://data/result4/hero/${hightestDamagePlayer.heroid}.png`;
+      responseData.Result4roleDamage = `C://data/result4/role/${hightestDamagePlayer.c_role}.png`;
+      responseData.Result4spellDamage = `C://data/result4/${hightestDamagePlayer.skillid}.png`;
       //damageTaken
       responseData.hightestDamageTakenPlayer =
         name_finder(hightestDamageTaken.roleid, playerList) ||
@@ -2088,11 +2097,20 @@ app.get("/post-data", (req, res) => {
       responseData.hightestDamageTakenPlayerPic = `${formData.hightest}${hightestDamageTaken.roleid}.png`;
       responseData.hightestDamageTaken =
         hightestDamageTaken.total_hurt.toLocaleString();
+
+      responseData.Result4heroPngDamageTaken = `C://data/result4/hero/${hightestDamageTaken.heroid}.png`;
+      responseData.Result4roleDamageTaken = `C://data/result4/role/${hightestDamageTaken.c_role}.png`;
+      responseData.Result4spellDamageTaken = `C://data/result4/${hightestDamageTaken.skillid}.png`;
+
       //mostAssist
       responseData.hightestAssistPlayer =
         name_finder(hightestAssist.roleid, playerList) || hightestAssist.name;
       responseData.hightestAssistPlayerPic = `${formData.hightest}${hightestAssist.roleid}.png`;
       responseData.hightestAssist = hightestAssist.assist_num;
+
+      responseData.Result4heroPngAssist = `C://data/result4/hero/${hightestAssist.heroid}.png`;
+      responseData.Result4roleAssist = `C://data/result4/role/${hightestAssist.c_role}.png`;
+      responseData.Result4spellAssist = `C://data/result4/${hightestAssist.skillid}.png`;
 
       let jsonData = { data: [responseData] };
       res.send(jsonData);
