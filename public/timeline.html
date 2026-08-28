@@ -75,7 +75,7 @@
 
                         let diff = expectedTime - video.value.currentTime;
 
-                        // 🔥 Only Adjust Forward & Smooth 🔥
+               
                         if (diff > 0.3) {
                             video.value.currentTime = expectedTime; // Hard correct if lagging behind too much
                         } else if (diff > 0.05) {
