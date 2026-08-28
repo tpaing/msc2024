@@ -2221,6 +2221,7 @@ app.get("/mvp", (req, res) => {
           100
         ).toFixed(0)}%` || "55%";
       responseData.level = mvpPlayer.level;
+      responseData.damage = mvpPlayer.total_damage.toLocaleString();
       let jsonData = { data: [responseData] };
       res.send(jsonData);
     } catch (e) {
