@@ -2192,6 +2192,7 @@ app.get("/mvp", (req, res) => {
       responseData.mvpPlayerName =
         name_finder(mvpPlayer.roleid, playerList) || mvpPlayer.name;
       responseData.mvpPlayerPic = `${formData.mvpPlayerPath}${mvpPlayer.roleid}.png`;
+      responseData.mvpPlayerPic2 = `C://data/mvp/player2/${mvpPlayer.roleid}.png`;
       responseData.heroName = heroNames[mvpPlayer.heroid];
       responseData.heroPic = `${formData.mvpHeroPath}${mvpPlayer.heroid}.png`;
       responseData.BattleSpell = `${formData.mvpPlayerSpellPath}${mvpPlayer.skillid}.png`;
