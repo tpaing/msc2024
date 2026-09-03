@@ -4809,17 +4809,17 @@ app.get("/item", (req, res) => {
       responseData.level10 = team2[4].level
 
       //isLvl4 (per player) — 0 for level 1-3, 1 for level 4-15
-      responseData.isLvl4_1 = team1[0].level >= 4 ? 1 : 0;
-      responseData.isLvl4_2 = team1[1].level >= 4 ? 1 : 0;
-      responseData.isLvl4_3 = team1[2].level >= 4 ? 1 : 0;
-      responseData.isLvl4_4 = team1[3].level >= 4 ? 1 : 0;
-      responseData.isLvl4_5 = team1[4].level >= 4 ? 1 : 0;
+      responseData.isLvl4_1 = team1[0].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_2 = team1[1].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_3 = team1[2].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_4 = team1[3].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_5 = team1[4].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
 
-      responseData.isLvl4_6 = team2[0].level >= 4 ? 1 : 0;
-      responseData.isLvl4_7 = team2[1].level >= 4 ? 1 : 0;
-      responseData.isLvl4_8 = team2[2].level >= 4 ? 1 : 0;
-      responseData.isLvl4_9 = team2[3].level >= 4 ? 1 : 0;
-      responseData.isLvl4_10 = team2[4].level >= 4 ? 1 : 0;
+      responseData.isLvl4_6 = team2[0].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_7 = team2[1].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_8 = team2[2].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_9 = team2[3].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
+      responseData.isLvl4_10 = team2[4].level >= 4 ? `C://data/lvl4/1.png` : `C://data/lvl4/0.png`;
 
       //goldshort
       responseData.goldShort1 =
