@@ -21,6 +21,13 @@ let displayGameTime = 0; // Initialize local game time
 let lastApiSyncTime = 0; // Track the last API game time for sync reference
 let gameState = ""; // Track game state
 
+const firstItemTracker = {}; // { "battleid_roleid": itemid }
+let lastBattleId = null;
+
+const validFirstItems = [
+  3203, 3007
+];
+
 // Function to fetch API game time and sync local game time
 const syncGameTime = async () => {
   const battleData =
@@ -4576,7 +4583,60 @@ app.get("/item", (req, res) => {
       let team1 = role_sorter(a[0].player_list, playerList);
       let team2 = role_sorter(a[1].player_list, playerList);
       
-      //
+      //first item
+       const battleId = data.data.battleid;
+
+      if (lastBattleId !== null && lastBattleId !== battleId) {
+        for (const key in firstItemTracker) {
+          delete firstItemTracker[key];
+        }
+      }
+      lastBattleId = battleId;
+
+      const getFirstItem = (player) => {
+        const key = `${battleId}_${player.roleid}`;
+        if (!firstItemTracker[key] && player.equip_list) {
+          const match = player.equip_list.find(itemId => validFirstItems.includes(itemId));
+          if (match) {
+            firstItemTracker[key] = match;
+          }
+        }
+        return firstItemTracker[key] || null;
+      };
+
+      const safeFirstItem = (player, offset) => {
+        try {
+          const firstItemId = getFirstItem(player);
+          responseData[`firstitem${offset}`] = firstItemId
+            ? `C://data/item/firstItem/${firstItemId}.png`
+            : `C://data/item/firstItem/0.png`;
+          responseData[`firstitemTrigger${offset}`] = firstItemId ? 1 : 0;
+          responseData[`firstitemName${offset}`] =
+            (player && (name_finder(player.roleid, playerList) || player.name)) || "";
+          responseData[`firstitemRole${offset}`] =
+            (player && role_finder(player.roleid, playerList)) || "";
+          responseData[`firstitemRolePng${offset}`] =
+            `C://data/item/firstitem/${(player && role_finder(player.roleid, playerList)) || "0"}.png`;
+        } catch (e) {
+          console.error(`Error building firstitem for offset ${offset}:`, e);
+          responseData[`firstitem${offset}`] = `C://data/item/firstItem/0.png`;
+          responseData[`firstitemTrigger${offset}`] = 0;
+          responseData[`firstitemName${offset}`] = "";
+          responseData[`firstitemRole${offset}`] = "";
+          responseData[`firstitemRolePng${offset}`] = `C://data/item/firstitem/0.png`;
+        }
+      };
+
+      // Team 1 -> 1 to 5
+      for (let i = 0; i < 5; i++) {
+        safeFirstItem(team1[i], i + 1);
+      }
+
+      // Team 2 -> 6 to 10
+      for (let i = 0; i < 5; i++) {
+        safeFirstItem(team2[i], i + 6);
+      }
+
       //playerNames
       responseData.SLplayerName1 =
         name_finder(team1[0].roleid, playerList) || team1[0].name;
