@@ -25,7 +25,7 @@ const firstItemTracker = {}; // { "battleid_roleid": itemid }
 let lastBattleId = null;
 
 const validFirstItems = [
-  3203, 3007
+  2006, 2008, 2009, 2011, 2013, 2014, 2106, 2107, 2108, 2112, 2207, 2208, 2212, 3001, 3002, 3003, 3004, 3005, 3007, 3008, 3009, 3012, 3013, 3014, 3015, 3101, 3102, 3103, 3104, 3105, 3106, 3108, 3109, 3110, 3111, 3112, 3113, 3201, 3202, 3203, 3204, 3205, 3206, 3207, 3208, 3209, 3210
 ];
 
 // Function to fetch API game time and sync local game time
