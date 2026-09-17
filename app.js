@@ -31,7 +31,7 @@ const validFirstItems = [
 
 //=== TRINITY ITEM TRACKING ===
 const ownedItemsTracker = {}; // { "battleid_roleid": Set of item ids ever equipped }
-const trinityItems = [2013, 3203, 3204]; // <- your actual 3 required item IDs
+const trinityItems = [2008, 2009, 2006]; // <- your actual 3 required item IDs
 
 // Module-level - must be outside/above the route handler
 const ultState = {}; // roleid -> { peak, startTime, lastLeft }
