@@ -15,6 +15,7 @@ app.use(express.static(path.join(__dirname, "public")));
 let playerList;
 let formData;
 let id;
+let draftLastBattleId;
 let token;
 
 let displayGameTime = 0; // Initialize local game time
@@ -27,6 +28,14 @@ let lastBattleId = null;
 const validFirstItems = [
   2006, 2008, 2009, 2011, 2013, 2014, 2106, 2107, 2108, 2112, 2207, 2208, 2212, 3001, 3002, 3003, 3004, 3005, 3007, 3008, 3009, 3012, 3013, 3014, 3015, 3101, 3102, 3103, 3104, 3105, 3106, 3108, 3109, 3110, 3111, 3112, 3113, 3201, 3202, 3203, 3204, 3205, 3206, 3207, 3208, 3209, 3210
 ];
+
+//=== TRINITY ITEM TRACKING ===
+const ownedItemsTracker = {}; // { "battleid_roleid": Set of item ids ever equipped }
+const trinityItems = [2013, 3203, 3204]; // <- your actual 3 required item IDs
+
+// Module-level - must be outside/above the route handler
+const ultState = {}; // roleid -> { peak, startTime, lastLeft }
+
 
 // Function to fetch API game time and sync local game time
 const syncGameTime = async () => {
@@ -105,6 +114,7 @@ function readAndUpdateGlobalVariables() {
         playerList = JSON.parse(playerListData);
         formData = JSON.parse(pathData);
         id = formData.battleid;
+        draftLastBattleId = formData.draftLastBattleId;
         token = JSON.parse(passData).token;
 
         // // You can now use these global variables anywhere in your script
@@ -2654,6 +2664,28 @@ app.get("/hud", async (req, res) => {
     // Enhanced event processing with comprehensive error handling
     const eventList = data.incre_event_list || [];
 
+    //kill or steal
+    const bossKillEvents = safeEventFilter(
+      eventList,
+      (e) => e?.event_type === "kill_boss",
+      "boss kill"
+    );
+
+    try {
+      if (bossKillEvents.length > 0) {
+        const lastBossKill = bossKillEvents[bossKillEvents.length - 1];
+        const stolen = Array.isArray(lastBossKill.extra_param)
+          ? lastBossKill.extra_param.includes("steal")
+          : lastBossKill.extra_param === "steal";
+        responseData.kill_or_steal = stolen ? "Steal" : "Kill";
+      } else {
+        responseData.kill_or_steal = "";
+      }
+    } catch (error) {
+      console.error('Error setting kill_or_steal:', error);
+      responseData.kill_or_steal = "";
+    }
+
     // Helper function to safely filter events
     function safeEventFilter(eventList, filterFunction, eventType = "unknown") {
       try {
@@ -3187,6 +3219,18 @@ app.get("/draft", (req, res) => {
     let a = data.data.camp_list;
     let team1 = a[0].player_list;
     let team2 = a[1].player_list;
+
+    const mapNames = {
+      1: "Broken Walls",
+      2: "Dangerous Grass",
+      3: "Flying Cloud",
+      4: "Expanding Rivers",
+    };
+
+    const playmodeid = data.data.play_mode_id;
+    responseData.map = `C://data/draft/map/${playmodeid}.png`;
+    responseData.mapName = mapNames[playmodeid] || "";
+
     // let team1 = role_sorter(a[0].player_list, playerList);
     // let team2 = role_sorter(a[1].player_list, playerList);
     // const team1 = role_sorter(a[0].player_list, playerList)
@@ -4514,6 +4558,142 @@ app.get("/draft", (req, res) => {
   });
 });
 
+//const { currentMatchId, lastMatchId } = req.query;
+//=== DRAFT RECAP ROUTE ===
+app.get("/draftRecap", (req, res) => {
+  const currentMatchId = id;
+  const lastMatchId = draftLastBattleId;
+
+  if (!currentMatchId || !lastMatchId) {
+    return res.status(400).send("Missing currentMatchId or lastMatchId");
+  }
+
+  const fetchBattle = (battleId) => {
+    return new Promise((resolve, reject) => {
+      const url =
+        "http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
+        battleId +
+        "&dataid=1";
+      request({ url, json: true }, (error, response, body) => {
+        if (error) return reject(error);
+        resolve(body);
+      });
+    });
+  };
+
+  const getTeamPicks = (campData) => {
+    return (campData.player_list || [])
+      .filter(p => p.heroid && p.heroid !== 0)
+      .slice()
+      .sort((a, b) => a.pos - b.pos)
+      .map(p => p.heroid);
+  };
+
+  const getAllBans = (battle) => {
+    let bans = [];
+    (battle.data.camp_list || []).forEach(camp => {
+      if (camp.ban_hero_list) bans = bans.concat(camp.ban_hero_list);
+    });
+    return bans;
+  };
+
+  const statusImg = (status, folder) =>
+    status ? `C://data/draftrecap/${folder}/${status.toLowerCase()}.png`
+           : `C://data/draftrecap/${folder}/0.png`;
+
+  Promise.all([fetchBattle(lastMatchId), fetchBattle(currentMatchId)])
+    .then(([lastData, currentData]) => {
+      try {
+        const responseData = {};
+
+        const lastCamps = (lastData.data.camp_list || []).filter(c => c.campid === 1 || c.campid === 2);
+        const currentCamps = (currentData.data.camp_list || []).filter(c => c.campid === 1 || c.campid === 2);
+        const currentBans = getAllBans(currentData);
+
+        //=== PICK RECAP (stolen / repicked / banned) ===
+        const buildTeamRecap = (lastCamp, offsetStart) => {
+          const lastPicks = getTeamPicks(lastCamp);
+          const sameTeamCurrentCamp = currentCamps.find(c => c.team_id === lastCamp.team_id);
+          const currentTeamPicks = sameTeamCurrentCamp ? getTeamPicks(sameTeamCurrentCamp) : [];
+          const otherTeamPicks = currentCamps
+            .filter(c => c.team_id !== lastCamp.team_id)
+            .flatMap(getTeamPicks);
+
+          for (let i = 0; i < 5; i++) {
+            const offset = offsetStart + i;
+            try {
+              const heroId = lastPicks[i];
+              if (!heroId) {
+                responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/0.png`;
+                responseData[`draftStatus${offset}`] = statusImg(null, "status");
+                continue;
+              }
+
+              responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/${heroId}.png`;
+
+              let status = null;
+              if (currentTeamPicks.includes(heroId)) status = "REPICKED";
+              else if (otherTeamPicks.includes(heroId)) status = "STOLEN";
+              else if (currentBans.includes(heroId)) status = "BANNED";
+
+              responseData[`draftStatus${offset}`] = statusImg(status, "status");
+            } catch (e) {
+              console.error(`Error building draft recap offset ${offset}:`, e);
+              responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/0.png`;
+              responseData[`draftStatus${offset}`] = statusImg(null, "status");
+            }
+          }
+        };
+
+        //=== BAN HERO RECAP (0 = nothing, picked = banned hero got picked, banned = banned again) ===
+        const buildBanRecap = (lastCamp, offsetStart) => {
+          const lastBans = (lastCamp.ban_hero_list || []).slice(0, 5);
+          const currentAllPicks = currentCamps.flatMap(getTeamPicks);
+
+          for (let i = 0; i < 5; i++) {
+            const offset = offsetStart + i;
+            try {
+              const heroId = lastBans[i];
+              if (!heroId) {
+                responseData[`banHero${offset}`] = `C://data/draftrecap/banhero/0.png`;
+                responseData[`banHeroStatus${offset}`] = statusImg(null, "banstatus");
+                continue;
+              }
+
+              responseData[`banHero${offset}`] = `C://data/draftrecap/banhero/${heroId}.png`;
+
+              let status = null;
+              if (currentAllPicks.includes(heroId)) status = "PICKED";
+              else if (currentBans.includes(heroId)) status = "BANNED";
+
+              responseData[`banHeroStatus${offset}`] = statusImg(status, "banstatus");
+            } catch (e) {
+              console.error(`Error building ban recap offset ${offset}:`, e);
+              responseData[`banHero${offset}`] = `C://data/draftrecap/banhero/0.png`;
+              responseData[`banHeroStatus${offset}`] = statusImg(null, "banstatus");
+            }
+          }
+        };
+
+        // Left team -> 1 to 5, Right team -> 6 to 10
+        if (lastCamps[0]) buildTeamRecap(lastCamps[0], 1);
+        if (lastCamps[1]) buildTeamRecap(lastCamps[1], 6);
+
+        if (lastCamps[0]) buildBanRecap(lastCamps[0], 1);
+        if (lastCamps[1]) buildBanRecap(lastCamps[1], 6);
+
+        res.send({ data: [responseData] });
+      } catch (e) {
+        console.error("Error processing draft recap:", e);
+        res.status(500).send("Error processing draft recap");
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching battle data:", err);
+      res.status(500).send("Error Fetching Data");
+    });
+});
+
 app.get("/teamfightdamage", (req, res) => {
   const battleData =
     "http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
@@ -4591,6 +4771,14 @@ app.get("/item", (req, res) => {
           delete firstItemTracker[key];
         }
       }
+
+      //=== TRINITY: reset on new battle ===
+      if (lastBattleId !== null && lastBattleId !== battleId) {
+        for (const key in ownedItemsTracker) {
+          delete ownedItemsTracker[key];
+        }
+      }
+
       lastBattleId = battleId;
 
       const getFirstItem = (player) => {
@@ -4604,6 +4792,7 @@ app.get("/item", (req, res) => {
         return firstItemTracker[key] || null;
       };
 
+      //first item block
       const safeFirstItem = (player, offset) => {
         try {
           const firstItemId = getFirstItem(player);
@@ -4635,6 +4824,38 @@ app.get("/item", (req, res) => {
       // Team 2 -> 6 to 10
       for (let i = 0; i < 5; i++) {
         safeFirstItem(team2[i], i + 6);
+      }
+
+      //=== TRINITY ITEM BLOCK ===
+      const safeTrinity = (player, offset) => {
+        try {
+          const key = `${battleId}_${player.roleid}`;
+          if (!ownedItemsTracker[key]) {
+            ownedItemsTracker[key] = new Set();
+          }
+          if (player.equip_list) {
+            player.equip_list.forEach(itemId => ownedItemsTracker[key].add(itemId));
+          }
+          const owned = ownedItemsTracker[key];
+          const hasAllTrinity = trinityItems.every(itemId => owned.has(itemId));
+
+          responseData[`trinity${offset}`] = hasAllTrinity
+            ? `C://data/trinity/1.png`
+            : `C://data/trinity/0.png`;
+        } catch (e) {
+          console.error(`Error building trinity for offset ${offset}:`, e);
+          responseData[`trinity${offset}`] = `C://data/trinity/0.png`;
+        }
+      };
+
+      // Team 1 -> 1 to 5
+      for (let i = 0; i < 5; i++) {
+        safeTrinity(team1[i], i + 1);
+      }
+
+      // Team 2 -> 6 to 10
+      for (let i = 0; i < 5; i++) {
+        safeTrinity(team2[i], i + 6);
       }
 
       //playerNames
@@ -5497,6 +5718,49 @@ app.get("/inGameOverlay", (req, res) => {
       }
     }
 
+    // helper: ult cooldown hud path - timestamp-interpolated, counts DOWN from 100
+    function getUltPng(player) {
+      try {
+        const left = player.major_left_time;
+        if (typeof left !== "number" || isNaN(left) || !isFinite(left)) {
+          return `C://data/ingame/hud/0.png`;
+        }
+
+        const key = player.roleid;
+        const now = Date.now();
+
+        if (left <= 0) {
+          delete ultState[key]; // ready - clear so next cast starts fresh
+          return `C://data/ingame/hud/0.png`;
+        }
+
+        let state = ultState[key];
+        const prevLeft = state ? state.lastLeft : 0;
+
+        if (prevLeft <= 0) {
+          // Real cast just happened - peak is whatever left is right now
+          // (already reflects current CDR items)
+          state = { peak: left, startTime: now, lastLeft: left };
+          ultState[key] = state;
+        } else {
+          // Mid-cooldown: resync clock to API's true value so any CDR
+          // effect (item, basic attack, etc.) is picked up immediately
+          state.startTime = now - (state.peak - left) * 1000;
+          state.lastLeft = left;
+        }
+
+        // Interpolate smoothly using real elapsed time since last resync
+        const elapsed = (now - state.startTime) / 1000;
+        const remaining = Math.max(0, state.peak - elapsed);
+        let percent = Math.round((remaining / state.peak) * 100);
+        percent = Math.min(100, Math.max(0, percent));
+
+        return `C://data/ingame/hud/${percent}.png`;
+      } catch (e) {
+        return `C://data/ingame/hud/0.png`;
+      }
+    }
+
     // Team 1 Players (1-5)
     for (let i = 0; i < 5; i++) {
       const playerNum = i + 1;
@@ -5567,6 +5831,9 @@ app.get("/inGameOverlay", (req, res) => {
 
         // Ult ready
         responseData[`ultReady${playerNum}`] = getUltReady(player);
+
+        // Ult cooldown hud
+        responseData[`ultpng${playerNum}`] = getUltPng(player);
       } else {
         // Default values for missing players
         responseData[`hero${playerNum}`] = `C://data/ingame/hero/0.png`;
@@ -5586,6 +5853,7 @@ app.get("/inGameOverlay", (req, res) => {
         responseData[`Level${playerNum}`] = 1;
         responseData[`hpBar${playerNum}`] = `C://data/ingame/bar/3/0.png`;
         responseData[`ultReady${playerNum}`] = `C://data/ingame/ult/0.png`;
+        responseData[`ultpng${playerNum}`] = `C://data/ingame/hud/0.png`;
       }
     }
 
@@ -5659,6 +5927,9 @@ app.get("/inGameOverlay", (req, res) => {
 
         // Ult ready
         responseData[`ultReady${playerNum}`] = getUltReady(player);
+
+        // Ult cooldown hud
+        responseData[`ultpng${playerNum}`] = getUltPng(player);
       } else {
         // Default values for missing players
         responseData[`hero${playerNum}`] = `C://data/ingame/hero/0.png`;
@@ -5678,6 +5949,7 @@ app.get("/inGameOverlay", (req, res) => {
         responseData[`Level${playerNum}`] = 1;
         responseData[`hpBar${playerNum}`] = `C://data/ingame/bar/3/0.png`;
         responseData[`ultReady${playerNum}`] = `C://data/ingame/ult/0.png`;
+        responseData[`ultpng${playerNum}`] = `C://data/ingame/hud/0.png`;
       }
     }
 

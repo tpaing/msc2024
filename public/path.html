@@ -19,6 +19,7 @@
                                 <h3 class="mb-4">Key</h3>
                                 <v-text-field label="Token" v-model="pass" placeholder="f052754e" required></v-text-field>
                                 <v-text-field label="key" v-model="battleid" placeholder="12345678" required></v-text-field>
+                                <v-text-field label="Last Battle ID" v-model="draftLastBattleId" placeholder="12345678" required></v-text-field>
 
                                 <h3 class="mb-4 mt-8">Team Name</h3>
                                 <v-text-field label="Team 1 Name" v-model="team1_name" placeholder="Ai Esports" required></v-text-field>
@@ -121,6 +122,7 @@
                 
                 pass : '',
                 battleid : '',
+                draftLastBattleId : '',
                 //draft
                 team1_name: '',
                 team1_shortName: '',
@@ -195,6 +197,7 @@
                             const formData = await response.json();
                             this.pass = formData.pass
                             this.battleid = formData.battleid
+                            this.draftLastBattleId = formData.draftLastBattleId
                             this.team1_name = formData.team1_name
                             this.team1_shortName = formData.team1_shortName
                             this.team2_name = formData.team2_name
@@ -267,6 +270,7 @@
                     const formData = {
                         pass : this.pass,
                         battleid : this.battleid,
+                        draftLastBattleId : this.draftLastBattleId,
                         //draft
                         team1_name : this.team1_name,
                         team1_shortName : this.team1_shortName,
