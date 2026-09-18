@@ -2566,6 +2566,7 @@ app.get("/hud", async (req, res) => {
     // Basic game state and team information
     try {
       responseData.state = data.state || 0;
+      responseData.gameStart = data.state === "play" ? 1 : 0;
       responseData.team1Name = formData?.team1_name || team1?.team_name || "Team 1";
       responseData.team2Name = formData?.team2_name || team2?.team_name || "Team 2";
       responseData.team1ShortName = formData?.team1_shortName || team1?.team_simple_name || "T1";
@@ -2579,6 +2580,7 @@ app.get("/hud", async (req, res) => {
       console.error('Error setting basic team info:', error);
       // Set defaults
       responseData.state = 0;
+      responseData.gameStart = 0;
       responseData.team1Name = "Team 1";
       responseData.team2Name = "Team 2";
       responseData.team1ShortName = "T1";
@@ -2853,6 +2855,10 @@ app.get("/hud", async (req, res) => {
       },
       "penta kill"
     );
+
+    responseData.tripleKillCount = tripleKill.length;
+    responseData.miniacCount = miniac.length;
+    responseData.savageCount = savage.length;
 
     // Process Savage Kill
     try {
