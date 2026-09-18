@@ -4566,6 +4566,141 @@ app.get("/draft", (req, res) => {
 
 //const { currentMatchId, lastMatchId } = req.query;
 //=== DRAFT RECAP ROUTE ===
+// app.get("/draftRecap", (req, res) => {
+//   const currentMatchId = id;
+//   const lastMatchId = draftLastBattleId;
+
+//   if (!currentMatchId || !lastMatchId) {
+//     return res.status(400).send("Missing currentMatchId or lastMatchId");
+//   }
+
+//   const fetchBattle = (battleId) => {
+//     return new Promise((resolve, reject) => {
+//       const url =
+//         "http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
+//         battleId +
+//         "&dataid=1";
+//       request({ url, json: true }, (error, response, body) => {
+//         if (error) return reject(error);
+//         resolve(body);
+//       });
+//     });
+//   };
+
+//   const getTeamPicks = (campData) => {
+//     return (campData.player_list || [])
+//       .filter(p => p.heroid && p.heroid !== 0)
+//       .slice()
+//       .sort((a, b) => a.pos - b.pos)
+//       .map(p => p.heroid);
+//   };
+
+//   const getAllBans = (battle) => {
+//     let bans = [];
+//     (battle.data.camp_list || []).forEach(camp => {
+//       if (camp.ban_hero_list) bans = bans.concat(camp.ban_hero_list);
+//     });
+//     return bans;
+//   };
+
+//   const statusImg = (status, folder) =>
+//     status ? `C://data/draftrecap/${folder}/${status.toLowerCase()}.png`
+//            : `C://data/draftrecap/${folder}/0.png`;
+
+//   Promise.all([fetchBattle(lastMatchId), fetchBattle(currentMatchId)])
+//     .then(([lastData, currentData]) => {
+//       try {
+//         const responseData = {};
+
+//         const lastCamps = (lastData.data.camp_list || []).filter(c => c.campid === 1 || c.campid === 2);
+//         const currentCamps = (currentData.data.camp_list || []).filter(c => c.campid === 1 || c.campid === 2);
+//         const currentBans = getAllBans(currentData);
+
+//         //=== PICK RECAP (stolen / repicked / banned) ===
+//         const buildTeamRecap = (lastCamp, offsetStart) => {
+//           const lastPicks = getTeamPicks(lastCamp);
+//           const sameTeamCurrentCamp = currentCamps.find(c => c.team_id === lastCamp.team_id);
+//           const currentTeamPicks = sameTeamCurrentCamp ? getTeamPicks(sameTeamCurrentCamp) : [];
+//           const otherTeamPicks = currentCamps
+//             .filter(c => c.team_id !== lastCamp.team_id)
+//             .flatMap(getTeamPicks);
+
+//           for (let i = 0; i < 5; i++) {
+//             const offset = offsetStart + i;
+//             try {
+//               const heroId = lastPicks[i];
+//               if (!heroId) {
+//                 responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/0.png`;
+//                 responseData[`draftStatus${offset}`] = statusImg(null, "status");
+//                 continue;
+//               }
+
+//               responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/${heroId}.png`;
+
+//               let status = null;
+//               if (currentTeamPicks.includes(heroId)) status = "REPICKED";
+//               else if (otherTeamPicks.includes(heroId)) status = "STOLEN";
+//               else if (currentBans.includes(heroId)) status = "BANNED";
+
+//               responseData[`draftStatus${offset}`] = statusImg(status, "status");
+//             } catch (e) {
+//               console.error(`Error building draft recap offset ${offset}:`, e);
+//               responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/0.png`;
+//               responseData[`draftStatus${offset}`] = statusImg(null, "status");
+//             }
+//           }
+//         };
+
+//         //=== BAN HERO RECAP (0 = nothing, picked = banned hero got picked, banned = banned again) ===
+//         const buildBanRecap = (lastCamp, offsetStart) => {
+//           const lastBans = (lastCamp.ban_hero_list || []).slice(0, 5);
+//           const currentAllPicks = currentCamps.flatMap(getTeamPicks);
+
+//           for (let i = 0; i < 5; i++) {
+//             const offset = offsetStart + i;
+//             try {
+//               const heroId = lastBans[i];
+//               if (!heroId) {
+//                 responseData[`banHero${offset}`] = `C://data/draftrecap/banhero/0.png`;
+//                 responseData[`banHeroStatus${offset}`] = statusImg(null, "banstatus");
+//                 continue;
+//               }
+
+//               responseData[`banHero${offset}`] = `C://data/draftrecap/banhero/${heroId}.png`;
+
+//               let status = null;
+//               if (currentAllPicks.includes(heroId)) status = "PICKED";
+//               else if (currentBans.includes(heroId)) status = "BANNED";
+
+//               responseData[`banHeroStatus${offset}`] = statusImg(status, "banstatus");
+//             } catch (e) {
+//               console.error(`Error building ban recap offset ${offset}:`, e);
+//               responseData[`banHero${offset}`] = `C://data/draftrecap/banhero/0.png`;
+//               responseData[`banHeroStatus${offset}`] = statusImg(null, "banstatus");
+//             }
+//           }
+//         };
+
+//         // Left team -> 1 to 5, Right team -> 6 to 10
+//         if (lastCamps[0]) buildTeamRecap(lastCamps[0], 1);
+//         if (lastCamps[1]) buildTeamRecap(lastCamps[1], 6);
+
+//         if (lastCamps[0]) buildBanRecap(lastCamps[0], 1);
+//         if (lastCamps[1]) buildBanRecap(lastCamps[1], 6);
+
+//         res.send({ data: [responseData] });
+//       } catch (e) {
+//         console.error("Error processing draft recap:", e);
+//         res.status(500).send("Error processing draft recap");
+//       }
+//     })
+//     .catch(err => {
+//       console.error("Error fetching battle data:", err);
+//       res.status(500).send("Error Fetching Data");
+//     });
+// });
+
+//recap new
 app.get("/draftRecap", (req, res) => {
   const currentMatchId = id;
   const lastMatchId = draftLastBattleId;
@@ -4595,6 +4730,12 @@ app.get("/draftRecap", (req, res) => {
       .map(p => p.heroid);
   };
 
+  const getPicksWithRole = (campData) => {
+    const players = (campData.player_list || []).filter(p => p.heroid && p.heroid !== 0);
+    role_sorter(players, playerList);
+    return players;
+  };
+
   const getAllBans = (battle) => {
     let bans = [];
     (battle.data.camp_list || []).forEach(camp => {
@@ -4618,7 +4759,7 @@ app.get("/draftRecap", (req, res) => {
 
         //=== PICK RECAP (stolen / repicked / banned) ===
         const buildTeamRecap = (lastCamp, offsetStart) => {
-          const lastPicks = getTeamPicks(lastCamp);
+          const lastPlayers = getPicksWithRole(lastCamp);
           const sameTeamCurrentCamp = currentCamps.find(c => c.team_id === lastCamp.team_id);
           const currentTeamPicks = sameTeamCurrentCamp ? getTeamPicks(sameTeamCurrentCamp) : [];
           const otherTeamPicks = currentCamps
@@ -4628,7 +4769,12 @@ app.get("/draftRecap", (req, res) => {
           for (let i = 0; i < 5; i++) {
             const offset = offsetStart + i;
             try {
-              const heroId = lastPicks[i];
+              const player = lastPlayers[i];
+              const heroId = player?.heroid;
+              const role = player?.c_role;
+
+              responseData[`draftRole${offset}`] = role ? `C://data/draftrecap/role/${role}.png` : `C://data/draftrecap/role/0.png`;
+
               if (!heroId) {
                 responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/0.png`;
                 responseData[`draftStatus${offset}`] = statusImg(null, "status");
@@ -4647,6 +4793,7 @@ app.get("/draftRecap", (req, res) => {
               console.error(`Error building draft recap offset ${offset}:`, e);
               responseData[`draftHero${offset}`] = `C://data/draftrecap/hero/0.png`;
               responseData[`draftStatus${offset}`] = statusImg(null, "status");
+              responseData[`draftRole${offset}`] = `C://data/draftrecap/role/0.png`;
             }
           }
         };
