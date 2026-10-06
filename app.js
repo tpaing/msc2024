@@ -22,6 +22,7 @@ let displayGameTime = 0; // Initialize local game time
 let lastApiSyncTime = 0; // Track the last API game time for sync reference
 let gameState = ""; // Track game state
 
+//first item
 const firstItemTracker = {}; // { "battleid_roleid": itemid }
 let lastBattleId = null;
 
