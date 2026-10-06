@@ -26,6 +26,125 @@ let gameState = ""; // Track game state
 const firstItemTracker = {}; // { "battleid_roleid": itemid }
 let lastBattleId = null;
 
+const fastItemSwapItemIds = new Set([3207, 2107, 3012, 2208]);
+const fastItemSwapWindowMs = 1000;
+const fastItemSwapHistoryLimit = 20;
+const fastItemSwapTracker = {};
+
+const trackFastItemSwaps = (player, battleId, playerSlot) => {
+  if (!player || player.roleid == null) {
+    return [];
+  }
+
+  const key = `${battleId}_${player.roleid}`;
+  const state = fastItemSwapTracker[key] || (fastItemSwapTracker[key] = {
+    previousItems: null,
+    pendingSales: [],
+    events: [],
+    nextEventId: 1,
+    successfulSwapCount: 0,
+  });
+  const currentItems = Array.isArray(player.equip_list)
+    ? player.equip_list.map(Number).filter(Number.isFinite)
+    : [];
+
+  if (state.previousItems === null) {
+    state.previousItems = currentItems;
+    return state.events;
+  }
+
+  const getTrackedItemCounts = (items) => {
+    const counts = new Map();
+    for (const itemId of items) {
+      if (fastItemSwapItemIds.has(itemId)) {
+        counts.set(itemId, (counts.get(itemId) || 0) + 1);
+      }
+    }
+    return counts;
+  };
+
+  const previousCounts = getTrackedItemCounts(state.previousItems);
+  const currentCounts = getTrackedItemCounts(currentItems);
+  const removedItems = [];
+  const addedItems = [];
+
+  for (const [itemId, count] of previousCounts) {
+    const removedCount = count - (currentCounts.get(itemId) || 0);
+    for (let i = 0; i < removedCount; i++) {
+      removedItems.push(itemId);
+    }
+  }
+
+  for (const [itemId, count] of currentCounts) {
+    const addedCount = count - (previousCounts.get(itemId) || 0);
+    for (let i = 0; i < addedCount; i++) {
+      addedItems.push(itemId);
+    }
+  }
+
+  const now = Date.now();
+  state.pendingSales = state.pendingSales.filter((pendingSale) => {
+    if (now - pendingSale.soldAtMs <= fastItemSwapWindowMs) {
+      return true;
+    }
+
+    pendingSale.event.status = "failed";
+    pendingSale.event.success = false;
+    pendingSale.event.elapsedMs = now - pendingSale.soldAtMs;
+    pendingSale.event.completedAt = new Date(now).toISOString();
+    return false;
+  });
+
+  for (const soldItemId of removedItems) {
+    const event = {
+      eventId: `${battleId}_${player.roleid}_${state.nextEventId++}`,
+      playerRoleId: player.roleid,
+      playerName: name_finder(player.roleid, playerList) || player.name || "",
+      playerSlot,
+      previousItems: state.previousItems.slice(),
+      previousItemId: soldItemId,
+      soldItemId,
+      purchasedItemId: null,
+      status: "pending",
+      success: null,
+      soldAt: new Date(now).toISOString(),
+      purchasedAt: null,
+      elapsedMs: null,
+    };
+    const pendingSale = { event, soldAtMs: now };
+    state.pendingSales.push(pendingSale);
+    state.events.push(event);
+  }
+
+  for (const purchasedItemId of addedItems) {
+    const pendingSale = state.pendingSales.shift();
+    if (!pendingSale) {
+      continue;
+    }
+
+    pendingSale.event.purchasedItemId = purchasedItemId;
+    pendingSale.event.status = "success";
+    pendingSale.event.success = true;
+    pendingSale.event.purchasedAt = new Date(now).toISOString();
+    pendingSale.event.elapsedMs = now - pendingSale.soldAtMs;
+    state.successfulSwapCount++;
+  }
+
+  state.previousItems = currentItems;
+
+  while (state.events.length > fastItemSwapHistoryLimit) {
+    const completedEventIndex = state.events.findIndex(
+      (event) => event.status !== "pending"
+    );
+    if (completedEventIndex === -1) {
+      break;
+    }
+    state.events.splice(completedEventIndex, 1);
+  }
+
+  return state.events;
+};
+
 const validFirstItems = [
   2006, 2008, 2009, 2011, 2013, 2014, 2106, 2107, 2108, 2112, 2207, 2208, 2212, 3001, 3002, 3003, 3004, 3005, 3007, 3008, 3009, 3012, 3013, 3014, 3015, 3101, 3102, 3103, 3104, 3105, 3106, 3108, 3109, 3110, 3111, 3112, 3113, 3201, 3202, 3203, 3204, 3205, 3206, 3207, 3208, 3209, 3210
 ];
@@ -4933,7 +5052,45 @@ app.get("/item", (req, res) => {
         }
       }
 
+      if (lastBattleId !== null && lastBattleId !== battleId) {
+        for (const key in fastItemSwapTracker) {
+          delete fastItemSwapTracker[key];
+        }
+      }
+
       lastBattleId = battleId;
+
+      responseData.fastItemSwapEvents = [...team1, ...team2].flatMap(
+        (player, index) => {
+          const playerSlot = index + 1;
+          const playerEvents = trackFastItemSwaps(player, battleId, playerSlot);
+          const emptyItemImage = `${formData.itemPath}0.png`;
+          responseData[`fastItemswap${playerSlot}`] = 0;
+          responseData[`soldItem${playerSlot}`] = emptyItemImage;
+          responseData[`boughtItem${playerSlot}`] = emptyItemImage;
+
+          if (!player || player.roleid == null) {
+            return playerEvents;
+          }
+
+          const playerState =
+            fastItemSwapTracker[`${battleId}_${player.roleid}`];
+          const lastSuccessfulSwap = [...playerState.events]
+            .reverse()
+            .find((event) => event.success === true);
+
+          responseData[`fastItemswap${playerSlot}`] =
+            playerState.successfulSwapCount;
+          if (lastSuccessfulSwap) {
+            responseData[`soldItem${playerSlot}`] =
+              `${formData.itemPath}${lastSuccessfulSwap.soldItemId}.png`;
+            responseData[`boughtItem${playerSlot}`] =
+              `${formData.itemPath}${lastSuccessfulSwap.purchasedItemId}.png`;
+          }
+
+          return playerEvents;
+        }
+      );
 
       const getFirstItem = (player) => {
         const key = `${battleId}_${player.roleid}`;
