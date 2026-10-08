@@ -3351,6 +3351,9 @@ app.get("/draft", (req, res) => {
       2: "Dangerous Grass",
       3: "Flying Cloud",
       4: "Expanding Rivers",
+      12: "Revealing Wisps",
+      15: "Healing Turtle",
+      16: "Golden Turret",
     };
 
     const playmodeid = data.data.play_mode_id;
