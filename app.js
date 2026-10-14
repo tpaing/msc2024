@@ -2771,6 +2771,14 @@ app.get("/hud", async (req, res) => {
       responseData.TotalKill2 = team2?.score || 0;
       responseData.Tower1 = team1?.kill_tower || 0;
       responseData.Tower2 = team2?.kill_tower || 0;
+
+      const isPlaying = data.state === "play" && (gameTime || 0) > 0;
+      const turtleAlive = isPlaying && (data.tortoise_left_time || 0) === 0 ? 1 : 0;
+      const lordAlive = isPlaying && (data.lord_left_time || 0) === 0 ? 1 : 0;
+      responseData.turtleSpawnCount =
+        (team1?.kill_tortoise || 0) + (team2?.kill_tortoise || 0) + turtleAlive;
+      responseData.LordSpawnCount =
+        (team1?.kill_lord || 0) + (team2?.kill_lord || 0) + lordAlive;
     } catch (error) {
       console.error('Error setting team statistics:', error);
       responseData.TurtleKill1 = 0;
@@ -2781,6 +2789,8 @@ app.get("/hud", async (req, res) => {
       responseData.TotalKill2 = 0;
       responseData.Tower1 = 0;
       responseData.Tower2 = 0;
+      responseData.turtleSpawnCount = 0;
+      responseData.LordSpawnCount = 0;
     }
 
     // Enhanced event processing with comprehensive error handling
@@ -6666,6 +6676,272 @@ app.get("/playerled", (req, res) => {
     let jsonData = { data: [responseData] };
     res.send(jsonData);
   });
+});
+
+// hit_rate is only filled for Selena / Franco: [{ skillid, cast_times, hit_times }]
+// Selena (63) skill 2 = 6320 (arrow). Franco (10) hook skill id is not known yet, so it stays on defaults.
+const ledHitRateHeroes = {
+  selena: { heroid: 63, skillid: "6320", label: "Arrow" },
+  franco: { heroid: 10, skillid: null, label: "Hook" },
+};
+
+const formatNumber = (value) => Number(value || 0).toLocaleString("en-US");
+
+app.get("/ledData", async (req, res) => {
+  try {
+    const battleData = `http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=${id}&dataid=1`;
+    const { response, body } = await makeRequest(battleData);
+
+    if (response.statusCode !== 200) {
+      return res.status(500).json({ error: "Request to external API failed", statusCode: response.statusCode });
+    }
+    if (!body || !body.data || !Array.isArray(body.data.camp_list) || body.data.camp_list.length < 2) {
+      return res.status(500).json({ error: "Invalid API response" });
+    }
+
+    const data = body.data;
+    const team1 = data.camp_list[0];
+    const team2 = data.camp_list[1];
+    const battleId = data.battleid;
+    const isPlaying = data.state === "play";
+    const eventList = Array.isArray(data.incre_event_list) ? data.incre_event_list : [];
+    const responseData = {};
+
+    // Trackers are shared with /item, reset them when a new battle starts
+    if (lastBattleId !== null && lastBattleId !== battleId) {
+      for (const tracker of [firstItemTracker, ownedItemsTracker, fastItemSwapTracker]) {
+        for (const key in tracker) delete tracker[key];
+      }
+    }
+    lastBattleId = battleId;
+
+    // Players sorted by role (exp, jg, mid, roam, gold), slots 1-5 = team 1, 6-10 = team 2
+    const sortedTeam1 = role_sorter(Array.isArray(team1.player_list) ? team1.player_list : [], playerList);
+    const sortedTeam2 = role_sorter(Array.isArray(team2.player_list) ? team2.player_list : [], playerList);
+    const slots = [...sortedTeam1.slice(0, 5), ...sortedTeam2.slice(0, 5)];
+    const playerAt = (slotNo) => {
+      const teamPlayers = slotNo <= 5 ? sortedTeam1 : sortedTeam2;
+      return teamPlayers[(slotNo - 1) % 5] || null;
+    };
+
+    // Teams
+    const team1Short = formData?.team1_shortName || team1.team_simple_name || "";
+    const team2Short = formData?.team2_shortName || team2.team_simple_name || "";
+    responseData.team1Name = formData?.team1_name || team1.team_name || "";
+    responseData.team2Name = formData?.team2_name || team2.team_name || "";
+    responseData.team1ShortName = team1Short;
+    responseData.team2ShortName = team2Short;
+    responseData.team1Logo = `C://data/led/logo/${team1Short || 0}.png`;
+    responseData.team2Logo = `C://data/led/logo/${team2Short || 0}.png`;
+
+    // Objectives
+    responseData.team1Turtle = team1.kill_tortoise || 0;
+    responseData.team2Turtle = team2.kill_tortoise || 0;
+    responseData.team1Lord = team1.kill_lord || 0;
+    responseData.team2Lord = team2.kill_lord || 0;
+
+    // Gold
+    const gold1 = team1.total_money || 0;
+    const gold2 = team2.total_money || 0;
+    const goldShort = (g) => `${(g / 1000).toFixed(1)}k`;
+    responseData.team1GoldShort = goldShort(gold1);
+    responseData.team2GoldShort = goldShort(gold2);
+    responseData.team1GoldLong = formatNumber(gold1);
+    responseData.team2GoldLong = formatNumber(gold2);
+
+    const goldIconPath = formData?.goldLogo || "";
+    const goldDiffText = `+${(Math.abs(gold1 - gold2) / 1000).toFixed(1)}k`;
+    responseData.goldDiff1 = gold1 > gold2 ? goldDiffText : "";
+    responseData.goldDiff2 = gold2 > gold1 ? goldDiffText : "";
+    responseData.goldDiffPng1 = `${goldIconPath}${gold1 > gold2 ? 1 : 0}.png`;
+    responseData.goldDiffPng2 = `${goldIconPath}${gold2 > gold1 ? 2 : 0}.png`;
+
+    // Result and duration
+    responseData.team1Result = `C://data/led/result/${data.win_camp === 1 ? 1 : 0}.png`;
+    responseData.team2Result = `C://data/led/result/${data.win_camp === 2 ? 1 : 0}.png`;
+    responseData.matchDuration = formatTime(data.game_time || 0);
+
+    // Turtle / Lord (alive = 1, dead or not spawned = 0)
+    const turtleLeft = data.tortoise_left_time || 0;
+    const lordLeft = data.lord_left_time || 0;
+    responseData.turtleAlive = isPlaying && turtleLeft === 0 ? 1 : 0;
+    responseData.lordAlive = isPlaying && lordLeft === 0 ? 1 : 0;
+    responseData.turtleRespawnTime = isPlaying && turtleLeft > 0 ? `${turtleLeft}sec` : "";
+    responseData.lordRespawnTime = isPlaying && lordLeft > 0 ? `${lordLeft}sec` : "";
+
+    // First blood / triple / maniac / savage (same shape as /hud)
+    const hasTag = (e, tag) =>
+      Array.isArray(e?.extra_param) ? e.extra_param.includes(tag) : e?.extra_param === tag;
+    const campName = (campid) =>
+      campid === 1 ? responseData.team1Name : campid === 2 ? responseData.team2Name : "";
+    const campLogo = (campid) => {
+      const short = campid === 1 ? team1Short : campid === 2 ? team2Short : "";
+      return short ? `${formData?.bossKillerLogoPath || ""}${short}.png` : "";
+    };
+    const setKillFeature = (prefix, tag) => {
+      try {
+        const events = eventList.filter((e) => e?.event_type === "kill_hero" && hasTag(e, tag));
+        if (events.length === 0) throw new Error("no event");
+        const last = events[events.length - 1];
+        const role = role_finder(last.killer_id, playerList);
+        const safeRole = role !== "undefined" ? role : "Unknown Role";
+        responseData[`${prefix}PlayerTeamName`] = campName(last.campid);
+        responseData[`${prefix}PlayerName`] = name_finder(last.killer_id, playerList) || last.killer_name || "";
+        responseData[`${prefix}PlayerRole`] = safeRole;
+        responseData[`${prefix}PlayerPic`] = `C://data/firstblood/${last.killer_id || 0}.png`;
+        responseData[`${prefix}PlayerPicTeamLogo`] = campLogo(last.campid);
+        responseData[`${prefix}PlayerRolepng`] = `C://data/lordkill/role/${safeRole}.png`;
+      } catch (e) {
+        responseData[`${prefix}PlayerTeamName`] = "";
+        responseData[`${prefix}PlayerName`] = "";
+        responseData[`${prefix}PlayerRole`] = "";
+        responseData[`${prefix}PlayerPic`] = "C://data/firstblood/0.png";
+        responseData[`${prefix}PlayerPicTeamLogo`] = "";
+        responseData[`${prefix}PlayerRolepng`] = "C://data/lordkill/role/Unknown Role.png";
+      }
+    };
+    setKillFeature("firstBlood", "first_blood");
+    setKillFeature("tripleKill", "triple_kill");
+    setKillFeature("miniac", "quadra_kill");
+    setKillFeature("savage", "penta_kill");
+
+    // Wipe out: 1 while all 5 players of the team are dead
+    const isWiped = (players) => isPlaying && players.length >= 5 && players.slice(0, 5).every((p) => p.dead);
+    responseData.wipeOut1 = isWiped(sortedTeam1) ? 1 : 0;
+    responseData.wipeOut2 = isWiped(sortedTeam2) ? 1 : 0;
+
+    // Per player data (slots 1-10)
+    const getFirstItem = (player) => {
+      const key = `${battleId}_${player.roleid}`;
+      if (!firstItemTracker[key] && Array.isArray(player.equip_list)) {
+        const match = player.equip_list.find((itemId) => validFirstItems.includes(itemId));
+        if (match) firstItemTracker[key] = match;
+      }
+      return firstItemTracker[key] || null;
+    };
+    const hasTrinity = (player) => {
+      const key = `${battleId}_${player.roleid}`;
+      const owned = ownedItemsTracker[key] || (ownedItemsTracker[key] = new Set());
+      (player.equip_list || []).forEach((itemId) => owned.add(itemId));
+      return trinityItems.every((itemId) => owned.has(itemId));
+    };
+
+    const draftTimer = data.state_left_time || 0;
+    responseData.draftTimer = draftTimer > 0 ? draftTimer : "";
+
+    // Each attribute is written for slots 1-10 before the next attribute (healing1..healing10, then ...)
+    const fillSlots = (writeSlot) => {
+      for (let n = 1; n <= 10; n++) writeSlot(n, playerAt(n));
+    };
+
+    fillSlots((n, player) => {
+      const role = player ? role_finder(player.roleid, playerList) : "undefined";
+      responseData[`role${n}`] = role !== "undefined" ? role : "";
+    });
+    fillSlots((n) => {
+      responseData[`rolePng${n}`] = `C://data/led/role/${responseData[`role${n}`] || 0}.png`;
+    });
+    fillSlots((n, player) => {
+      const equipList = player?.equip_list || [];
+      for (let j = 1; j <= 6; j++) {
+        responseData[`player${n}item${j}`] = `C://data/led/item/${equipList[j - 1] || 0}.png`;
+      }
+    });
+    fillSlots((n, player) => {
+      responseData[`MainEmblem${n}`] = `C://data/led/emblem/${player?.rune_id || 0}.png`;
+    });
+    fillSlots((n, player) => {
+      const runeValues = Object.values(player?.rune_map || {});
+      for (let j = 1; j <= 3; j++) {
+        responseData[`player${n}Emblem${j}`] = `C://data/led/emblem/${runeValues[j - 1] || 0}.png`;
+      }
+    });
+    fillSlots((n, player) => {
+      const reviveLeft = player?.revive_left_time || 0;
+      responseData[`respawnTime${n}`] = reviveLeft > 0 ? reviveLeft : "";
+    });
+    fillSlots((n, player) => {
+      responseData[`ult${n}`] = `C://data/led/ult/${player && (player.major_left_time || 0) === 0 ? 1 : 0}.png`;
+    });
+    fillSlots((n, player) => {
+      const ultLeft = player?.major_left_time || 0;
+      responseData[`ultCountdown${n}`] = ultLeft > 0 ? ultLeft : "";
+    });
+    fillSlots((n, player) => {
+      responseData[`spell${n}`] = `C://data/led/spell/${player?.skillid || 0}.png`;
+    });
+    fillSlots((n, player) => {
+      const spellLeft = player?.skill_left_time || 0;
+      responseData[`spellCountdown${n}`] = spellLeft > 0 ? spellLeft : "";
+    });
+    fillSlots((n, player) => {
+      responseData[`kda${n}`] = player
+        ? `${player.kill_num || 0}/${player.dead_num || 0}/${player.assist_num || 0}`
+        : "";
+    });
+    fillSlots((n, player) => {
+      responseData[`healing${n}`] = player ? formatNumber(player.total_heal || 0) : "";
+    });
+    fillSlots((n, player) => {
+      const firstItemId = player ? getFirstItem(player) : null;
+      responseData[`firstItem${n}`] = `C://data/led/firstitem/${firstItemId || 0}.png`;
+    });
+    fillSlots((n, player) => {
+      responseData[`swiftTrinity${n}`] = `C://data/led/trinity/${player && hasTrinity(player) ? 1 : 0}.png`;
+    });
+
+    // Draft
+    fillSlots((n, player) => {
+      responseData[`draftPickHero${n}`] = `C://data/led/draft/pick/${player?.heroid || 0}.png`;
+    });
+    fillSlots((n, player) => {
+      responseData[`draftBanHero${n}`] = `C://data/led/draft/ban/${player?.ban_heroid || 0}.png`;
+    });
+    fillSlots((n, player) => {
+      const heroWinRate = player?.heroid ? getWinRate(player.heroid) : null;
+      responseData[`draftWinrate${n}`] =
+        heroWinRate === null || heroWinRate === undefined ? "" : `${(heroWinRate * 100).toFixed(0)}%`;
+    });
+    fillSlots((n, player) => {
+      responseData[`draftPlayerPhoto${n}`] = `C://data/led/draft/player/${player?.roleid || 0}.png`;
+    });
+    fillSlots((n, player) => {
+      responseData[`draftPlayerName${n}`] = player
+        ? name_finder(player.roleid, playerList) || player.name || ""
+        : "";
+    });
+
+    // Selena arrow / Franco hook hit rate
+    for (const [heroKey, cfg] of Object.entries(ledHitRateHeroes)) {
+      const prefix = `${heroKey}${cfg.label}`;
+      const owner = slots.find((p) => p.heroid === cfg.heroid);
+      const entry =
+        owner && cfg.skillid && Array.isArray(owner.hit_rate)
+          ? owner.hit_rate.find((h) => String(h.skillid) === cfg.skillid)
+          : null;
+
+      if (entry) {
+        const cast = entry.cast_times || 0;
+        const hit = entry.hit_times || 0;
+        responseData[`${prefix}Cast`] = formatNumber(cast);
+        responseData[`${prefix}Hit`] = formatNumber(hit);
+        responseData[`${prefix}HitRate`] = cast > 0 ? `${((hit / cast) * 100).toFixed(0)}%` : "0%";
+        responseData[`${heroKey}PlayerName`] = name_finder(owner.roleid, playerList) || owner.name || "";
+        responseData[`${heroKey}Team`] = owner.campid;
+      } else {
+        responseData[`${prefix}Cast`] = "";
+        responseData[`${prefix}Hit`] = "";
+        responseData[`${prefix}HitRate`] = "";
+        responseData[`${heroKey}PlayerName`] = "";
+        responseData[`${heroKey}Team`] = "";
+      }
+    }
+
+    res.json({ data: [responseData] });
+  } catch (error) {
+    console.error("Critical error in /ledData route:", error);
+    res.status(500).json({ error: "Internal server error", message: error.message });
+  }
 });
 
 app.get('/mileStone', (req, res) => {
