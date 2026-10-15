@@ -7244,6 +7244,180 @@ app.get("/playercam", async (req, res) => {
   }
 });
 
+// === HEATMAP ===
+// Builds per-player position tracks from json/<battleid>.ndjson (one point per game second).
+let heatmapCache = null; // { key, value } - only the latest battle is cached
+
+const loadHeatmapSource = async (battleId) => {
+  const filePath = path.join(__dirname, "json", `${battleId}.ndjson`);
+  const stat = await fs.promises.stat(filePath);
+  const key = `${filePath}:${stat.size}:${stat.mtimeMs}`;
+  if (heatmapCache && heatmapCache.key === key) {
+    return heatmapCache.value;
+  }
+
+  const players = new Map(); // roleid -> Map(game_time -> [t, x, y, dead])
+  const bounds = { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity };
+  let lastSnapshot = null;
+
+  const lines = require("readline").createInterface({
+    input: fs.createReadStream(filePath, { encoding: "utf8" }),
+    crlfDelay: Infinity,
+  });
+
+  for await (const line of lines) {
+    if (!line) continue;
+    let snapshot;
+    try {
+      snapshot = JSON.parse(line);
+    } catch (e) {
+      continue; // partially written line
+    }
+
+    const data = snapshot?.data?.data;
+    if (!data || (data.state !== "play" && data.state !== "end")) continue;
+    lastSnapshot = data;
+
+    for (const camp of data.camp_list || []) {
+      for (const player of camp.player_list || []) {
+        if (!player.map_pos) continue;
+        const { x, y } = player.map_pos;
+        if (!players.has(player.roleid)) players.set(player.roleid, new Map());
+        // Several snapshots can share a game second, the latest one wins
+        players
+          .get(player.roleid)
+          .set(data.game_time, [data.game_time, x, y, player.dead ? 1 : 0]);
+        bounds.minX = Math.min(bounds.minX, x);
+        bounds.maxX = Math.max(bounds.maxX, x);
+        bounds.minY = Math.min(bounds.minY, y);
+        bounds.maxY = Math.max(bounds.maxY, y);
+      }
+    }
+  }
+
+  const value = { players, bounds, lastSnapshot };
+  heatmapCache = { key, value };
+  return value;
+};
+
+app.get("/heatmap", async (req, res) => {
+  try {
+    const battleId = String(req.query.battleid || id || "").trim();
+    if (!/^[A-Za-z0-9_-]+$/.test(battleId)) {
+      return res.status(400).json({ error: "Invalid battle id" });
+    }
+
+    const from = req.query.from !== undefined ? Number(req.query.from) : 0;
+    const to = req.query.to !== undefined ? Number(req.query.to) : Infinity;
+    if (Number.isNaN(from) || Number.isNaN(to)) {
+      return res.status(400).json({ error: "from/to must be seconds" });
+    }
+
+    let source;
+    try {
+      source = await loadHeatmapSource(battleId);
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        return res.status(404).json({ error: `No snapshots saved for battle ${battleId}` });
+      }
+      throw e;
+    }
+
+    const last = source.lastSnapshot;
+    if (!last) {
+      return res.status(404).json({ error: "No play snapshots saved yet" });
+    }
+
+    const buildPlayer = (player) => {
+      const track = [...(source.players.get(player.roleid)?.values() || [])]
+        .filter((point) => point[0] >= from && point[0] <= to)
+        .sort((a, b) => a[0] - b[0]);
+      return {
+        roleid: player.roleid,
+        name: playerList?.[player.roleid]?.name || player.name || "",
+        ign: player.name || "",
+        c_role: playerList?.[player.roleid]?.role || null,
+        campid: player.campid,
+        heroid: player.heroid,
+        level: player.level,
+        kill_num: player.kill_num,
+        dead_num: player.dead_num,
+        assist_num: player.assist_num,
+        gold: player.gold,
+        total_damage: player.total_damage,
+        total_hurt: player.total_hurt,
+        total_heal: player.total_heal,
+        // [game_time, x, y, dead]
+        track,
+      };
+    };
+
+    const teams = {};
+    const allPlayers = [];
+    for (const camp of last.camp_list || []) {
+      if (camp.campid !== 1 && camp.campid !== 2) continue; // skip judge/observer camps
+      const teamPlayers = (camp.player_list || []).map(buildPlayer);
+      allPlayers.push(...teamPlayers);
+      teams[`team${camp.campid}`] = {
+        campid: camp.campid,
+        team_name: camp.team_name,
+        team_simple_name: camp.team_simple_name,
+        team_id: camp.team_id,
+        score: camp.score,
+        kill_lord: camp.kill_lord,
+        kill_tortoise: camp.kill_tortoise,
+        kill_tower: camp.kill_tower,
+        total_money: camp.total_money,
+        players: teamPlayers,
+      };
+    }
+
+    // MVP comes from postdata (only available after the match), ?roleid= overrides it
+    let mvp = null;
+    let mvpSource = null;
+    const requestedRoleId = req.query.roleid;
+    if (requestedRoleId) {
+      mvp = allPlayers.find((p) => String(p.roleid) === String(requestedRoleId)) || null;
+      mvpSource = mvp ? "query" : null;
+    } else {
+      try {
+        const postUrl =
+          "http://esportsdata-sg.mobilelegends.com/postdata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
+          encodeURIComponent(battleId);
+        const { response, body } = await makeRequest(postUrl);
+        if (response.statusCode === 200 && body?.data?.hero_list) {
+          const winner = body.data.win_camp;
+          const mvpPlayer = body.data.hero_list.find(
+            (p) => p.campid === winner && p.mvp === true
+          );
+          if (mvpPlayer) {
+            mvp = allPlayers.find((p) => p.roleid === mvpPlayer.roleid) || null;
+            mvpSource = mvp ? "postdata" : null;
+          }
+        }
+      } catch (e) {
+        console.error("Error fetching MVP for heatmap:", e.message);
+      }
+    }
+
+    res.json({
+      battleid: battleId,
+      state: last.state,
+      win_camp: last.win_camp,
+      duration: last.game_time,
+      range: { from, to: Number.isFinite(to) ? to : last.game_time },
+      // Observed min/max of map_pos in this match (game units)
+      bounds: source.bounds,
+      mvpSource,
+      mvp,
+      ...teams,
+    });
+  } catch (error) {
+    console.error("Error in /heatmap route:", error);
+    res.status(500).json({ error: "Internal server error", message: error.message });
+  }
+});
+
 app.listen(3000, () => {
   console.log("Server Running on localhost:3000");
 });
