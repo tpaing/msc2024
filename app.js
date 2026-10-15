@@ -21,6 +21,10 @@ let token;
 let displayGameTime = 0; // Initialize local game time
 let lastApiSyncTime = 0; // Track the last API game time for sync reference
 let gameState = ""; // Track game state
+let snapshotBattleId = null;
+let snapshotFilePath = null;
+let snapshotsStopped = false;
+let gameDataSyncInProgress = false;
 
 //first item
 const firstItemTracker = {}; // { "battleid_roleid": itemid }
@@ -157,19 +161,110 @@ const trinityItems = [2008, 2009, 2006]; // <- your actual 3 required item IDs
 const ultState = {}; // roleid -> { peak, startTime, lastLeft }
 
 
-// Function to fetch API game time and sync local game time
-const syncGameTime = async () => {
-  const battleData =
-    "http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
-    id +
-    "&dataid=1";
+const readLastBattleSnapshot = async (filePath) => {
+  let file;
+  try {
+    file = await fs.promises.open(filePath, "r");
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
 
   try {
+    let position = (await file.stat()).size;
+    let content = Buffer.alloc(0);
+
+    while (position > 0) {
+      const chunkSize = Math.min(64 * 1024, position);
+      position -= chunkSize;
+      const chunk = Buffer.alloc(chunkSize);
+      const { bytesRead } = await file.read(chunk, 0, chunkSize, position);
+      content = Buffer.concat([chunk.subarray(0, bytesRead), content]);
+
+      let lineEnd = content.length;
+      while (
+        lineEnd > 0 &&
+        (content[lineEnd - 1] === 10 || content[lineEnd - 1] === 13)
+      ) {
+        lineEnd--;
+      }
+
+      const previousNewline = content.lastIndexOf("\n", lineEnd - 1);
+      if (previousNewline >= 0 || position === 0) {
+        const line = content.subarray(previousNewline + 1, lineEnd).toString("utf8");
+        return line ? JSON.parse(line) : null;
+      }
+    }
+
+    return null;
+  } finally {
+    await file.close();
+  }
+};
+
+// Fetch battle data, sync local game time, and append a timestamped snapshot.
+const syncGameTime = async () => {
+  if (
+    gameDataSyncInProgress ||
+    id == null ||
+    String(id).trim() === ""
+  ) {
+    return;
+  }
+
+  gameDataSyncInProgress = true;
+  const battleId = String(id).trim();
+
+  try {
+    if (!/^[A-Za-z0-9_-]+$/.test(battleId)) {
+      console.error("Invalid battle ID; cannot save battle snapshots:", battleId);
+      return;
+    }
+
+    if (snapshotBattleId !== battleId) {
+      const snapshotDirectory = path.join(__dirname, "json");
+      const filePath = path.join(snapshotDirectory, `${battleId}.ndjson`);
+      await fs.promises.mkdir(snapshotDirectory, { recursive: true });
+
+      const lastSnapshot = await readLastBattleSnapshot(filePath);
+      snapshotBattleId = battleId;
+      snapshotFilePath = filePath;
+      snapshotsStopped = Boolean(lastSnapshot && lastSnapshot.state === "end");
+
+      if (snapshotsStopped) {
+        gameState = lastSnapshot.state;
+        if (lastSnapshot.game_time != null) {
+          displayGameTime = lastSnapshot.game_time;
+        }
+      }
+    }
+
+    if (snapshotsStopped) {
+      return;
+    }
+
+  const battleData =
+    "http://esportsdata-sg.mobilelegends.com/battledata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
+    encodeURIComponent(battleId) +
+    "&dataid=1";
+
     const { response, body } = await makeRequest(battleData);
 
     if (response.statusCode === 200) {
-      const apiGameTime = body.data.game_time;
-      gameState = body.data.state; // Get game state from API
+      if (!body || !body.data || typeof body.data !== "object") {
+        console.error("Invalid battle data response for battle ID:", battleId);
+        return;
+      }
+
+      if (String(id).trim() !== battleId) {
+        return;
+      }
+
+      const data = body.data;
+      const apiGameTime = data.game_time;
+      gameState = data.state; // Get game state from API
 
       if (gameState === "play") {
         if (Math.abs(displayGameTime - apiGameTime) > 1) {
@@ -180,11 +275,29 @@ const syncGameTime = async () => {
       }
 
       lastApiSyncTime = apiGameTime;
+
+      const snapshot = {
+        captured_at: new Date().toISOString(),
+        game_time: data.game_time ?? null,
+        state: data.state ?? null,
+        data: body,
+      };
+      await fs.promises.appendFile(
+        snapshotFilePath,
+        `${JSON.stringify(snapshot)}\n`,
+        "utf8"
+      );
+
+      if (data.state === "end") {
+        snapshotsStopped = true;
+      }
     } else {
       console.error("API sync failed with status:", response.statusCode);
     }
   } catch (error) {
-    console.error("Error syncing with API:", error);
+    console.error("Error syncing battle data or saving snapshot:", error);
+  } finally {
+    gameDataSyncInProgress = false;
   }
 };
 
@@ -195,7 +308,7 @@ setInterval(() => {
   }
 }, 1000);
 
-// Sync with API every 10 seconds
+// Poll battle data and save snapshots once per second.
 setInterval(syncGameTime, 1000);
 
 function makeRequest(url) {
