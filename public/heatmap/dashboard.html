@@ -31,7 +31,7 @@
   <h1>Dashboard</h1>
 
   <section class="module" id="heatmap-module">
-    <h2>Heat Map <a href="/heatmapui?fit=1&debug=1" target="_blank">open /heatmapui</a></h2>
+    <h2><span>Heat Map</span><span><a href="/heatmapui?fit=1&debug=1" target="_blank">open /heatmapui</a> &nbsp; <a href="/heatmapui?fit=1&preview=1" target="_blank">layout preview</a></span></h2>
     <div class="body">
       <div class="group-title">Match</div>
       <div class="row">
@@ -60,10 +60,23 @@
         </label>
       </div>
 
+      <div class="group-title">Graphic</div>
+      <div class="row">
+        <button class="start" id="show">Transition In</button>
+        <button class="stop" id="hide">Transition Out</button>
+      </div>
+
+      <div class="group-title">Heat animation</div>
       <div class="row">
         <button class="start" id="start">Start</button>
+        <button id="pause">Pause / Resume</button>
         <button class="stop" id="stop">Stop</button>
-        <button id="clear">Clear</button>
+      </div>
+
+      <div class="group-title">Graphic text</div>
+      <div class="row">
+        <label>Title <input id="title" size="22" maxlength="30" /></label>
+        <label>Day tag (empty = hidden) <input id="dayTag" size="12" maxlength="16" placeholder="DAY 2" /></label>
       </div>
 
       <div class="group-title">Look</div>
@@ -102,6 +115,7 @@
 
     const fmt = (sec) => `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
     const parseTime = (text) => {
+      if (!String(text).trim()) return NaN;
       const parts = String(text).trim().split(":").map(Number);
       if (parts.some((n) => !Number.isFinite(n))) return NaN;
       return parts.length === 2 ? parts[0] * 60 + parts[1] : parts[0];
@@ -116,12 +130,16 @@
       const settings = {
         battleid: $("battleid").value.trim(),
         target: $("target").value,
+        title: $("title").value,
+        dayTag: $("dayTag").value.trim(),
         from: parseTime($("from").value),
         to: parseTime($("to").value),
         palette: $("palette").value,
         skipDead: $("skipDead").checked,
       };
       for (const key of numberKeys) settings[key] = $(key).value;
+      // invalid (empty/NaN) time fields are left out so they never overwrite the saved value
+      for (const key of ["from", "to"]) if (!Number.isFinite(settings[key])) delete settings[key];
       return settings;
     }
 
@@ -131,6 +149,8 @@
         $("target").add(new Option(`Player ${s.target}`, s.target));
       }
       $("target").value = s.target;
+      $("title").value = s.title;
+      $("dayTag").value = s.dayTag;
       $("from").value = fmt(s.from);
       $("to").value = fmt(s.to);
       $("palette").value = s.palette;
@@ -218,25 +238,35 @@
     }
 
     $("load").onclick = loadMatch;
-    $("start").onclick = async () => {
-      if (!(await loadMatch())) return;
-      let from = parseTime($("from").value), to = parseTime($("to").value);
+
+    // Loads the match, keeps the time range inside it and checks the chosen target has data
+    async function prepareMatch() {
+      if (!(await loadMatch())) return false;
+      const from = parseTime($("from").value);
+      let to = parseTime($("to").value);
       if (!Number.isFinite(from) || !Number.isFinite(to) || from >= match.duration) {
-        return setInfo(`Choose a time range inside the match (0:00 - ${fmt(match.duration)})`, true);
+        setInfo(`Choose a time range inside the match (00:00 - ${fmt(match.duration)})`, true);
+        return false;
       }
       if (to > match.duration) {
         to = match.duration;
         $("to").value = fmt(to);
+        markActivePreset();
       }
       if ($("target").value === "mvp" && !match.mvp) {
-        return setInfo("MVP is not available yet, pick a team or a player", true);
+        setInfo("MVP is not available yet, pick a team or a player", true);
+        return false;
       }
-      await post("start");
-    };
-    $("stop").onclick = () => post("stop");
-    $("clear").onclick = () => post("clear");
+      return true;
+    }
 
-    for (const id of ["battleid", "target", "from", "to", "palette", "skipDead", ...numberKeys]) {
+    $("show").onclick = async () => { if (await prepareMatch()) await post("show"); };
+    $("hide").onclick = () => post("hide");
+    $("start").onclick = async () => { if (await prepareMatch()) await post("start"); };
+    $("pause").onclick = () => post("pause");
+    $("stop").onclick = () => post("stop");
+
+    for (const id of ["battleid", "target", "title", "dayTag", "from", "to", "palette", "skipDead", ...numberKeys]) {
       $(id).addEventListener("input", scheduleSettingsPost);
     }
 

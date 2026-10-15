@@ -5,22 +5,123 @@
   <title>Heat Map</title>
   <style>
     html, body { margin: 0; background: transparent; overflow: hidden; }
-    #stage { display: block; width: 1920px; height: 1080px; transform-origin: 0 0; }
+    #root {
+      /* KV palette: ruby red, gold trim, white marble */
+      --ruby: #c8102e; --ruby-bright: #ee2b2b; --ruby-dark: #7d0a17; --ruby-deep: #4a060e;
+      --gold: #d4a944; --gold-light: #f6e3a1; --gold-dark: #9c7326;
+      --marble: #fffbf5; --ink: #2b1114;
+      position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
+      transform-origin: 0 0; color: var(--ink); text-transform: uppercase;
+      font-family: Bahnschrift, "Segoe UI", Arial, sans-serif;
+    }
+    #stage { position: absolute; left: 0; top: 0; }
+
+    /* Every animated element hides by default and transitions in when #root has .show.
+       Delays only exist on the .show rules, so the outro plays back without waiting. */
+    .anim { opacity: 0; transition: opacity .6s ease, transform .7s cubic-bezier(.2, .8, .2, 1); }
+    #root.show .anim { opacity: 1; transform: none; }
+
+    #title {
+      position: absolute; left: 1180px; top: 40px; font-size: 118px; line-height: 1.1; font-weight: 900;
+      font-style: italic; letter-spacing: -2px; white-space: nowrap; padding-right: 20px;
+      background: linear-gradient(180deg, var(--ruby-bright), var(--ruby) 55%, var(--ruby-dark));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(2px 3px 0 var(--gold));
+      transform: translateX(140px);
+    }
+    #dayTag {
+      position: absolute; right: 0; top: 96px; padding: 6px 44px 6px 34px; font-size: 34px; font-weight: 800;
+      font-style: italic; color: #fff; background: linear-gradient(90deg, var(--ruby-bright), var(--ruby-dark));
+      border-bottom: 3px solid var(--gold);
+      clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%); transform: translateX(220px);
+    }
+    #heroName {
+      position: absolute; left: 22px; bottom: 215px; font-size: 40px; font-weight: 800; letter-spacing: 5px;
+      color: var(--ruby); writing-mode: vertical-rl; transform: rotate(180deg) translateY(-90px); white-space: nowrap;
+    }
+    #root.show #heroName { transform: rotate(180deg); }
+
+    #card { position: absolute; left: 640px; top: 290px; width: 430px; text-align: center; }
+    #teamName {
+      font-size: 46px; font-weight: 800; font-style: italic; height: 56px; line-height: 56px; transform: translateY(-30px);
+      text-shadow: 0 0 14px rgba(255, 255, 255, .9);
+    }
+    #player {
+      height: 100px; line-height: 100px; font-size: 90px; font-weight: 900; font-style: italic; color: var(--ruby);
+      white-space: pre; margin: 10px -70px 0; text-shadow: 0 2px 0 var(--gold), 0 6px 16px rgba(125, 10, 23, .3);
+    }
+    #player span { display: inline-block; opacity: 0; transform: translateY(46px) skewX(-8deg); transition: opacity .5s ease, transform .6s cubic-bezier(.2, .9, .2, 1); }
+    #root.show #player span { opacity: 1; transform: none; transition-delay: calc(.55s + var(--i) * .045s); }
+
+    #info {
+      position: relative; margin-top: 52px; padding: 22px 0 30px; background: rgba(255, 251, 245, .94);
+      background-image: linear-gradient(rgba(156, 115, 38, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(156, 115, 38, .08) 1px, transparent 1px);
+      background-size: 36px 36px; border: 1px solid rgba(212, 169, 68, .75);
+      box-shadow: 0 10px 30px rgba(74, 6, 14, .25); transform: translateY(70px);
+    }
+    #info i { position: absolute; width: 22px; height: 22px; border: 0 solid var(--gold-dark); }
+    #info i:nth-child(1) { left: -4px; top: -4px; border-width: 2px 0 0 2px; }
+    #info i:nth-child(2) { right: -4px; top: -4px; border-width: 2px 2px 0 0; }
+    #info i:nth-child(3) { left: -4px; bottom: -4px; border-width: 0 0 2px 2px; }
+    #info i:nth-child(4) { right: -4px; bottom: -4px; border-width: 0 2px 2px 0; }
+    .bar {
+      display: inline-block; min-width: 300px; padding: 4px 22px; font-size: 23px; font-weight: 700; letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--ruby-dark), var(--ruby)); color: #fff;
+      border-bottom: 2px solid var(--gold);
+    }
+    #timeRange { margin: 26px 0 14px; font-size: 62px; font-weight: 900; font-style: italic; color: var(--ruby); line-height: 1.1; }
+    #progress { width: 300px; height: 6px; margin: 0 auto 34px; background: rgba(156, 115, 38, .22); overflow: hidden; }
+    #progressFill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--ruby)); transform-origin: 0 0; transform: scaleX(0); }
+    #sides { display: flex; justify-content: center; gap: 70px; margin-top: 18px; font-size: 36px; font-weight: 800; font-style: italic; }
+    .side { display: flex; align-items: center; gap: 10px; transition: opacity .5s ease; }
+    .side.dim { opacity: .35; }
+    .side b { font-size: 30px; font-style: normal; }
+    #side1 { color: var(--gold); }
+    #side2 { color: var(--ruby); }
+
+    #root.show #title { transition-delay: .05s; }
+    #root.show #dayTag { transition-delay: .25s; }
+    #root.show #heroName { transition-delay: .75s; }
+    #root.show #teamName { transition-delay: .4s; }
+    #root.show #info { transition-delay: .3s; }
   </style>
 </head>
 <body>
-  <canvas id="stage" width="1920" height="1080"></canvas>
+  <div id="root">
+    <canvas id="stage" width="1920" height="1080"></canvas>
+    <div id="title" class="anim"></div>
+    <div id="dayTag" class="anim"></div>
+    <div id="heroName" class="anim"></div>
+    <div id="card">
+      <div id="teamName" class="anim"></div>
+      <div id="player"></div>
+      <div id="info" class="anim">
+        <i></i><i></i><i></i><i></i>
+        <div class="bar">Selected game time</div>
+        <div id="timeRange"></div>
+        <div id="progress"><div id="progressFill"></div></div>
+        <div class="bar">Side selection</div>
+        <div id="sides">
+          <div class="side" id="sideBox1"><b id="side1">&#9670;</b><span id="side1Name"></span></div>
+          <div class="side" id="sideBox2"><b id="side2">&#9670;</b><span id="side2Name"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
-    // ?fit=1 scales the 1920x1080 canvas to the window for previewing, ?debug=1 shows status text
+    // ?fit=1 scales the 1920x1080 page to the window, ?debug=1 shows status text,
+    // ?preview=1 keeps the layout visible with placeholder text (for positioning)
     const params = new URLSearchParams(location.search);
     const W = 1920, H = 1080;
     const R = 400; // internal heat field resolution (square)
 
-    const stage = document.getElementById("stage");
+    const $ = (id) => document.getElementById(id);
+    const root = $("root");
+    const stage = $("stage");
     const ctx = stage.getContext("2d");
     if (params.has("fit")) {
       document.body.style.background = "#222";
-      const fit = () => { stage.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`; };
+      const fit = () => { root.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`; };
       fit();
       addEventListener("resize", fit);
     }
@@ -43,6 +144,19 @@
     let dirty = true;
     let status = "idle";
     let startToken = 0;
+    let showToken = 0;
+
+    // map reveal tween (0 hidden .. 1 shown)
+    let reveal = 0, revealFrom = 0, revealTarget = 0, revealStart = 0;
+    const REVEAL_MS = 900;
+    function setReveal(target) {
+      revealFrom = reveal;
+      revealTarget = target;
+      revealStart = performance.now();
+    }
+
+    const fmt = (sec) => `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     // Game coords (x, y) range -65..65 and the map image is rotated 45deg:
     // (65,0) top-right, (0,65) top-left, (-65,0) bottom-left, (0,-65) bottom-right.
@@ -60,12 +174,8 @@
         const t = i / 255;
         let r, g, b, a;
         if (palette === "fire") {
-          // yellow -> orange -> red
           const k = Math.min(1, t * 1.4);
-          r = 255;
-          g = Math.round(230 - 200 * k);
-          b = Math.round(80 - 60 * k);
-          a = Math.min(1, t * 1.4);
+          r = 255; g = Math.round(230 - 200 * k); b = Math.round(80 - 60 * k); a = Math.min(1, t * 1.4);
         } else {
           r = 255; g = 196; b = 45; a = t;
         }
@@ -132,26 +242,121 @@
       return dense;
     }
 
+    // ---- overlay text ----
+    function applySettingsText(s) {
+      $("title").textContent = s.title || "";
+      $("dayTag").textContent = s.dayTag || "";
+      $("dayTag").style.display = s.dayTag ? "" : "none";
+      // the selected game time always follows the chosen range
+      $("timeRange").textContent = `${fmt(s.from)} - ${fmt(s.to)}`;
+    }
+
+    function setPlayerName(text) {
+      const box = $("player");
+      box.innerHTML = "";
+      [...text].forEach((ch, i) => {
+        const span = document.createElement("span");
+        span.textContent = ch;
+        span.style.setProperty("--i", i);
+        box.appendChild(span);
+      });
+      box.style.fontSize = "90px";
+      const maxWidth = 520;
+      if (box.scrollWidth > maxWidth) {
+        box.style.fontSize = Math.max(34, Math.floor((90 * maxWidth) / box.scrollWidth)) + "px";
+      }
+    }
+
+    function applyMeta(meta) {
+      $("teamName").textContent = meta.teamName;
+      setPlayerName(meta.playerName);
+      $("heroName").textContent = meta.heroName;
+      $("side1Name").textContent = meta.side1;
+      $("side2Name").textContent = meta.side2;
+      $("sideBox1").classList.toggle("dim", !meta.activeCamps.includes(1));
+      $("sideBox2").classList.toggle("dim", !meta.activeCamps.includes(2));
+    }
+
+    function buildMeta(data, s) {
+      const t1 = data.team1 || {}, t2 = data.team2 || {};
+      const label = (t, n) => t.short_name || t.name || `TEAM ${n}`;
+      const everyone = [...(t1.players || []), ...(t2.players || [])];
+      const player = s.target === "mvp" ? data.mvp : everyone.find((p) => String(p.roleid) === s.target);
+      let playerName, teamName, activeCamps;
+      if (player) {
+        playerName = player.name || player.ign;
+        teamName = label(player.campid === 1 ? t1 : t2, player.campid);
+        activeCamps = [player.campid];
+      } else if (s.target === "team1") {
+        playerName = t1.name || label(t1, 1); teamName = ""; activeCamps = [1];
+      } else if (s.target === "team2") {
+        playerName = t2.name || label(t2, 2); teamName = ""; activeCamps = [2];
+      } else {
+        playerName = "Both teams"; teamName = ""; activeCamps = [1, 2];
+      }
+      return {
+        playerName, teamName, activeCamps,
+        heroName: player ? player.hero_name : "",
+        side1: label(t1, 1), side2: label(t2, 2),
+      };
+    }
+
+    function showOverlay() {
+      root.classList.add("show");
+      setReveal(1);
+    }
+
+    function hideOverlay() {
+      if (params.has("preview")) return;
+      root.classList.remove("show");
+      setReveal(0);
+    }
+
     function clearHeat() {
       field.fill(0);
       dirty = true;
     }
 
+    async function fetchMatch(s, namesOnly) {
+      // namesOnly skips the tracks (a 1-second window) when only team/player names are needed
+      const query = new URLSearchParams(namesOnly ? { from: 0, to: 0 } : { from: s.from, to: s.to });
+      if (s.target !== "mvp") query.set("mvp", "0"); // no need to wait for the MVP lookup
+      if (s.battleid) query.set("battleid", s.battleid);
+      const res = await fetch(`/heatmap?${query}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || res.status);
+      return data;
+    }
+
+    // Transition in: load the names for the chosen target, then animate the overlay in
+    async function showSequence() {
+      const token = ++showToken;
+      try {
+        const data = await fetchMatch(settings, true);
+        if (token !== showToken) return;
+        if (root.classList.contains("show") && !params.has("preview")) {
+          hideOverlay(); // replay the intro
+          await sleep(700);
+          if (token !== showToken) return;
+        }
+        applyMeta(buildMeta(data, settings));
+        showOverlay();
+      } catch (e) {
+        status = "error: " + e.message;
+        console.error("heatmap show failed:", e);
+      }
+    }
+
+    // Start only runs the heat animation, the overlay transition is separate
     async function startPlayback() {
       const s = settings;
       const token = ++startToken;
       running = false;
       play = null;
-      clearHeat();
       status = "loading";
       try {
-        const query = new URLSearchParams({ from: s.from, to: s.to });
-        if (s.target !== "mvp") query.set("mvp", "0"); // no need to wait for the MVP lookup
-        if (s.battleid) query.set("battleid", s.battleid);
-        const res = await fetch(`/heatmap?${query}`);
-        const data = await res.json();
+        const data = await fetchMatch(s, false);
         if (token !== startToken) return;
-        if (!res.ok) throw new Error(data.error || res.status);
 
         const from = Math.floor(s.from);
         const to = Math.min(Math.floor(s.to), data.duration);
@@ -159,6 +364,9 @@
         if (to <= from) throw new Error("empty time range");
         if (!players.length) throw new Error("no player data for target " + s.target);
 
+        clearHeat();
+        $("progressFill").style.transform = "scaleX(0)";
+        applyMeta(buildMeta(data, s));
         play = {
           tracks: players.map((p) => buildDense(p.track, from, to, s.skipDead)),
           from, to, t: from, next: from,
@@ -171,18 +379,28 @@
       }
     }
 
-    function handleCommand(state) {
+    function togglePause() {
+      if (!play || play.t >= play.to) return;
+      running = !running;
+      status = running ? "playing" : "paused";
+    }
+
+    function stopPlayback() {
       startToken++; // cancels an in-flight start
-      if (state.action === "start") {
-        startPlayback();
-      } else if (state.action === "stop") {
-        running = false;
-        status = "stopped";
-      } else if (state.action === "clear") {
-        running = false;
-        play = null;
-        clearHeat();
-        status = "cleared";
+      running = false;
+      play = null;
+      clearHeat();
+      $("progressFill").style.transform = "scaleX(0)";
+      status = "stopped";
+    }
+
+    function handleCommand(state) {
+      switch (state.action) {
+        case "show": showSequence(); break;
+        case "hide": showToken++; hideOverlay(); break;
+        case "start": startPlayback(); break;
+        case "pause": togglePause(); break;
+        case "stop": stopPlayback(); break;
       }
     }
 
@@ -192,7 +410,10 @@
         const state = await res.json();
         const changed = JSON.stringify(state.settings) !== JSON.stringify(settings);
         settings = state.settings;
-        if (changed) dirty = true;
+        if (changed) {
+          dirty = true;
+          applySettingsText(settings);
+        }
         if (seq === null) {
           seq = state.seq; // ignore commands issued before this page loaded
         } else if (state.seq !== seq) {
@@ -225,6 +446,7 @@
           play.next++;
           dirty = true;
         }
+        $("progressFill").style.transform = `scaleX(${Math.min(1, (play.t - play.from) / (play.to - play.from))})`;
         if (play.t >= play.to) {
           running = false;
           status = "finished";
@@ -237,29 +459,75 @@
       }
     }
 
-    function frame() {
-      if (settings) {
-        ctx.clearRect(0, 0, W, H);
-        if (bg.complete && bg.naturalWidth) {
-          ctx.drawImage(bg, settings.mapX, settings.mapY, settings.mapSize, settings.mapSize);
-        }
-        ctx.globalAlpha = settings.opacity;
-        ctx.drawImage(heatCanvas, settings.mapX, settings.mapY, settings.mapSize, settings.mapSize);
-        ctx.globalAlpha = 1;
+    const easeOut = (p) => 1 - Math.pow(1 - p, 3);
 
-        if (params.has("debug")) {
-          const shown = play ? Math.min(play.t, play.to).toFixed(0) : "-";
-          ctx.fillStyle = "#fff";
-          ctx.font = "20px sans-serif";
-          ctx.fillText(`${status}  t=${shown}`, 20, 30);
-        }
+    function drawMap(s) {
+      const size = s.mapSize;
+      const pad = Math.round(size * 0.045);
+      ctx.save();
+      // grow the whole map block in from 85% size while fading
+      const cx = s.mapX + size / 2, cy = s.mapY + size / 2;
+      const scale = 0.85 + 0.15 * reveal;
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+      ctx.translate(-cx, -cy);
+      ctx.globalAlpha = reveal;
+
+      const gradient = ctx.createLinearGradient(0, s.mapY - pad, 0, s.mapY + size + pad);
+      gradient.addColorStop(0, "#f6e3a1");
+      gradient.addColorStop(0.5, "#d4a944");
+      gradient.addColorStop(1, "#9c7326");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(s.mapX - pad, s.mapY - pad, size + pad * 2, size + pad * 2);
+      ctx.fillStyle = "#4a060e";
+      ctx.fillRect(s.mapX - 4, s.mapY - 4, size + 8, size + 8);
+
+      if (bg.complete && bg.naturalWidth) ctx.drawImage(bg, s.mapX, s.mapY, size, size);
+      ctx.globalAlpha = reveal * s.opacity;
+      ctx.drawImage(heatCanvas, s.mapX, s.mapY, size, size);
+      ctx.restore();
+    }
+
+    function frame(now) {
+      const p = Math.min(1, (now - revealStart) / REVEAL_MS);
+      reveal = revealFrom + (revealTarget - revealFrom) * easeOut(p);
+
+      ctx.clearRect(0, 0, W, H);
+      if (settings && reveal > 0.002) drawMap(settings);
+
+      if (params.has("debug")) {
+        const shown = play ? Math.min(play.t, play.to).toFixed(0) : "-";
+        ctx.fillStyle = "#fff";
+        ctx.font = "20px sans-serif";
+        ctx.fillText(`${status}  t=${shown}`, 20, 30);
       }
       requestAnimationFrame(frame);
     }
 
+    if (params.has("preview")) {
+      applyMeta({
+        playerName: "Player name", teamName: "Team", heroName: "Hero",
+        side1: "Team 1", side2: "Team 2", activeCamps: [1],
+      });
+      showOverlay();
+    }
+
+    // A worker drives the clock: page timers are throttled hard in background tabs, worker timers are not
+    let pollCounter = 0;
+    function onClock() {
+      tick();
+      if (++pollCounter >= 15) {
+        pollCounter = 0;
+        poll();
+      }
+    }
+    try {
+      const clock = new Worker(URL.createObjectURL(new Blob(["setInterval(() => postMessage(0), 33);"])));
+      clock.onmessage = onClock;
+    } catch (e) {
+      setInterval(onClock, 33);
+    }
     poll();
-    setInterval(poll, 500);
-    setInterval(tick, 33);
     requestAnimationFrame(frame);
   </script>
 </body>

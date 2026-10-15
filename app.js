@@ -7330,6 +7330,7 @@ app.get("/heatmap", async (req, res) => {
       return res.status(404).json({ error: "No play snapshots saved yet" });
     }
 
+    const useFormNames = battleId === String(id); // formData holds the current battle's team names
     const buildPlayer = (player) => {
       const track = [...(source.players.get(player.roleid)?.values() || [])]
         .filter((point) => point[0] >= from && point[0] <= to)
@@ -7341,6 +7342,7 @@ app.get("/heatmap", async (req, res) => {
         c_role: playerList?.[player.roleid]?.role || null,
         campid: player.campid,
         heroid: player.heroid,
+        hero_name: heroNames[player.heroid] || "",
         level: player.level,
         kill_num: player.kill_num,
         dead_num: player.dead_num,
@@ -7362,6 +7364,9 @@ app.get("/heatmap", async (req, res) => {
       allPlayers.push(...teamPlayers);
       teams[`team${camp.campid}`] = {
         campid: camp.campid,
+        // pathData.json names win for the current battle, the API names are the fallback
+        name: (useFormNames && formData?.[`team${camp.campid}_name`]) || camp.team_name,
+        short_name: (useFormNames && formData?.[`team${camp.campid}_shortName`]) || camp.team_simple_name,
         team_name: camp.team_name,
         team_simple_name: camp.team_simple_name,
         team_id: camp.team_id,
@@ -7439,6 +7444,8 @@ const heatmapControl = {
   settings: {
     battleid: "", // empty = current battle id
     target: "mvp", // mvp | team1 | team2 | both | <roleid>
+    title: "HEAT MAP",
+    dayTag: "",
     from: 0,
     to: 300,
     speed: 15, // game seconds drawn per real second
@@ -7447,9 +7454,9 @@ const heatmapControl = {
     opacity: 0.9,
     palette: "gold", // gold | fire
     skipDead: true,
-    mapX: 1100,
-    mapY: 190,
-    mapSize: 700,
+    mapX: 1175,
+    mapY: 262,
+    mapSize: 612,
     calibScale: 1,
     calibX: 0,
     calibY: 0,
@@ -7476,7 +7483,7 @@ const applyHeatmapSettings = (input) => {
   const settings = heatmapControl.settings;
 
   for (const [key, [min, max]] of Object.entries(heatmapNumberLimits)) {
-    if (input[key] === undefined || input[key] === "") continue;
+    if (input[key] === undefined || input[key] === null || input[key] === "") continue;
     const value = Number(input[key]);
     if (Number.isFinite(value)) settings[key] = Math.min(max, Math.max(min, value));
   }
@@ -7487,6 +7494,8 @@ const applyHeatmapSettings = (input) => {
     settings.target = input.target;
   }
   if (input.palette === "gold" || input.palette === "fire") settings.palette = input.palette;
+  if (typeof input.title === "string") settings.title = input.title.slice(0, 30);
+  if (typeof input.dayTag === "string") settings.dayTag = input.dayTag.slice(0, 16);
   if (typeof input.skipDead === "boolean") settings.skipDead = input.skipDead;
 };
 
@@ -7498,7 +7507,8 @@ app.get("/heatmapcontrol", (req, res) => {
 app.post("/heatmapcontrol", (req, res) => {
   const { action, settings } = req.body || {};
   applyHeatmapSettings(settings);
-  if (["start", "stop", "clear"].includes(action)) {
+  // show/hide = overlay transition in/out, start/pause/stop = heat animation
+  if (["show", "hide", "start", "pause", "stop"].includes(action)) {
     heatmapControl.action = action;
     heatmapControl.seq++;
   }
