@@ -9,7 +9,8 @@ const path = require("path");
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(express.static(path.join(__dirname, "public")));
+// redirect:false so the public/heatmap folder doesn't hijack the /heatmap JSON route
+app.use(express.static(path.join(__dirname, "public"), { redirect: false }));
 
 // Define global variables //254770134480685102
 let playerList;
@@ -7247,6 +7248,7 @@ app.get("/playercam", async (req, res) => {
 // === HEATMAP ===
 // Builds per-player position tracks from json/<battleid>.ndjson (one point per game second).
 let heatmapCache = null; // { key, value } - only the latest battle is cached
+const heatmapMvpCache = new Map(); // battleId -> MVP roleid, filled once a match has ended
 
 const loadHeatmapSource = async (battleId) => {
   const filePath = path.join(__dirname, "json", `${battleId}.ndjson`);
@@ -7372,31 +7374,42 @@ app.get("/heatmap", async (req, res) => {
       };
     }
 
-    // MVP comes from postdata (only available after the match), ?roleid= overrides it
+    // MVP comes from postdata (only available after the match), ?roleid= overrides it.
+    // ?mvp=0 skips the lookup, the MVP is cached per battle once the match has ended.
     let mvp = null;
     let mvpSource = null;
     const requestedRoleId = req.query.roleid;
     if (requestedRoleId) {
       mvp = allPlayers.find((p) => String(p.roleid) === String(requestedRoleId)) || null;
       mvpSource = mvp ? "query" : null;
-    } else {
-      try {
-        const postUrl =
-          "http://esportsdata-sg.mobilelegends.com/postdata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
-          encodeURIComponent(battleId);
-        const { response, body } = await makeRequest(postUrl);
-        if (response.statusCode === 200 && body?.data?.hero_list) {
-          const winner = body.data.win_camp;
-          const mvpPlayer = body.data.hero_list.find(
+    } else if (req.query.mvp !== "0") {
+      let mvpRoleId = heatmapMvpCache.get(battleId);
+      if (mvpRoleId === undefined) {
+        try {
+          const postUrl =
+            "http://esportsdata-sg.mobilelegends.com/postdata?authkey=6d1fdc8b564a7ca26de867bd9d717fd4&battleid=" +
+            encodeURIComponent(battleId);
+          const body = await new Promise((resolve, reject) => {
+            request({ url: postUrl, json: true, timeout: 15000 }, (error, response, data) => {
+              if (error) return reject(error);
+              resolve(response.statusCode === 200 ? data : null);
+            });
+          });
+          const winner = body?.data?.win_camp;
+          const mvpPlayer = body?.data?.hero_list?.find(
             (p) => p.campid === winner && p.mvp === true
           );
           if (mvpPlayer) {
-            mvp = allPlayers.find((p) => p.roleid === mvpPlayer.roleid) || null;
-            mvpSource = mvp ? "postdata" : null;
+            mvpRoleId = mvpPlayer.roleid;
+            if (last.state === "end") heatmapMvpCache.set(battleId, mvpRoleId);
           }
+        } catch (e) {
+          console.error("Error fetching MVP for heatmap:", e.message);
         }
-      } catch (e) {
-        console.error("Error fetching MVP for heatmap:", e.message);
+      }
+      if (mvpRoleId !== undefined) {
+        mvp = allPlayers.find((p) => p.roleid === mvpRoleId) || null;
+        mvpSource = mvp ? "postdata" : null;
       }
     }
 
@@ -7416,6 +7429,88 @@ app.get("/heatmap", async (req, res) => {
     console.error("Error in /heatmap route:", error);
     res.status(500).json({ error: "Internal server error", message: error.message });
   }
+});
+
+// === HEATMAP UI CONTROL ===
+// /dashboard writes this state, /heatmapui (broadcast page) polls it.
+const heatmapControl = {
+  seq: 0, // bumped on every start/stop/clear so the UI knows a new command arrived
+  action: "idle",
+  settings: {
+    battleid: "", // empty = current battle id
+    target: "mvp", // mvp | team1 | team2 | both | <roleid>
+    from: 0,
+    to: 300,
+    speed: 15, // game seconds drawn per real second
+    radius: 22, // dot radius in map pixels
+    strength: 0.5,
+    opacity: 0.9,
+    palette: "gold", // gold | fire
+    skipDead: true,
+    mapX: 1100,
+    mapY: 190,
+    mapSize: 700,
+    calibScale: 1,
+    calibX: 0,
+    calibY: 0,
+  },
+};
+
+const heatmapNumberLimits = {
+  from: [0, 36000],
+  to: [0, 36000],
+  speed: [0.5, 200],
+  radius: [2, 200],
+  strength: [0.01, 5],
+  opacity: [0, 1],
+  mapX: [-2000, 3840],
+  mapY: [-2000, 2160],
+  mapSize: [50, 3000],
+  calibScale: [0.5, 2],
+  calibX: [-0.5, 0.5],
+  calibY: [-0.5, 0.5],
+};
+
+const applyHeatmapSettings = (input) => {
+  if (!input || typeof input !== "object") return;
+  const settings = heatmapControl.settings;
+
+  for (const [key, [min, max]] of Object.entries(heatmapNumberLimits)) {
+    if (input[key] === undefined || input[key] === "") continue;
+    const value = Number(input[key]);
+    if (Number.isFinite(value)) settings[key] = Math.min(max, Math.max(min, value));
+  }
+  if (typeof input.battleid === "string" && /^[A-Za-z0-9_-]*$/.test(input.battleid.trim())) {
+    settings.battleid = input.battleid.trim();
+  }
+  if (typeof input.target === "string" && /^(mvp|team1|team2|both|\d+)$/.test(input.target)) {
+    settings.target = input.target;
+  }
+  if (input.palette === "gold" || input.palette === "fire") settings.palette = input.palette;
+  if (typeof input.skipDead === "boolean") settings.skipDead = input.skipDead;
+};
+
+app.get("/heatmapcontrol", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json(heatmapControl);
+});
+
+app.post("/heatmapcontrol", (req, res) => {
+  const { action, settings } = req.body || {};
+  applyHeatmapSettings(settings);
+  if (["start", "stop", "clear"].includes(action)) {
+    heatmapControl.action = action;
+    heatmapControl.seq++;
+  }
+  res.json(heatmapControl);
+});
+
+app.get("/heatmapui", (req, res) => {
+  res.sendFile(__dirname + "/public/heatmap/heatmapui.html");
+});
+
+app.get("/dashboard", (req, res) => {
+  res.sendFile(__dirname + "/public/heatmap/dashboard.html");
 });
 
 app.listen(3000, () => {

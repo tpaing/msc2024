@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; font-family: Segoe UI, Arial, sans-serif; background: #12161c; color: #e8edf3; }
+    h1 { margin: 0 0 16px; font-size: 22px; }
+    .module { max-width: 760px; background: #1b222c; border: 1px solid #2b3644; border-radius: 10px; margin-bottom: 20px; }
+    .module > h2 { margin: 0; padding: 12px 16px; font-size: 17px; border-bottom: 1px solid #2b3644; display: flex; justify-content: space-between; align-items: center; }
+    .module > h2 a { font-size: 13px; color: #6cb8ff; font-weight: normal; }
+    .body { padding: 16px; display: grid; gap: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+    label { display: grid; gap: 4px; font-size: 12px; color: #9fb0c3; }
+    input, select, button { font: inherit; font-size: 14px; border-radius: 6px; border: 1px solid #38465a; background: #0f1318; color: #e8edf3; padding: 7px 9px; }
+    input[type=range] { padding: 0; width: 150px; }
+    input[type=checkbox] { width: 18px; height: 18px; }
+    button { cursor: pointer; background: #26425e; }
+    button:hover { background: #2f5379; }
+    button.active { background: #2e7d4f; border-color: #3fa569; }
+    button.start { background: #2e7d4f; } button.stop { background: #8a3b3b; }
+    button:disabled { opacity: .4; cursor: default; }
+    .group-title { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #6f8197; margin-bottom: -4px; }
+    #info { font-size: 13px; color: #9fb0c3; min-height: 18px; }
+    #info.err { color: #ff8585; }
+    .val { color: #e8edf3; }
+  </style>
+</head>
+<body>
+  <h1>Dashboard</h1>
+
+  <section class="module" id="heatmap-module">
+    <h2>Heat Map <a href="/heatmapui?fit=1&debug=1" target="_blank">open /heatmapui</a></h2>
+    <div class="body">
+      <div class="group-title">Match</div>
+      <div class="row">
+        <label>Battle ID (empty = current)
+          <input id="battleid" size="26" placeholder="current battle id" />
+        </label>
+        <button id="load">Load match</button>
+        <label>Heat of
+          <select id="target">
+            <option value="mvp">MVP</option>
+            <option value="team1">Team 1</option>
+            <option value="team2">Team 2</option>
+            <option value="both">Both teams</option>
+          </select>
+        </label>
+      </div>
+      <div id="info"></div>
+
+      <div class="group-title">Game time</div>
+      <div class="row" id="presets"></div>
+      <div class="row">
+        <label>From (mm:ss) <input id="from" size="7" /></label>
+        <label>To (mm:ss) <input id="to" size="7" /></label>
+        <label>Speed (game sec / sec)
+          <input id="speed" type="number" min="0.5" max="200" step="0.5" style="width:90px" />
+        </label>
+      </div>
+
+      <div class="row">
+        <button class="start" id="start">Start</button>
+        <button class="stop" id="stop">Stop</button>
+        <button id="clear">Clear</button>
+      </div>
+
+      <div class="group-title">Look</div>
+      <div class="row">
+        <label>Dot radius <span class="val" id="radius-v"></span><input id="radius" type="range" min="4" max="80" step="1" /></label>
+        <label>Strength <span class="val" id="strength-v"></span><input id="strength" type="range" min="0.05" max="3" step="0.05" /></label>
+        <label>Opacity <span class="val" id="opacity-v"></span><input id="opacity" type="range" min="0" max="1" step="0.05" /></label>
+        <label>Palette
+          <select id="palette"><option value="gold">Gold</option><option value="fire">Fire</option></select>
+        </label>
+        <label>Skip dead <input id="skipDead" type="checkbox" /></label>
+      </div>
+
+      <div class="group-title">Map position on 1920x1080</div>
+      <div class="row">
+        <label>X <input id="mapX" type="number" step="1" style="width:90px" /></label>
+        <label>Y <input id="mapY" type="number" step="1" style="width:90px" /></label>
+        <label>Size <input id="mapSize" type="number" step="1" style="width:90px" /></label>
+      </div>
+
+      <div class="group-title">Coordinate calibration (only if heat is off the map)</div>
+      <div class="row">
+        <label>Scale <input id="calibScale" type="number" step="0.01" style="width:90px" /></label>
+        <label>Offset X <input id="calibX" type="number" step="0.005" style="width:90px" /></label>
+        <label>Offset Y <input id="calibY" type="number" step="0.005" style="width:90px" /></label>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const numberKeys = ["speed", "radius", "strength", "opacity", "mapX", "mapY", "mapSize", "calibScale", "calibX", "calibY"];
+    const rangeKeys = ["radius", "strength", "opacity"];
+    let match = null; // last loaded /heatmap response
+    let postTimer = null;
+
+    const fmt = (sec) => `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
+    const parseTime = (text) => {
+      const parts = String(text).trim().split(":").map(Number);
+      if (parts.some((n) => !Number.isFinite(n))) return NaN;
+      return parts.length === 2 ? parts[0] * 60 + parts[1] : parts[0];
+    };
+
+    function setInfo(text, isError) {
+      $("info").textContent = text;
+      $("info").className = isError ? "err" : "";
+    }
+
+    function readForm() {
+      const settings = {
+        battleid: $("battleid").value.trim(),
+        target: $("target").value,
+        from: parseTime($("from").value),
+        to: parseTime($("to").value),
+        palette: $("palette").value,
+        skipDead: $("skipDead").checked,
+      };
+      for (const key of numberKeys) settings[key] = $(key).value;
+      return settings;
+    }
+
+    function fillForm(s) {
+      $("battleid").value = s.battleid;
+      if (![...$("target").options].some((o) => o.value === s.target)) {
+        $("target").add(new Option(`Player ${s.target}`, s.target));
+      }
+      $("target").value = s.target;
+      $("from").value = fmt(s.from);
+      $("to").value = fmt(s.to);
+      $("palette").value = s.palette;
+      $("skipDead").checked = s.skipDead;
+      for (const key of numberKeys) $(key).value = s[key];
+      for (const key of rangeKeys) $(`${key}-v`).textContent = s[key];
+      markActivePreset();
+    }
+
+    async function post(action) {
+      const res = await fetch("/heatmapcontrol", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, settings: readForm() }),
+      });
+      return res.json();
+    }
+
+    // Settings are applied live; they are sent shortly after the last change
+    function scheduleSettingsPost() {
+      for (const key of rangeKeys) $(`${key}-v`).textContent = $(key).value;
+      clearTimeout(postTimer);
+      postTimer = setTimeout(() => post("settings"), 150);
+      markActivePreset();
+    }
+
+    function renderPresets() {
+      const box = $("presets");
+      box.innerHTML = "";
+      const duration = match ? match.duration : 15 * 60;
+      for (let start = 0; start < Math.max(duration, 1); start += 300) {
+        const end = start + 300;
+        const button = document.createElement("button");
+        button.textContent = `${start / 60} - ${end / 60} min`;
+        button.dataset.from = start;
+        button.dataset.to = end;
+        button.onclick = () => {
+          $("from").value = fmt(start);
+          $("to").value = fmt(end);
+          scheduleSettingsPost();
+        };
+        box.appendChild(button);
+        if (start >= 900 && !match) break; // before loading, offer 0-5, 5-10, 10-15
+      }
+      markActivePreset();
+    }
+
+    function markActivePreset() {
+      const from = parseTime($("from").value), to = parseTime($("to").value);
+      for (const button of $("presets").children) {
+        button.classList.toggle("active", Number(button.dataset.from) === from && Number(button.dataset.to) === to);
+      }
+    }
+
+    async function loadMatch() {
+      const battleid = $("battleid").value.trim();
+      setInfo("Loading...");
+      try {
+        const res = await fetch(`/heatmap?${battleid ? "battleid=" + encodeURIComponent(battleid) : ""}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || res.status);
+        match = data;
+
+        const names = [data.team1, data.team2].map((t, i) => (t && (t.team_simple_name || t.team_name)) || `Team ${i + 1}`);
+        const mvpText = data.mvp ? `${data.mvp.name || data.mvp.ign} (hero ${data.mvp.heroid})` : "not available yet";
+        setInfo(`${names[0]} vs ${names[1]} | state: ${data.state} | length ${fmt(data.duration)} | MVP: ${mvpText}`);
+
+        // keep MVP/teams, then list every player for single-player heat
+        const keep = $("target").value;
+        for (const option of [...$("target").options]) if (/^\d+$/.test(option.value)) option.remove();
+        for (const team of [data.team1, data.team2]) {
+          for (const p of (team && team.players) || []) {
+            $("target").add(new Option(`${(team.team_simple_name || "T" + team.campid)} - ${p.name || p.ign}`, String(p.roleid)));
+          }
+        }
+        $("target").value = [...$("target").options].some((o) => o.value === keep) ? keep : "mvp";
+        renderPresets();
+        return true;
+      } catch (e) {
+        match = null;
+        setInfo(e.message, true);
+        renderPresets();
+        return false;
+      }
+    }
+
+    $("load").onclick = loadMatch;
+    $("start").onclick = async () => {
+      if (!(await loadMatch())) return;
+      let from = parseTime($("from").value), to = parseTime($("to").value);
+      if (!Number.isFinite(from) || !Number.isFinite(to) || from >= match.duration) {
+        return setInfo(`Choose a time range inside the match (0:00 - ${fmt(match.duration)})`, true);
+      }
+      if (to > match.duration) {
+        to = match.duration;
+        $("to").value = fmt(to);
+      }
+      if ($("target").value === "mvp" && !match.mvp) {
+        return setInfo("MVP is not available yet, pick a team or a player", true);
+      }
+      await post("start");
+    };
+    $("stop").onclick = () => post("stop");
+    $("clear").onclick = () => post("clear");
+
+    for (const id of ["battleid", "target", "from", "to", "palette", "skipDead", ...numberKeys]) {
+      $(id).addEventListener("input", scheduleSettingsPost);
+    }
+
+    fetch("/heatmapcontrol", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((state) => { fillForm(state.settings); renderPresets(); });
+  </script>
+</body>
+</html>

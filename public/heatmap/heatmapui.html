@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Heat Map</title>
+  <style>
+    html, body { margin: 0; background: transparent; overflow: hidden; }
+    #stage { display: block; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  </style>
+</head>
+<body>
+  <canvas id="stage" width="1920" height="1080"></canvas>
+  <script>
+    // ?fit=1 scales the 1920x1080 canvas to the window for previewing, ?debug=1 shows status text
+    const params = new URLSearchParams(location.search);
+    const W = 1920, H = 1080;
+    const R = 400; // internal heat field resolution (square)
+
+    const stage = document.getElementById("stage");
+    const ctx = stage.getContext("2d");
+    if (params.has("fit")) {
+      document.body.style.background = "#222";
+      const fit = () => { stage.style.transform = `scale(${Math.min(innerWidth / W, innerHeight / H)})`; };
+      fit();
+      addEventListener("resize", fit);
+    }
+
+    const bg = new Image();
+    bg.src = "/heatmap/HeatMapBG.png";
+
+    const heatCanvas = document.createElement("canvas");
+    heatCanvas.width = heatCanvas.height = R;
+    const heatCtx = heatCanvas.getContext("2d");
+    const heatImage = heatCtx.createImageData(R, R);
+    const field = new Float32Array(R * R);
+
+    let settings = null;
+    let lut = new Uint8ClampedArray(256 * 4);
+    let lutPalette = "";
+    let seq = null;
+    let play = null; // { tracks, from, to, t, next }
+    let running = false;
+    let dirty = true;
+    let status = "idle";
+    let startToken = 0;
+
+    // Game coords (x, y) range -65..65 and the map image is rotated 45deg:
+    // (65,0) top-right, (0,65) top-left, (-65,0) bottom-left, (0,-65) bottom-right.
+    function toMapFraction(x, y, s) {
+      const u = 0.5 + (x - y) / 130;
+      const v = 0.5 - (x + y) / 130;
+      return [
+        0.5 + (u - 0.5) * s.calibScale + s.calibX,
+        0.5 + (v - 0.5) * s.calibScale + s.calibY,
+      ];
+    }
+
+    function buildLut(palette) {
+      for (let i = 0; i < 256; i++) {
+        const t = i / 255;
+        let r, g, b, a;
+        if (palette === "fire") {
+          // yellow -> orange -> red
+          const k = Math.min(1, t * 1.4);
+          r = 255;
+          g = Math.round(230 - 200 * k);
+          b = Math.round(80 - 60 * k);
+          a = Math.min(1, t * 1.4);
+        } else {
+          r = 255; g = 196; b = 45; a = t;
+        }
+        lut[i * 4] = r; lut[i * 4 + 1] = g; lut[i * 4 + 2] = b; lut[i * 4 + 3] = a * 255;
+      }
+      lutPalette = palette;
+    }
+
+    function addDot(fu, fv, s) {
+      const cx = fu * R, cy = fv * R;
+      const radius = (s.radius * R) / s.mapSize;
+      const sigma = radius / 2;
+      const reach = Math.ceil(radius * 1.5);
+      const x0 = Math.max(0, Math.floor(cx - reach)), x1 = Math.min(R - 1, Math.ceil(cx + reach));
+      const y0 = Math.max(0, Math.floor(cy - reach)), y1 = Math.min(R - 1, Math.ceil(cy + reach));
+      const k = 1 / (2 * sigma * sigma);
+      for (let y = y0; y <= y1; y++) {
+        for (let x = x0; x <= x1; x++) {
+          const dx = x - cx, dy = y - cy;
+          field[y * R + x] += Math.exp(-(dx * dx + dy * dy) * k);
+        }
+      }
+    }
+
+    function colorize(s) {
+      if (lutPalette !== s.palette) buildLut(s.palette);
+      const data = heatImage.data;
+      for (let i = 0; i < field.length; i++) {
+        const v = field[i];
+        const o = i * 4;
+        if (v < 0.002) { data[o + 3] = 0; continue; }
+        const idx = Math.min(255, Math.round((1 - Math.exp(-s.strength * v)) * 255)) * 4;
+        data[o] = lut[idx]; data[o + 1] = lut[idx + 1]; data[o + 2] = lut[idx + 2]; data[o + 3] = lut[idx + 3];
+      }
+      heatCtx.putImageData(heatImage, 0, 0);
+    }
+
+    function selectTracks(data, target) {
+      const team1 = (data.team1 && data.team1.players) || [];
+      const team2 = (data.team2 && data.team2.players) || [];
+      if (target === "mvp") return data.mvp ? [data.mvp] : [];
+      if (target === "team1") return team1;
+      if (target === "team2") return team2;
+      if (target === "both") return [...team1, ...team2];
+      return [...team1, ...team2].filter((p) => String(p.roleid) === target);
+    }
+
+    // One position per game second; short gaps (missed snapshots) are filled by interpolation
+    function buildDense(track, from, to, skipDead) {
+      const dense = new Array(to - from + 1).fill(null);
+      const points = track.filter((p) => p[0] >= from && p[0] <= to);
+      for (const [t, x, y, dead] of points) {
+        if (!(skipDead && dead)) dense[t - from] = [x, y];
+      }
+      for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1], b = points[i];
+        const gap = b[0] - a[0];
+        if (gap < 2 || gap > 10 || a[3] || b[3]) continue;
+        for (let t = a[0] + 1; t < b[0]; t++) {
+          const f = (t - a[0]) / gap;
+          dense[t - from] = [a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+        }
+      }
+      return dense;
+    }
+
+    function clearHeat() {
+      field.fill(0);
+      dirty = true;
+    }
+
+    async function startPlayback() {
+      const s = settings;
+      const token = ++startToken;
+      running = false;
+      play = null;
+      clearHeat();
+      status = "loading";
+      try {
+        const query = new URLSearchParams({ from: s.from, to: s.to });
+        if (s.target !== "mvp") query.set("mvp", "0"); // no need to wait for the MVP lookup
+        if (s.battleid) query.set("battleid", s.battleid);
+        const res = await fetch(`/heatmap?${query}`);
+        const data = await res.json();
+        if (token !== startToken) return;
+        if (!res.ok) throw new Error(data.error || res.status);
+
+        const from = Math.floor(s.from);
+        const to = Math.min(Math.floor(s.to), data.duration);
+        const players = selectTracks(data, s.target);
+        if (to <= from) throw new Error("empty time range");
+        if (!players.length) throw new Error("no player data for target " + s.target);
+
+        play = {
+          tracks: players.map((p) => buildDense(p.track, from, to, s.skipDead)),
+          from, to, t: from, next: from,
+        };
+        running = true;
+        status = "playing";
+      } catch (e) {
+        status = "error: " + e.message;
+        console.error("heatmap start failed:", e);
+      }
+    }
+
+    function handleCommand(state) {
+      startToken++; // cancels an in-flight start
+      if (state.action === "start") {
+        startPlayback();
+      } else if (state.action === "stop") {
+        running = false;
+        status = "stopped";
+      } else if (state.action === "clear") {
+        running = false;
+        play = null;
+        clearHeat();
+        status = "cleared";
+      }
+    }
+
+    async function poll() {
+      try {
+        const res = await fetch("/heatmapcontrol", { cache: "no-store" });
+        const state = await res.json();
+        const changed = JSON.stringify(state.settings) !== JSON.stringify(settings);
+        settings = state.settings;
+        if (changed) dirty = true;
+        if (seq === null) {
+          seq = state.seq; // ignore commands issued before this page loaded
+        } else if (state.seq !== seq) {
+          seq = state.seq;
+          handleCommand(state);
+        }
+      } catch (e) {
+        console.error("heatmap poll failed:", e);
+      }
+    }
+
+    // Playback is driven by a timer (keeps running in background tabs); drawing uses requestAnimationFrame
+    let last = performance.now();
+    function tick() {
+      const now = performance.now();
+      const dt = Math.min(5, (now - last) / 1000);
+      last = now;
+
+      if (settings && running && play) {
+        play.t += dt * settings.speed;
+        const upTo = Math.min(Math.floor(play.t), play.to);
+        while (play.next <= upTo) {
+          for (const dense of play.tracks) {
+            const p = dense[play.next - play.from];
+            if (p) {
+              const [fu, fv] = toMapFraction(p[0], p[1], settings);
+              addDot(fu, fv, settings);
+            }
+          }
+          play.next++;
+          dirty = true;
+        }
+        if (play.t >= play.to) {
+          running = false;
+          status = "finished";
+        }
+      }
+
+      if (settings && dirty) {
+        colorize(settings);
+        dirty = false;
+      }
+    }
+
+    function frame() {
+      if (settings) {
+        ctx.clearRect(0, 0, W, H);
+        if (bg.complete && bg.naturalWidth) {
+          ctx.drawImage(bg, settings.mapX, settings.mapY, settings.mapSize, settings.mapSize);
+        }
+        ctx.globalAlpha = settings.opacity;
+        ctx.drawImage(heatCanvas, settings.mapX, settings.mapY, settings.mapSize, settings.mapSize);
+        ctx.globalAlpha = 1;
+
+        if (params.has("debug")) {
+          const shown = play ? Math.min(play.t, play.to).toFixed(0) : "-";
+          ctx.fillStyle = "#fff";
+          ctx.font = "20px sans-serif";
+          ctx.fillText(`${status}  t=${shown}`, 20, 30);
+        }
+      }
+      requestAnimationFrame(frame);
+    }
+
+    poll();
+    setInterval(poll, 500);
+    setInterval(tick, 33);
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
