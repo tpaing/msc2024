@@ -156,7 +156,14 @@ const validFirstItems = [
 
 //=== TRINITY ITEM TRACKING ===
 const ownedItemsTracker = {}; // { "battleid_roleid": Set of item ids ever equipped }
-const trinityItems = [2008, 2009, 2006]; // <- your actual 3 required item IDs
+const trinityItems = [2008, 2009, 2006]; // swift trinity (used by the led route)
+// Checked in order; the first complete set wins. Image = trinity/<image>.png
+const trinityTypes = [
+  { name: "swift", items: trinityItems, image: 1 },
+  { name: "magic", items: [3110, 3105, 3102], image: 2 },
+  { name: "hybrid", items: [2013, 3204, 2208], image: 3 },
+  { name: "lifesteal", items: [3004, 2208, 2013], image: 4 },
+];
 
 // Module-level - must be outside/above the route handler
 const ultState = {}; // roleid -> { peak, startTime, lastLeft }
@@ -5275,11 +5282,9 @@ app.get("/item", (req, res) => {
             player.equip_list.forEach(itemId => ownedItemsTracker[key].add(itemId));
           }
           const owned = ownedItemsTracker[key];
-          const hasAllTrinity = trinityItems.every(itemId => owned.has(itemId));
+          const matched = trinityTypes.find(t => t.items.every(itemId => owned.has(itemId)));
 
-          responseData[`trinity${offset}`] = hasAllTrinity
-            ? `C://data/trinity/1.png`
-            : `C://data/trinity/0.png`;
+          responseData[`trinity${offset}`] = `C://data/trinity/${matched ? matched.image : 0}.png`;
         } catch (e) {
           console.error(`Error building trinity for offset ${offset}:`, e);
           responseData[`trinity${offset}`] = `C://data/trinity/0.png`;
