@@ -2893,9 +2893,15 @@ app.get("/hud", async (req, res) => {
       responseData.Tower1 = team1?.kill_tower || 0;
       responseData.Tower2 = team2?.kill_tower || 0;
 
+      // Spawn count = kills + 1 while a boss is currently up. *_left_time is also 0 before the
+      // first spawn, so only trust it once the game clock has passed the first spawn time.
+      const TURTLE_FIRST_SPAWN_SEC = 120;
+      const LORD_FIRST_SPAWN_SEC = 480;
       const isPlaying = data.state === "play" && (gameTime || 0) > 0;
-      const turtleAlive = isPlaying && (data.tortoise_left_time || 0) === 0 ? 1 : 0;
-      const lordAlive = isPlaying && (data.lord_left_time || 0) === 0 ? 1 : 0;
+      const turtleAlive =
+        isPlaying && gameTime >= TURTLE_FIRST_SPAWN_SEC && (data.tortoise_left_time || 0) === 0 ? 1 : 0;
+      const lordAlive =
+        isPlaying && gameTime >= LORD_FIRST_SPAWN_SEC && (data.lord_left_time || 0) === 0 ? 1 : 0;
       responseData.turtleSpawnCount =
         (team1?.kill_tortoise || 0) + (team2?.kill_tortoise || 0) + turtleAlive;
       responseData.LordSpawnCount =
