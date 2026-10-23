@@ -2920,6 +2920,50 @@ app.get("/hud", async (req, res) => {
       responseData.LordSpawnCount = 0;
     }
 
+    // Lord Kill Advantage
+    try {
+      const lkAdv1 = team1?.kill_lord_advantage;
+      const lkAdv2 = team2?.kill_lord_advantage;
+
+      if (Array.isArray(lkAdv1) && lkAdv1.length > 0) {
+        const last1 = lkAdv1[lkAdv1.length - 1];
+        responseData.lkAdvGold1 = last1?.gold || 0;
+        responseData.lkAdvExp1 = last1?.exp || 0;
+        responseData.lkAdvTwrHp1 = last1?.tower_hp || 0;
+      } else {
+        responseData.lkAdvGold1 = 0;
+        responseData.lkAdvExp1 = 0;
+        responseData.lkAdvTwrHp1 = 0;
+      }
+
+      if (Array.isArray(lkAdv2) && lkAdv2.length > 0) {
+        const last2 = lkAdv2[lkAdv2.length - 1];
+        responseData.lkAdvGold2 = last2?.gold || 0;
+        responseData.lkAdvExp2 = last2?.exp || 0;
+        responseData.lkAdvTwrHp2 = last2?.tower_hp || 0;
+      } else {
+        responseData.lkAdvGold2 = 0;
+        responseData.lkAdvExp2 = 0;
+        responseData.lkAdvTwrHp2 = 0;
+      }
+
+      // Which team killed the last lord
+      const lordEvents = (data.incre_event_list || []).filter(
+        (e) => e?.event_type === "kill_boss" && e?.boss_name === "lord"
+      );
+      responseData.killLordLast =
+        lordEvents.length > 0 ? lordEvents[lordEvents.length - 1].campid || 0 : 0;
+    } catch (error) {
+      console.error('Error processing lord kill advantage:', error);
+      responseData.lkAdvGold1 = 0;
+      responseData.lkAdvExp1 = 0;
+      responseData.lkAdvTwrHp1 = 0;
+      responseData.lkAdvGold2 = 0;
+      responseData.lkAdvExp2 = 0;
+      responseData.lkAdvTwrHp2 = 0;
+      responseData.killLordLast = 0;
+    }
+
     // Enhanced event processing with comprehensive error handling
     const eventList = data.incre_event_list || [];
 
