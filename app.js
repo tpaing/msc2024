@@ -2902,8 +2902,12 @@ app.get("/hud", async (req, res) => {
         isPlaying && gameTime >= TURTLE_FIRST_SPAWN_SEC && (data.tortoise_left_time || 0) === 0 ? 1 : 0;
       const lordAlive =
         isPlaying && gameTime >= LORD_FIRST_SPAWN_SEC && (data.lord_left_time || 0) === 0 ? 1 : 0;
-      responseData.turtleSpawnCount =
-        (team1?.kill_tortoise || 0) + (team2?.kill_tortoise || 0) + turtleAlive;
+
+      //responseData.turtleSpawnCount = (team1?.kill_tortoise || 0) + (team2?.kill_tortoise || 0) + turtleAlive;
+      responseData.turtleSpawnCount = Math.min(
+        3,
+        (team1?.kill_tortoise || 0) + (team2?.kill_tortoise || 0) + turtleAlive
+      );
       responseData.LordSpawnCount =
         (team1?.kill_lord || 0) + (team2?.kill_lord || 0) + lordAlive;
     } catch (error) {
